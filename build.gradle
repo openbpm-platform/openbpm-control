@@ -17,7 +17,7 @@ jmix {
 }
 
 group = 'io.openbpm'
-version = '1.0.999-SNAPSHOT'
+version = '1.1.999-SNAPSHOT'
 
 repositories {
     mavenCentral()
