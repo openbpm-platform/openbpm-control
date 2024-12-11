@@ -1,0 +1,54 @@
+#
+# Copyright (c) Haulmont 2024. All Rights Reserved.
+# Use is subject to license terms.
+#
+
+# This is a lightweight configuration with OpenBPM control application + database that does not include Camunda 7.
+# See docker-compose-full.yml for a full configuration that includes external Camunda 7.
+
+services:
+  openbpm-control-app: # OpenBPM Сontrol web application exposed on the configured port (by default 8081)
+    image: openbpm/openbpm-control:latest
+    container_name: openbpm-control-app
+    build: ..
+    restart: "no"
+    environment:
+      MAIN_DATASOURCE_URL: "jdbc:postgresql://openbpm-control-database/${OPENBPM_CONTROL_DB_NAME}"
+      MAIN_DATASOURCE_USERNAME: "${OPENBPM_CONTROL_DB_USERNAME}"
+      MAIN_DATASOURCE_PASSWORD: "${OPENBPM_CONTROL_DB_PASSWORD}"
+      SERVER_PORT: "${OPENBPM_CONTROL_SERVER_PORT}"
+      UI_LOGIN_DEFAULTUSERNAME: "${OPENBPM_CONTROL_UI_DEFAULT_USERNAME}"
+      UI_LOGIN_DEFAULTPASSWORD: "${OPENBPM_CONTROL_UI_DEFAULT_PASSWORD}"
+    ports:
+      - "${OPENBPM_CONTROL_SERVER_PORT}:${OPENBPM_CONTROL_SERVER_PORT}"
+    depends_on:
+      openbpm-control-database:
+        condition: service_started
+    healthcheck:
+      test: curl --fail --silent http://localhost:$$SERVER_PORT/actuator/health | grep UP || exit 1
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+
+  openbpm-control-database: # PostgresQL database used by OpenBPM Сontrol web application
+    image: postgres:16.3
+    container_name: openbpm-control-database
+    restart: "no"
+    ports:
+      - "5432:5432"
+    volumes:
+      - openbpm-control-database_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "${OPENBPM_CONTROL_DB_USERNAME}"
+      POSTGRES_PASSWORD: "${OPENBPM_CONTROL_DB_PASSWORD}"
+      POSTGRES_DB: "${OPENBPM_CONTROL_DB_NAME}"
+    healthcheck:
+      test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+
+volumes:
+  openbpm-control-database_data:

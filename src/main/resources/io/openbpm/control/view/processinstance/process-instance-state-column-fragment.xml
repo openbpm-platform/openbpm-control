@@ -1,0 +1,12 @@
+<fragment xmlns="http://jmix.io/schema/flowui/fragment">
+    <data readOnly="true">
+        <instance id="processInstanceDataDc" class="io.openbpm.control.entity.processinstance.ProcessInstanceData"/>
+    </data>
+    <content>
+        <hbox padding="false" themeNames="spacing-xs" classNames="mt-xs mb-xs" width="max-content" alignItems="BASELINE">
+            <icon id="incidentIcon" icon="WARNING" size="1em" classNames="text-error" visible="false">
+                <tooltip text="msg://processInstanceIncidentTooltip"/>
+            </icon>
+        </hbox>
+    </content>
+</fragment>

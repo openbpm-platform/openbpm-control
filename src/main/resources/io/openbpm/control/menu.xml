@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<menu-config xmlns="http://jmix.io/schema/flowui/menu">
+    <item view="bpm_ProcessDefinition.list"
+          description="msg://io.openbpm.control/menu_config.bpm_ProcessDefinition.list.description"
+          title="msg://io.openbpm.control/menu_config.bpm_ProcessDefinition.list.title" icon="SITEMAP"/>
+    <item view="bpm_ProcessInstance.list"
+          description="msg://io.openbpm.control/menu_config.bpm_ProcessInstance.list.description"
+          title="msg://io.openbpm.control/menu_config.bpm_ProcessInstance.list.title" icon="TASKS">
+        <urlQueryParameters>
+            <parameter name="mode" value="active"/>
+        </urlQueryParameters>
+    </item>
+    <item view="bpm_AllTasksView" title="msg://io.openbpm.control/allTasks" icon="USER_CARD"/>
+    <item view="IncidentData.list" title="msg://io.openbpm.control.view.incidentdata/incidentDataListView.title" icon="WARNING"/>
+    <item view="BpmEngine.list" title="msg://io.openbpm.control.view.bpmengine/bpmEngineListView.title" icon="CLOUD"/>
+    <menu id="security">
+        <item view="User.list" title="msg://io.openbpm.control.view.user/UserListView.title" icon="USERS"/>
+        <item view="sec_ResourceRoleModel.list"
+              title="msg://io.jmix.securityflowui.view.resourcerole/resourceRoleModelListView.menu" icon="SHIELD"/>
+        <item view="sec_RowLevelRoleModel.list"  icon="LOCK"
+              title="msg://io.jmix.securityflowui.view.rowlevelrole/rowLevelRoleModelListView.menu"/>
+    </menu>
+    <menu id="datatools">
+        <item view="datatl_entityInspectorListView" title="msg://io.jmix.datatoolsflowui.view.entityinspector/listTitle"
+              icon="TOOLS"/>
+    </menu>
+</menu-config>

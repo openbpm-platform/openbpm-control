@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://taskReassignView.title">
+    <actions>
+        <action id="reassignAction" shortcutCombination="${SAVE_SHORTCUT}" text="msg:///actions.Ok"
+                icon="CHECK"/>
+        <action id="closeAction" shortcutCombination="${CLOSE_SHORTCUT}" text="msg:///actions.Close"
+                icon="BAN"/>
+    </actions>
+    <layout>
+        <formLayout width="100%">
+            <textField id="newAssigneeField" placeholder="msg://startTypingUserName" classNames="pt-xs"
+                       label="msg://newTaskAssignee"/>
+        </formLayout>
+        <hbox width="100%" justifyContent="END">
+            <button id="okBtn" action="reassignAction" themeNames="primary"/>
+            <button id="cancelBtn" action="closeAction"/>
+        </hbox>
+    </layout>
+</view>

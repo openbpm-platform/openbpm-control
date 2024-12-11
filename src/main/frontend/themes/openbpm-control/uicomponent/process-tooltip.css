@@ -1,0 +1,16 @@
+/*
+ * Copyright (c) Haulmont 2024. All Rights Reserved.
+ * Use is subject to license terms.
+ */
+
+.process-tooltip::part(content) {
+    font-size: medium;
+    white-space: pre;
+    font-weight: 500;
+    max-width: 30em;
+}
+
+.process-tooltip::part(overlay) {
+    font-size: medium;
+    min-width: min-content;
+}

@@ -1,0 +1,65 @@
+/*
+ * Copyright (c) Haulmont 2024. All Rights Reserved.
+ * Use is subject to license terms.
+ */
+
+package io.openbpm.control.service.externaltask;
+
+import io.openbpm.control.entity.ExternalTaskData;
+import io.openbpm.control.entity.filter.ExternalTaskFilter;
+import org.springframework.lang.Nullable;
+
+import java.util.List;
+
+/**
+ * Provides methods for getting and updating data about external task instances in the BPM engine.
+ */
+public interface ExternalTaskService {
+    /**
+     * Loads running external task instances from the engine using the specified context.
+     *
+     * @param loadContext a context to load external task instances
+     * @return found running external tasks
+     */
+    List<ExternalTaskData> findRunningTasks(ExternalTaskLoadContext loadContext);
+
+    /**
+     * Loads from engine the total count of external task instances that match the specified filter.
+     *
+     * @param filter an external task filter instance
+     * @return count of external task instances
+     */
+    long getRunningTasksCount(@Nullable ExternalTaskFilter filter);
+
+    /**
+     * Updates the retry count to the specified value for the external task instance with the specified identifier.
+     *
+     * @param externalTaskId an external task instance identifier
+     * @param retries        a new value of retries
+     */
+    void setRetries(String externalTaskId, int retries);
+
+    /**
+     * Asynchronously updates the retry count to the specified value for external task instances with the specified identifiers.
+     *
+     * @param externalTaskIds a list of external task instance identifiers
+     * @param retries         a new value of retries
+     */
+    void setRetriesAsync(List<String> externalTaskIds, int retries);
+
+    /**
+     * Loads error details for the running external task instance with the specified identifier.
+     *
+     * @param externalTaskId an identifier of running external task instance
+     * @return error details
+     */
+    String getErrorDetails(String externalTaskId);
+
+    /**
+     * Loads from the engine history the error details for the completed external task instance with the specified identifier.
+     *
+     * @param externalTaskId an identifier of completed external task instance
+     * @return error details
+     */
+    String getHistoryErrorDetails(String externalTaskId);
+}

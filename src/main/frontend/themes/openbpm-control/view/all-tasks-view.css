@@ -1,0 +1,35 @@
+/*
+ * Copyright (c) Haulmont 2024. All Rights Reserved.
+ * Use is subject to license terms.
+ */
+
+.user-tasks-filter-count-badge {
+    position: relative;
+    display: flex;
+    border-radius: 50%;
+    z-index: 1;
+    left: -0.75em;
+    background-color: var(--lumo-contrast);
+    color: var(--lumo-primary-contrast-color);
+}
+
+.user-tasks-filter-container {
+    width: min-content;
+    border: 1px var(--lumo-utility-border-style, solid) var(--lumo-utility-border-color, var(--lumo-contrast-20pct));
+    border-radius: var(--lumo-border-radius-l);
+    box-shadow: 0 0 6px 2px var(--lumo-shade-20pct);
+    gap: var(--lumo-space-m);
+    padding: var(--lumo-space-m);
+    height: max-content;
+    min-height: 95%;
+    min-width: 20.5em;
+}
+
+.user-tasks-filter-button-container {
+    display: inline-flex;
+    align-items: self-start;
+    justify-content: flex-start;
+    min-height: inherit;
+    text-shadow: inherit;
+    position: relative;
+}

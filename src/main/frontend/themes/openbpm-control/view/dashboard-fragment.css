@@ -1,0 +1,110 @@
+/*
+ * Copyright (c) Haulmont 2024. All Rights Reserved.
+ * Use is subject to license terms.
+ */
+
+.dashboard-root-container {
+    background-color: var(--dashboard-background-color);
+}
+
+.bordered-card {
+    border: 1px var(--lumo-utility-border-style, solid) var(--lumo-utility-border-color, var(--lumo-contrast-20pct));
+    border-radius: var(--lumo-border-radius-l);
+    box-shadow: var(--lumo-box-shadow-s);
+}
+
+.suspend-instances-count-icon {
+    padding-left: 0.1em;
+    padding-right: 0.1em;
+}
+
+@media (min-width: 640px) {
+    .sm\:dashboard-padding {
+        padding-left: 1em;
+        padding-right: 1em;
+    }
+}
+
+@media (min-width: 768px) {
+    .md\:dashboard-padding {
+        padding-left: 2em;
+        padding-right: 2em;
+    }
+}
+
+@media (min-width: 1024px) {
+    .lg\:dashboard-padding {
+        padding-left: 1em;
+        padding-right: 1em;
+    }
+}
+
+@media (min-width: 1280px) {
+    .xl\:dashboard-padding {
+        padding-left: 2em;
+        padding-right: 2em;
+    }
+}
+
+@media (min-width: 1536px) {
+    .xxl\:dashboard-padding {
+        padding-left: 5em;
+        padding-right: 5em;
+    }
+}
+
+.count-statistics-card {
+    height: 5em;
+}
+
+@media (min-width: 640px) {
+    .sm\:small-gap {
+        gap: var(--lumo-space-s);
+    }
+}
+
+@media (min-width: 768px) {
+    .md\:small-gap {
+        gap: var(--lumo-space-s);
+    }
+}
+
+@media (min-width: 1024px) {
+    .lg\:small-gap {
+        gap: var(--lumo-space-s);
+    }
+}
+
+@media (min-width: 1280px) {
+    .xl\:small-gap {
+        gap: var(--lumo-space-s);
+    }
+}
+
+@media (min-width: 1536px) {
+    .xxl\:small-gap {
+        gap: var(--lumo-space-l);
+    }
+}
+
+.skeleton-background {
+      background: linear-gradient(90deg, var(--lumo-contrast-10pct) 25%, var(--lumo-contrast-20pct) 37%, var(--lumo-contrast-10pct) 63%);
+      background-size: 400% 100%;
+      animation-name: skeleton-loading;
+      animation-duration: 1.4s;
+      animation-timing-function: ease;
+      animation-iteration-count: infinite;
+      border-radius: var(--lumo-border-radius-m);
+      color: transparent;
+      min-width: 1.25em;
+}
+
+@keyframes skeleton-loading {
+    0% {
+      background-position: 100% 50%;
+    }
+
+    100% {
+     background-position: 0 50%;
+  }
+}

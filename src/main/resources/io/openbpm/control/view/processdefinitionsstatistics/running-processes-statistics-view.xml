@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://processDefinitionsStatisticsView.title">
+    <data>
+        <keyValueCollection id="statisticsDc">
+            <properties>
+                <property datatype="string"
+                          name="process"/>
+                <property datatype="int"
+                          name="instanceCount"/>
+            </properties>
+        </keyValueCollection>
+    </data>
+    <layout>
+        <dataGrid id="runningInstancesStatisticsDataGrid" dataContainer="statisticsDc" width="100%">
+            <columns>
+                <column property="process" header="msg://process" autoWidth="true"/>
+                <column property="instanceCount" header="msg://instanceCount" autoWidth="true"/>
+            </columns>
+        </dataGrid>
+        <hbox width="100%" justifyContent="END">
+            <button id="closeBtn" text="msg:///actions.Cancel" icon="BAN"/>
+        </hbox>
+    </layout>
+</view>

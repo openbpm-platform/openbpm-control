@@ -1,0 +1,110 @@
+#
+# Copyright (c) Haulmont 2024. All Rights Reserved.
+# Use is subject to license terms.
+#
+
+# This is a full configuration with OpenBPM control application + database and external Camunda 7 + database
+# See docker-compose-core.yml for a lightweight configuration that does not include Camunda 7.
+
+services:
+  openbpm-control-app: # OpenBPM Сontrol web application exposed on configured port (by default 8081)
+    image: openbpm/openbpm-control:latest
+    container_name: openbpm-control-app
+    build: ..
+    restart: "no"
+    environment:
+      MAIN_DATASOURCE_URL: "jdbc:postgresql://openbpm-control-database/${OPENBPM_CONTROL_DB_NAME}"
+      MAIN_DATASOURCE_USERNAME: "${OPENBPM_CONTROL_DB_USERNAME}"
+      MAIN_DATASOURCE_PASSWORD: "${OPENBPM_CONTROL_DB_PASSWORD}"
+      SERVER_PORT: "${OPENBPM_CONTROL_SERVER_PORT}"
+      UI_LOGIN_DEFAULTUSERNAME: "${OPENBPM_CONTROL_UI_DEFAULT_USERNAME}"
+      UI_LOGIN_DEFAULTPASSWORD: "${OPENBPM_CONTROL_UI_DEFAULT_PASSWORD}"
+    ports:
+      - "${OPENBPM_CONTROL_SERVER_PORT}:${OPENBPM_CONTROL_SERVER_PORT}"
+    depends_on:
+      openbpm-control-database:
+        condition: service_started
+    healthcheck:
+      test: curl --fail --silent http://localhost:$$SERVER_PORT/actuator/health | grep UP || exit 1
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+    networks:
+      - openbpm-control-platform-net
+
+  openbpm-control-database: # PostgresQL database used by OpenBPM Сontrol web application
+    image: postgres:16.3
+    container_name: openbpm-control-database
+    restart: "no"
+    ports:
+      - "5432:5432"
+    volumes:
+      - openbpm-control-database_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: "${OPENBPM_CONTROL_DB_USERNAME}"
+      POSTGRES_PASSWORD: "${OPENBPM_CONTROL_DB_PASSWORD}"
+      POSTGRES_DB: "${OPENBPM_CONTROL_DB_NAME}"
+    healthcheck:
+      test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+      interval: 10s
+      timeout: 5s
+      start_period: 10s
+      retries: 5
+    networks:
+      - openbpm-control-platform-net
+
+  camunda7-bpm-platform: # Camunda 7 included REST API and web apps exposed on configured port (by default 8082)
+    container_name: camunda7-bpm-platform
+    image: camunda/camunda-bpm-platform:run-${CAMUNDA_RUN_VERSION}
+    environment:
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: "org.postgresql.Driver"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://camunda7-bpm-platform-database:5432/${CAMUNDA7_DB_NAME}"
+      SPRING_DATASOURCE_USERNAME: "${CAMUNDA7_DB_USERNAME}"
+      SPRING_DATASOURCE_PASSWORD: "${CAMUNDA7_DB_PASSWORD}"
+      SERVER_PORT: "${CAMUNDA7_SERVER_PORT}"
+      CAMUNDA_BPM_RUN_AUTH_ENABLED: "true"
+      CAMUNDA_BPM_ADMIN_USER_ID: "${CAMUNDA7_UI_ADMIN_USERNAME}"
+      CAMUNDA_BPM_ADMIN_USER_PASSWORD: "${CAMUNDA7_UI_ADMIN_PASSWORD}"
+    ports:
+      - "${CAMUNDA7_SERVER_PORT}:${CAMUNDA7_SERVER_PORT}"
+    depends_on:
+      camunda7-bpm-platform-database:
+        condition: service_started
+    command: ./camunda.sh --rest --webapps
+    healthcheck:
+      test: curl --fail --silent http://localhost:$$SERVER_PORT/engine-rest/engine | grep default  || exit 1
+      interval: 30s
+      timeout: 5s
+      start_period: 30s
+      retries: 5
+    networks:
+      - openbpm-control-platform-net
+
+  camunda7-bpm-platform-database: # PostgresQL database used by Camunda 7
+      image: postgres:16.3
+      container_name: camunda7-bpm-platform-database
+      ports:
+        - "5433:5432"
+      environment:
+        - POSTGRES_USER=${CAMUNDA7_DB_USERNAME}
+        - POSTGRES_PASSWORD=${CAMUNDA7_DB_PASSWORD}
+        - POSTGRES_DB=${CAMUNDA7_DB_NAME}
+      volumes:
+        - camunda7-bpm-platform-database_data:/var/lib/postgresql/data
+      healthcheck:
+        test: pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB
+        interval: 10s
+        timeout: 5s
+        start_period: 10s
+        retries: 5
+      networks:
+        - openbpm-control-platform-net
+
+volumes:
+  openbpm-control-database_data:
+  camunda7-bpm-platform-database_data:
+
+networks:
+  openbpm-control-platform-net:
+    driver: bridge

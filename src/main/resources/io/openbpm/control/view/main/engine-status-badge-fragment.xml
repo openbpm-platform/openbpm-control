@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fragment xmlns="http://jmix.io/schema/flowui/fragment">
+    <data>
+        <instance id="engineConnectionStatusDc" provided="true"
+                  class="io.openbpm.control.entity.EngineConnectionCheckResult"/>
+        <instance id="selectedEngineDc" provided="true"
+                  class="io.openbpm.control.entity.engine.BpmEngine"/>
+    </data>
+    <content>
+        <flexLayout classNames="ml-auto pr-l gap-s" alignItems="CENTER">
+            <span id="engineStateBadge" themeNames="badge pill contrast">
+                <spinner id="statusSpinner" classNames="pr-xs" visible="false"/>
+                <icon id="successStatusIcon" icon="CHECK_CIRCLE" classNames="p-xs" visible="false"/>
+                <icon id="warningStatusIcon" icon="WARNING" classNames="p-xs" visible="false"/>
+                <div id="connectionStatusText" classNames="inline-flex gap-xs"/>
+            </span>
+            <button id="viewEngineConfigBtn" icon="lumo:edit" themeNames="contrast tertiary-inline"/>
+        </flexLayout>
+    </content>
+</fragment>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://historicVariableInstanceDataDetailView.title"
+      focusComponent="form">
+    <data>
+        <instance id="historicVariableInstanceDataDc"
+                  class="io.openbpm.control.entity.variable.HistoricVariableInstanceData">
+            <loader id="historicVariableInstanceDataDl"/>
+        </instance>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+    <actions>
+        <action id="closeAction" type="detail_close"/>
+    </actions>
+    <layout>
+        <formLayout id="form" dataContainer="historicVariableInstanceDataDc">
+            <textField id="nameField" property="name" readOnly="true"/>
+            <textField id="typeField" property="type" readOnly="true"/>
+            <textField id="fileNameField" property="valueInfo.filename" visible="false" readOnly="true"/>
+            <textField id="mimeTypeField" property="valueInfo.mimeType" visible="false" readOnly="true"/>
+            <textField id="encodingField" property="valueInfo.encoding" visible="false" readOnly="true"/>
+            <textField id="objectTypeInfoField" property="valueInfo.object.objectTypeName" visible="false" readOnly="true"/>
+            <textField id="serializationDataFormatField" property="valueInfo.object.serializationDataFormat"
+                       visible="false" readOnly="true"/>
+            <dateTimePicker id="createTimeField" property="createTime" readOnly="true"/>
+            <textField id="idField" property="historicVariableInstanceId" readOnly="true"/>
+            <textField id="taskIdField" property="taskId" readOnly="true"/>
+            <textField id="activityInstanceIdField" property="activityInstanceId" readOnly="true"/>
+            <textField id="stateField" property="state" readOnly="true"/>
+            <textField id="errorMessageField" property="errorMessage" readOnly="true"/>
+        </formLayout>
+        <hbox id="detailActions" width="100%" justifyContent="END">
+            <button id="closeBtn" action="closeAction"/>
+        </hbox>
+    </layout>
+</view>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://variableInstanceData.detail.title">
+    <data>
+        <instance id="variableInstanceDc"
+                  class="io.openbpm.control.entity.variable.VariableInstanceData"/>
+    </data>
+    <actions>
+        <action id="saveAction" type="detail_saveClose" text="msg:///actions.Save" icon="ARCHIVE"/>
+        <action id="okAction" type="detail_saveClose"/>
+        <action id="closeAction" type="detail_close"/>
+    </actions>
+    <layout spacing="false">
+        <formLayout id="form" dataContainer="variableInstanceDc">
+            <textField id="nameField" property="name" required="true"/>
+            <comboBox id="typeComboBox" label="msg://valueType"/>
+            <textField id="activityInstanceIdField" property="activityInstanceId" visible="false" readOnly="true"/>
+            <textField id="fileNameField" property="valueInfo.filename" visible="false"/>
+            <textField id="mimeTypeField" property="valueInfo.mimeType" visible="false"/>
+            <textField id="encodingField" property="valueInfo.encoding" visible="false"/>
+            <textField id="objectTypeInfoField" property="valueInfo.object.objectTypeName" visible="false"/>
+            <textField id="serializationDataFormatField" property="valueInfo.object.serializationDataFormat"
+                       visible="false"/>
+
+        </formLayout>
+        <formLayout id="valueForm" dataContainer="variableInstanceDc" labelsPosition="TOP"
+                    height="100%">
+            <responsiveSteps>
+                <responsiveStep minWidth="0" columns="1" labelsPosition="TOP"/>
+            </responsiveSteps>
+        </formLayout>
+        <hbox id="editActions" width="100%" justifyContent="END">
+            <button id="saveBtn" action="saveAction" visible="false"/>
+            <button id="okBtn" action="okAction" visible="false"/>
+            <button action="closeAction"/>
+        </hbox>
+    </layout>
+</view>

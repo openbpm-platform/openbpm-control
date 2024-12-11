@@ -1,1 +1,207 @@
-# openbpm-control
+**OpenBPM Control** is a web application that provides administrative functionality for external BPM engines.
+
+**Key Features**
+- **Connection Management:** Easily set up connections to various BPM engines and switch between them as needed.
+- **Process Browsing:** Navigate through the processes deployed to the engine.
+- **Process Deployement:** Deploy a new version of a business process with a convenient diagram preview.
+- **Instance Management:** Manage process instances currently running on the BPM engine.
+- **User Task Management:** View user tasks with the ability to reassign them.
+
+> [!NOTE]
+> Currently, only Camunda 7 is supported. 
+
+OpenBPM Control is built using the open-source [Jmix](https://www.jmix.io) framework.
+
+## Table of Contents
+
+- [Running the Application](#running-the-application)
+   - [Docker Image](#docker-image)
+   - [Using Sources](#using-sources)
+- [Usage](#usage)
+   - [Connecting to BPM Engines](#connecting-to-bpm-engines)
+   - [Working with Processes](#working-with-processes)
+     - [Deploying a Process](#deploying-a-process)
+     - [Starting a Process](#starting-a-process)
+   - [Managing Process Instances](#managing-process-instances)
+   - [User Tasks](#user-tasks)
+   - [Incidents](#incidents)
+   - [Configuring Users](#configuring-users)
+- [License](#license) 
+
+
+## Running the Application <a name="running-the-application"></a>
+
+You can run OpenBPM Control using either a Docker image or from source code.
+
+### Docker Image <a name="using-docker-image"></a>
+This method allows running OpenBPM Control with a pre-built Docker image.
+
+**Prerequisites:**
+
+You must have the following installed:
+1. Docker
+2. Docker Compose
+
+Instructions can be found [here](docker-compose/README.md).
+
+### Using Sources <a name="using-sources"></a>
+This method allows building and running OpenBPM Control locally with Gradle.
+
+**Prerequisites:**
+
+You must have the following installed:
+1. Git
+2. Java 21 (JDK and JRE)
+3. PostgreSQL
+
+**Instructions:**
+
+1. Clone the repository:
+    ```shell
+     git clone https://github.com/openbpm-platform/openbpm-control
+    ```
+2. Configure a PostgreSQL database.
+   OpenBPM Control stores data such as connections to BPM engines in the database. 
+   OpenBPM Control requires a PostgreSQL database by default:
+   - Name: `openbpm-control`
+   - Connection username: `root`
+   - Connection password: `root`
+3. Navigate to the cloned project directory and open a terminal.
+4. Run the following command:
+   ```shell
+    .\gradlew bootRun
+   ```
+The application is now running at http://localhost:8081 in the browser.
+
+## Usage <a name="usage"></a>
+OpenBPM Control requires authenticated access. An administrative user with the credentials `admin/admin` is provided 
+from the start. To add more users, see the [Configuring Users](#configuring-users) section.
+
+### Connecting to BPM Engines <a name="connecting-to-bpm-engines"></a>
+To add a connection to a running BPM engine, follow these steps:
+
+1. Navigate to the **BPM engines** view using the application menu.
+2. Click **Create**. 
+3. In the **New BPM engine** view, provide the following details:
+    - _Name_: a short name for your server where BPM engine is running. (e.g., `Dev stand`).
+    - _Base URL_.
+3. If the target BPM engine requires authenticated access, set the **Enabled** checkbox in the Authentication group to true.
+   You can then configure the credentials needed for this connection.
+4. Click the **OK** button to save the connection.
+
+![engine-list-view.png](img/engine-list-view.png)
+
+You can configure as many connections as needed.
+
+In the upper right corner, you can see which engine OpenBPM Control is currently connected to.
+
+![engine-state.png](img/engine-state.png)
+
+To switch to another configured BPM engine, click the **Edit** button next to the engine status badge.
+
+![engine-detail-view.png](img/engine-detail-view.png)
+
+### Working with Processes <a name="working-with-processes"></a>
+
+To view the business processes deployed on the selected BPM engine, click the **Processes** item in the application menu.
+The **Processes** view will open, enabling you to filter and sort deployed processes displayed in the table.
+By default, only the latest versions of deployed processes are displayed.
+
+The following actions are also available:
+- **Refresh:** reloads process list from the BPM engine.
+- **Deploy:** an action to deploy a BPMN 2.0 XML to the BPM engine.
+- **Remove:** removes selected deployed processes and associated instances.
+- **Activate:** activates suspended process versions and associated instances.
+- **Suspend:** suspends active process versions and their associated instances.
+- **View:** displays the details of the deployed process such as diagram, BPMN 2.0 XML and more.
+
+![process-list-view.png](img/process-list-view.png)
+
+#### Deploying a Process <a name="deploying-a-process"></a>
+You can deploy a new process or a new version of an existing process using the **Deploy** action available in the **Processes** view.
+Clicking the **Deploy** button opens the **New process deployment** view.
+
+![new-process-deployment-view.png](img/new-process-deployment-view.png)
+
+To upload a BPMN 2.0 file, click the **Upload** button and select the process to be deployed.
+After uploading, you can preview the diagram of the uploaded process and click the **OK** button to deploy to the BPM engine.
+
+#### Starting a Process <a name="starting-a-process"></a>
+It is possible to start a new instance of the process:
+1. Click the **Start** button in the row in the **Processes** list view.
+2. Click the **Start** button in the **Process Details** view, which you can open by clicking the **View** button.
+
+The **Start process** dialog window allows you to specify the process variables required to start a process.
+
+![start-process-dialog.png](img/start-process-dialog.png)
+
+### Managing Process Instances <a name="managing-process-instances"></a>
+
+To view process instances stored in the BPM engine, use the **Process instances** item in the application menu.
+
+The **Process instances** view allows you to sort and filter the process instances loaded from the BPM engine. 
+By default, only active instances are shown.
+
+![process-instance-list-view.png](img/process-instance-list-view.png)
+
+To view the execution details of a specific process instance, click the **View** button.
+
+In the **Process instance** view, you can view runtime and history data related to this instance, including completed
+and current activities, variable values, and more.
+
+The right panel provides actions available for the process instance such as viewing instance information, activating 
+or suspending the instance.
+
+![process-instance-detail-view.png](img/process-instance-detail-view.png)
+
+### User Tasks <a name="user-tasks"></a>
+
+You can view active user tasks by selecting the **User tasks** item in the application menu. The **User tasks** view 
+will open, enabling you to filter and sort the active tasks associated with the selected BPM engine. For tasks that are
+not suspended, you have the option to complete or reassign them.
+
+![user-task-list-view.png](img/user-task-list-view.png)
+
+### Incidents <a name="incidents"></a>
+
+You can view all opened incidents for the selected BPM engine by selecting the **Incidents** item in the application menu.
+In addition to viewing, you can also increase the number of retries for incidents related to failed jobs and external tasks.
+
+![incident-list-view.png](img/incident-list-view.png)
+
+### Configuring Users <a name="configuring-users"></a>
+OpenBPM Control stores users in the `USER_` table in the configured database.
+
+#### Adding Users <a name="add-a-user"></a>
+
+To add a new user, follow these steps:
+1. Log in to OpenBPM Control with administrator credentials (by default, `admin/admin`).
+2. In the menu, go to **Security** -> **Users** and then click the **Create** button.
+
+![user-list-view.png](img/user-list-view.png)
+
+3. In the opened **User** view, fill the required fields:
+   - **Username**: should be a unique value
+   - **Password** and **Confirm password**
+4. Click **OK** to save the user.
+
+![user-detail-view.png](img/user-detail-view.png)
+
+#### User Permissions
+
+Newly created users do not have any permissions and thus cannot log in to the application or use any of its functionality. 
+To grant permissions to a user, follow these steps:
+
+1. Select a user in the table and click the **Role assignments** button.
+2. Click the **Add** button in the **Resource roles** group.
+3. Select the row with the name **Full Access** and click the **Select** button.
+4. Click **OK** to save.
+
+![role-assignments-view_1.png](img/role-assignments-view_1.png)
+
+![role-assignments-view_2.png](img/role-assignments-view_2.png)
+
+The user can now log in to OpenBPM Control and use all the functionality.
+
+## License <a name="license"></a>
+OpenBPM Control is an open-source project distributed under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license. 

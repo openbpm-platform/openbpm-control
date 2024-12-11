@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd"
+        objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+    <changeSet id="1" author="openbpm-control">
+        <createTable tableName="CONTROL_BPM_ENGINE">
+            <column name="ID" type="${uuid.type}">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="PK_CONTROL_BPM_ENGINE"/>
+            </column>
+            <column name="AUTH_ENABLED" type="BOOLEAN"/>
+            <column name="BASE_URL" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="TYPE_" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="NAME" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="IS_DEFAULT" type="BOOLEAN"/>
+            <column name="AUTH_TYPE" type="VARCHAR(255)"/>
+            <column name="BASIC_AUTH_USERNAME" type="VARCHAR(255)"/>
+            <column name="BASIC_AUTH_PASSWORD" type="VARCHAR(255)"/>
+            <column name="HTTP_HEADER_NAME" type="VARCHAR(255)"/>
+            <column name="HTTP_HEADER_VALUE" type="VARCHAR(500)"/>
+            <column name="VERSION" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="CREATED_BY" type="VARCHAR(255)"/>
+            <column name="CREATED_DATE" type="${offsetDateTime.type}"/>
+            <column name="LAST_MODIFIED_BY" type="VARCHAR(255)"/>
+            <column name="LAST_MODIFIED_DATE" type="${offsetDateTime.type}"/>
+            <column name="DELETED_BY" type="VARCHAR(255)"/>
+            <column name="DELETED_DATE" type="${offsetDateTime.type}"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="2-mysql" author="openbpm-control" dbms="mysql">
+        <createIndex indexName="IDX_BPM_ENGINE_BASE_URL_UNQ" tableName="CONTROL_BPM_ENGINE" unique="true">
+            <column name="BASE_URL"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="2-another-db" author="openbpm-control" dbms="!mysql,!postgresql">
+        <createIndex indexName="IDX_BPM_ENGINE_BASE_URL_UNQ" tableName="CONTROL_BPM_ENGINE" unique="true">
+            <column name="BASE_URL"/>
+            <column name="DELETED_DATE"/>
+        </createIndex>
+    </changeSet>
+    <changeSet id="2-postgresql" author="openbpm-control" dbms="postgresql">
+        <createIndex indexName="IDX_BPM_ENGINE_BASE_URL_UNQ" tableName="CONTROL_BPM_ENGINE" unique="true">
+            <column name="BASE_URL"/>
+        </createIndex>
+
+        <modifySql>
+            <append value="where DELETED_DATE is null"/>
+        </modifySql>
+    </changeSet>
+</databaseChangeLog>

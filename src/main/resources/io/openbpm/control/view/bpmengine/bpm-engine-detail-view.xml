@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://bpmEngineDetailView.title"
+      focusComponent="form">
+    <data>
+        <instance id="bpmEngineDc"
+                  class="io.openbpm.control.entity.engine.BpmEngine">
+            <fetchPlan extends="_base"/>
+            <loader id="bpmEngineDl"/>
+        </instance>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+    <actions>
+        <action id="testConnectionAction" type="control_testEngineConnection"/>
+        <action id="saveAction" type="detail_saveClose"/>
+        <action id="closeAction" type="detail_close"/>
+    </actions>
+    <layout expand="rootBox">
+        <vbox id="rootBox" padding="false">
+            <formLayout id="form" dataContainer="bpmEngineDc" width="100%">
+                <responsiveSteps>
+                    <responsiveStep minWidth="0" columns="1"/>
+                    <responsiveStep minWidth="20em" columns="2"/>
+                    <responsiveStep minWidth="50em" columns="2"/>
+                    <responsiveStep minWidth="70em" columns="3"/>
+                    <responsiveStep minWidth="80em" columns="4"/>
+                </responsiveSteps>
+                <textField id="nameField" property="name" width="100%" classNames="pt-0"
+                           label="msg://io.openbpm.control.entity.engine/BpmEngine.name" maxLength="50"/>
+                <hbox padding="false" alignItems="BASELINE">
+                    <select id="typeField" property="type" classNames="pt-s"
+                            label="msg://io.openbpm.control.entity.engine/BpmEngine.type" width="100%"/>
+                    <hbox alignItems="BASELINE" padding="false" spacing="false">
+                        <checkbox id="defaultField" classNames="pt-s"
+                                  label="msg://io.openbpm.control.entity.engine/BpmEngine.isDefault"
+                                  dataContainer="bpmEngineDc"
+                                  property="isDefault"/>
+                        <icon icon="QUESTION_CIRCLE" classNames="text-secondary" size="0.8em">
+                            <tooltip text="msg://defaultEngine.tooltipText"/>
+                        </icon>
+                    </hbox>
+
+                </hbox>
+
+                <div colspan="2" classNames="pt-0"/>
+                <textField id="baseUrlField" width="100%" colspan="2"
+                           label="msg://io.openbpm.control.entity.engine/BpmEngine.baseUrl" valueChangeMode="ON_BLUR"
+                           property="baseUrl"
+                           helperText="msg://baseUrlField.helperText" classNames="pt-s"/>
+            </formLayout>
+            <vbox id="details" padding="false"
+                  width="100%" themeNames="spacing-xs">
+                <h4 text="msg://authPropertiesAccordionPanel.label"/>
+                <vbox padding="false" themeNames="spacing-xs">
+                    <checkbox id="authEnabledField" classNames="pt-s"
+                              label="msg://authEnabled"
+                              dataContainer="bpmEngineDc"
+                              property="authEnabled"/>
+                    <radioButtonGroup id="authTypeGroup" classNames="pt-s"
+                                      label="msg://authType"
+                                      dataContainer="bpmEngineDc"
+                                      property="authType"
+                                      itemsEnum="io.openbpm.control.entity.engine.AuthType"/>
+                    <div id="authBox" width="100%"/>
+                </vbox>
+            </vbox>
+        </vbox>
+
+        <hbox id="detailActions" justifyContent="START" alignItems="BASELINE" width="100%"
+              classNames="sticky-buttons-bottom-panel">
+            <hbox>
+                <button id="saveAndCloseButton" action="saveAction"/>
+                <button id="closeButton" action="closeAction"/>
+            </hbox>
+
+            <button id="testConnectionBtn" action="testConnectionAction" themeNames="tertiary-inline"
+                    classNames="pl-l"/>
+        </hbox>
+    </layout>
+</view>

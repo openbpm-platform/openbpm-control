@@ -1,0 +1,12 @@
+/*
+ * Copyright (c) Haulmont 2024. All Rights Reserved.
+ * Use is subject to license terms.
+ */
+
+.bpmn-viewer-zoom-reset-btn {
+    z-index: 1;
+    right: 2em;
+    position: fixed;
+    margin-top: 0.5em;
+    font-size: large;
+}

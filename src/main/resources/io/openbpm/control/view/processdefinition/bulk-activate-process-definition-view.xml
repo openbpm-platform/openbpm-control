@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://bulkActivateProcessDefinitionView.title">
+    <layout>
+        <span text="msg://bulkActivateProcessDefinitionMsg" width="100%"/>
+        <hbox>
+            <hbox id="activateAllVersionsHBox" alignItems="CENTER" justifyContent="START" themeNames="spacing-xs">
+                <checkbox id="activateAllVersionsCheckBox" label="msg://allVersions"/>
+                <icon icon="QUESTION_CIRCLE" id="allVersionsContextHelp" size="0.9em">
+                    <tooltip text="msg://activateAllVersions.tooltip" position="BOTTOM_START"/>
+                </icon>
+            </hbox>
+
+            <hbox id="activateAllInstancesHBox" alignItems="CENTER" justifyContent="START" themeNames="spacing-xs">
+                <checkbox id="activateProcessInstancesCheckBox" label="msg://allInstances"/>
+                <icon icon="QUESTION_CIRCLE" id="allInstancesContextHelp" size="0.9em">
+                    <tooltip text="msg://bulkActivateAllInstances.tooltip" position="BOTTOM_START"/>
+                </icon>
+            </hbox>
+        </hbox>
+
+        <hbox justifyContent="END" width="100%">
+            <button id="activateBtn" text="msg://activate" icon="PLAY"
+                    themeNames="primary"/>
+            <button id="cancelBtn" text="msg:///actions.Cancel" icon="BAN"/>
+        </hbox>
+    </layout>
+</view>

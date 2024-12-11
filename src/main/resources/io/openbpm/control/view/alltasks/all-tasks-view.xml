@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://allTasksView.title"
+      focusComponent="tasksDataGrid">
+    <data>
+        <collection id="tasksDc" class="io.openbpm.control.entity.UserTaskData">
+            <loader id="tasksDl"/>
+        </collection>
+        <instance id="userTaskFilterDc" class="io.openbpm.control.entity.filter.UserTaskFilter"/>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+    <actions>
+        <action id="applyFilter" icon="SEARCH" text="msg:///actions.Apply"
+                shortcutCombination="SHIFT-ENTER"/>
+    </actions>
+    <layout>
+        <hbox width="100%" height="100%" expand="tasksDataGridBox" themeNames="spacing-s">
+            <flexLayout id="filterContainer" classNames="user-tasks-filter-container" flexDirection="COLUMN">
+                <hbox width="100%" padding="false" alignItems="CENTER" themeNames="spacing-xs" expand="taskFilterHeader">
+                    <h4 id="taskFilterHeader" text="msg://taskFilter"/>
+                    <hbox alignSelf="END" justifyContent="END" themeNames="spacing-s">
+                        <button id="applyFilterBtn"
+                                action="applyFilter"
+                                themeNames="tertiary-inline"
+                                icon="SEARCH"/>
+                        <button id="clearBtn" text="msg:///actions.Clear"
+                                themeNames="error tertiary-inline"
+                                icon="ERASER"/>
+                    </hbox>
+                </hbox>
+                <formLayout id="filterFormLayout" dataContainer="userTaskFilterDc">
+                    <responsiveSteps>
+                        <responsiveStep minWidth="0" columns="1"/>
+                    </responsiveSteps>
+                    <details id="generalFilters" width="100%" themeNames="reverse small" opened="true">
+                        <textField id="taskKeyLikeField" classNames="pt-xs" property="taskKeyLike"
+                                   clearButtonVisible="true"
+                                   label="msg://io.openbpm.control.entity.filter/UserTaskFilter.taskKeyLike"
+                                   width="100%"/>
+                        <textField id="taskNameLikeField" classNames="pt-xs" property="taskNameLike"
+                                   clearButtonVisible="true"
+                                   label="msg://io.openbpm.control.entity.filter/UserTaskFilter.taskNameLike"
+                                   width="100%"/>
+                        <comboBox label="msg://processDefinition" classNames="pt-xs" id="processDefinitionLookup"
+                                  clearButtonVisible="true" width="100%"/>
+                        <radioButtonGroup id="stateTypeGroup" label="msg://state" classNames="pt-xs" />
+                    </details>
+                    <details id="assignmentFilters" width="100%" themeNames="reverse small" opened="true">
+                        <div width="100%">
+                            <radioButtonGroup id="assignmentTypeGroup" classNames="pt-xs"/>
+                            <textField id="assigneeField" property="assigneeLike" width="100%" classNames="pt-xs"
+                                       label="msg://io.openbpm.control.entity.filter/UserTaskFilter.assigneeLike"
+                                       clearButtonVisible="true"/>
+                        </div>
+                    </details>
+                    <details id="creationDateFilters" width="100%" themeNames="reverse small" opened="true">
+                        <dateTimePicker id="createdAfterField" property="createdAfter" classNames="pt-xs"
+                                        label="msg://io.openbpm.control.entity.filter/UserTaskFilter.createdAfter"
+                                        width="auto" maxWidth="20em"/>
+                        <dateTimePicker id="createdBeforeField" classNames="pt-xs"
+                                        label="msg://io.openbpm.control.entity.filter/UserTaskFilter.createdBefore"
+                                        property="createdBefore" width="auto" maxWidth="20em"/>
+                    </details>
+                </formLayout>
+            </flexLayout>
+            <vbox id="tasksDataGridBox" height="100%" themeNames="spacing-s" padding="false">
+                <hbox id="buttonsPanel" classNames="buttons-panel" padding="false">
+                    <div classNames="user-tasks-filter-button-container">
+                        <button id="filterBtn" icon="FILTER" themeNames="primary"/>
+                        <span id="appliedFiltersCount" themeNames="badge contrast primary small" text="0"
+                              classNames="user-tasks-filter-count-badge" visible="false"/>
+                    </div>
+                    <button action="tasksDataGrid.refresh" themeNames="primary success"/>
+                    <button action="tasksDataGrid.completeTask"/>
+                    <button action="tasksDataGrid.reassignTask"/>
+                    <simplePagination id="tasksPagination" dataLoader="tasksDl"/>
+                </hbox>
+                <dataGrid id="tasksDataGrid"
+                          dataContainer="tasksDc"
+                          minHeight="20em"
+                          selectionMode="MULTI">
+                    <actions>
+                        <action id="refresh"
+                                type="list_refresh"/>
+                        <action id="completeTask" text="msg://completeTask" icon="CHECK"
+                                type="list_itemTracking"/>
+                        <action id="reassignTask" text="msg://reassignTask" icon="RETWEET"
+                                type="list_itemTracking"/>
+                    </actions>
+                    <columns resizable="true">
+                        <column property="taskDefinitionKey" autoWidth="true" sortable="false">
+                            <fragmentRenderer
+                                    class="io.openbpm.control.view.alltasks.TaskKeyColumnFragment"/>
+                        </column>
+                        <column property="name"/>
+                        <column property="processDefinitionId" header="msg://processColumnLabel"/>
+                        <column property="createTime" autoWidth="true"/>
+                        <column property="assignee" autoWidth="true"/>
+                        <column key="actions" autoWidth="true" sortable="false" flexGrow="0"/>
+                    </columns>
+                </dataGrid>
+            </vbox>
+        </hbox>
+    </layout>
+</view>

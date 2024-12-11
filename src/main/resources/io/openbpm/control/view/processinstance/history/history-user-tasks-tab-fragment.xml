@@ -1,0 +1,42 @@
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<fragment xmlns="http://jmix.io/schema/flowui/fragment">
+    <data>
+        <instance id="processInstanceDataDc"
+                  class="io.openbpm.control.entity.processinstance.ProcessInstanceData" provided="true"/>
+
+        <collection id="historyTasksDc"
+                    class="io.openbpm.control.entity.UserTaskData">
+            <loader id="historyTasksDl" readOnly="true"/>
+        </collection>
+    </data>
+    <content>
+        <vbox height="100%" width="100%" themeNames="spacing-xs" minHeight="20em" padding="false">
+            <hbox classNames="buttons-panel" padding="false">
+                <button action="historyTasksGrid.view" themeNames="small primary"/>
+                <simplePagination id="userTasksPagination" dataLoader="historyTasksDl"/>
+            </hbox>
+            <dataGrid id="historyTasksGrid" width="100%" height="100%" themeNames="compact"
+                      dataContainer="historyTasksDc">
+                <actions>
+                    <action id="view"
+                            text="msg:///actions.View"
+                            icon="EYE"
+                            type="list_itemTracking"/>
+                </actions>
+                <columns resizable="true">
+                    <column property="taskId"/>
+                    <column property="name"/>
+                    <column property="taskDefinitionKey" sortable="false"/>
+                    <column property="assignee"/>
+                    <column property="startTime"/>
+                    <column property="endTime"/>
+                    <column property="dueDate"/>
+                </columns>
+            </dataGrid>
+        </vbox>
+    </content>
+</fragment>

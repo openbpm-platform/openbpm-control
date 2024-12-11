@@ -1,0 +1,39 @@
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<fragment xmlns="http://jmix.io/schema/flowui/fragment">
+    <data>
+        <instance id="processInstanceDataDc"
+                  class="io.openbpm.control.entity.processinstance.ProcessInstanceData" provided="true"/>
+
+        <collection id="historicVariableInstancesDc"
+                    class="io.openbpm.control.entity.variable.HistoricVariableInstanceData">
+            <loader id="historicVariableInstancesDl" readOnly="true"/>
+        </collection>
+    </data>
+    <content>
+        <vbox height="100%" width="100%" themeNames="spacing-xs" minHeight="20em" padding="false">
+            <hbox classNames="buttons-panel" padding="false">
+                <button action="historicVariableInstancesGrid.view" themeNames="small primary"/>
+                <simplePagination id="historicVariableInstancesPagination" dataLoader="historicVariableInstancesDl"/>
+            </hbox>
+            <dataGrid id="historicVariableInstancesGrid" width="100%" height="100%" themeNames="compact"
+                      dataContainer="historicVariableInstancesDc">
+                <actions>
+                    <action id="view"
+                            text="msg:///actions.View"
+                            icon="EYE"
+                            type="list_itemTracking"/>
+                </actions>
+                <columns resizable="true">
+                    <column property="name"/>
+                    <column property="type" sortable="false"/>
+                    <column key="value" sortable="false" header="msg://io.openbpm.control.view.processinstance.history/value"/>
+                    <column property="createTime" sortable="false"/>
+                </columns>
+            </dataGrid>
+        </vbox>
+    </content>
+</fragment>
