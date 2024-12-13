@@ -33,7 +33,7 @@ OpenBPM Control is built using the open-source [Jmix](https://www.jmix.io) frame
 
 You can run OpenBPM Control using either a Docker image or from source code.
 
-### Docker Image <a name="using-docker-image"></a>
+### Docker Image <a name="docker-image"></a>
 This method allows running OpenBPM Control with a pre-built Docker image.
 
 **Prerequisites:**
@@ -127,11 +127,14 @@ To upload a BPMN 2.0 file, click the **Upload** button and select the process to
 After uploading, you can preview the diagram of the uploaded process and click the **OK** button to deploy to the BPM engine.
 
 #### Starting a Process <a name="starting-a-process"></a>
-It is possible to start a new instance of the process:
-1. Click the **Start** button in the row in the **Processes** list view.
-2. Click the **Start** button in the **Process Details** view, which you can open by clicking the **View** button.
 
-The **Start process** dialog window allows you to specify the process variables required to start a process.
+To start a process instance immediately, simply click the **Start** button for the desired process.
+
+To specify process variables prior to starting an instance, follow these steps:
+
+1. Click **View** for the desired process.
+2. Add required variables in the **Start process** dialog.
+3. Click the **Start** button to start the process.
 
 ![start-process-dialog.png](img/start-process-dialog.png)
 
