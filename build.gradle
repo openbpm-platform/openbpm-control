@@ -81,7 +81,6 @@ dependencies {
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
     // Database drivers
-    runtimeOnly 'org.postgresql:postgresql'
 
     // test: Spring
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
@@ -94,6 +93,7 @@ dependencies {
     // test: processors
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    implementation 'org.hsqldb:hsqldb'
 }
 
 configurations.implementation {
