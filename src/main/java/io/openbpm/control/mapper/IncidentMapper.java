@@ -22,7 +22,6 @@ public abstract class IncidentMapper {
     @Mapping(target = "type", source = "incidentType")
     @Mapping(target = "message", source = "incidentMessage")
     @Mapping(target = "incidentId", source = "id")
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "timestamp", source = "incidentTimestamp")
     public abstract IncidentData fromIncidentModel(IncidentDto source);
 
@@ -30,7 +29,6 @@ public abstract class IncidentMapper {
         return metadata.create(IncidentData.class);
     }
 
-    @Mapping(target = "id", ignore = true)
     @Mapping(target = "type", source = "incidentType")
     @Mapping(target = "message", source = "incidentMessage")
     @Mapping(target = "incidentId", source = "id")

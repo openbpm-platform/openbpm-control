@@ -37,6 +37,7 @@ import io.openbpm.control.service.processdefinition.ProcessDefinitionLoadContext
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.view.newprocessdeployment.NewProcessDeploymentView;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -76,18 +77,10 @@ public class ProcessDefinitionListView extends StandardView {
     protected HorizontalLayout filterPanel;
 
     @ViewComponent
-    protected JmixButton bulkDeleteBtn;
-    @ViewComponent
-    protected JmixButton bulkSuspendBtn;
-    @ViewComponent
-    protected JmixButton bulkActivateBtn;
-
-    @ViewComponent
     protected DataGrid<ProcessDefinitionData> processDefinitionsGrid;
 
     @Subscribe
     public void onInit(final InitEvent event) {
-        processDefinitionsGrid.addSelectionListener(selectionEvent -> handleProcessDefinitionsSelection(selectionEvent.getAllSelectedItems()));
         addClassNames(LumoUtility.Padding.Top.SMALL);
         initFilterFormStyles();
     }
@@ -113,8 +106,16 @@ public class ProcessDefinitionListView extends StandardView {
         return processDefinitionService.findAll(context);
     }
 
-    @Subscribe(id = "bulkActivateBtn", subject = "clickListener")
-    public void onBulkActivateBtnClick(final ClickEvent<JmixButton> event) {
+    @Install(to = "processDefinitionsGrid.bulkActivate", subject = "enabledRule")
+    protected boolean processDefinitionsGridBulkActivateEnabledRule() {
+        Set<ProcessDefinitionData> selectedItems = processDefinitionsGrid.getSelectedItems();
+        boolean suspendedDefinitionExists = selectedItems.stream().anyMatch(definition -> BooleanUtils.isTrue(definition.getSuspended()));
+
+        return CollectionUtils.isNotEmpty(selectedItems) && suspendedDefinitionExists;
+    }
+
+    @Subscribe("processDefinitionsGrid.bulkActivate")
+    public void onProcessDefinitionsGridBulkActivate(final ActionPerformedEvent event) {
         Set<ProcessDefinitionData> selectedItems = processDefinitionsGrid.getSelectedItems();
         dialogWindows.view(this, BulkActivateProcessDefinitionView.class)
                 .withAfterCloseListener(closeEvent -> {
@@ -159,8 +160,8 @@ public class ProcessDefinitionListView extends StandardView {
         });
     }
 
-    @Subscribe(id = "bulkDeleteBtn", subject = "clickListener")
-    public void onBulkDeleteBtnClick(final ClickEvent<JmixButton> event) {
+    @Subscribe("processDefinitionsGrid.bulkRemove")
+    protected void onProcessDefinitionsGridBulkRemove(final ActionPerformedEvent event) {
         Set<ProcessDefinitionData> selectedItems = processDefinitionsGrid.getSelectedItems();
         if (selectedItems.isEmpty()) {
             return;
@@ -176,8 +177,8 @@ public class ProcessDefinitionListView extends StandardView {
                 .open();
     }
 
-    @Subscribe(id = "deployBtn", subject = "clickListener")
-    public void onDeployBtnClick(final ClickEvent<JmixButton> event) {
+    @Subscribe("processDefinitionsGrid.deploy")
+    protected void onProcessDefinitionsGridDeploy(final ActionPerformedEvent event) {
         viewNavigators.view(this, NewProcessDeploymentView.class)
                 .withBackwardNavigation(true)
                 .navigate();
@@ -207,18 +208,16 @@ public class ProcessDefinitionListView extends StandardView {
         });
     }
 
-    protected void handleProcessDefinitionsSelection(Set<ProcessDefinitionData> allSelectedItems) {
-        boolean multipleItemsSelected = !allSelectedItems.isEmpty();
-        boolean suspendedDefinitionExists = allSelectedItems.stream().anyMatch(definition -> BooleanUtils.isTrue(definition.getSuspended()));
-        boolean activeDefinitionExists = allSelectedItems.stream().anyMatch(definition -> BooleanUtils.isNotTrue(definition.getSuspended()));
+    @Install(to = "processDefinitionsGrid.bulkSuspend", subject = "enabledRule")
+    protected boolean processDefinitionsGridBulkSuspendEnabledRule() {
+        Set<ProcessDefinitionData> selectedDefinitions = processDefinitionsGrid.getSelectedItems();
+        boolean activeDefinitionExists = selectedDefinitions.stream().anyMatch(definition -> BooleanUtils.isNotTrue(definition.getSuspended()));
 
-        bulkDeleteBtn.setEnabled(multipleItemsSelected);
-        bulkActivateBtn.setEnabled(multipleItemsSelected && suspendedDefinitionExists);
-        bulkSuspendBtn.setEnabled(multipleItemsSelected && activeDefinitionExists);
+        return CollectionUtils.isNotEmpty(selectedDefinitions) && activeDefinitionExists;
     }
 
-    @Subscribe(id = "bulkSuspendBtn", subject = "clickListener")
-    public void onBulkSuspendBtnClick(final ClickEvent<JmixButton> event) {
+    @Subscribe("processDefinitionsGrid.bulkSuspend")
+    protected void onProcessDefinitionsGridBulkSuspend(final ActionPerformedEvent event) {
         Set<ProcessDefinitionData> selectedItems = processDefinitionsGrid.getSelectedItems();
         dialogWindows.view(this, BulkSuspendProcessDefinitionView.class)
                 .withAfterCloseListener(closeEvent -> {

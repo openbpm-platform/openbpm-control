@@ -95,8 +95,6 @@ public class ProcessInstanceListView extends StandardListView<ProcessInstanceDat
     protected Notifications notifications;
     @Autowired
     protected DialogWindows dialogWindows;
-    @Autowired
-    protected ComponentHelper componentHelper;
     @ViewComponent
     protected UrlQueryParametersFacet urlQueryParameters;
     @ViewComponent
