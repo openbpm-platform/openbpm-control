@@ -93,6 +93,11 @@
                                 type="list_itemTracking"/>
                         <action id="reassignTask" text="msg://reassignTask" icon="RETWEET"
                                 type="list_itemTracking"/>
+                        <action id="view" type="list_edit" visible="false">
+                            <properties>
+                                <property name="openMode" value="DIALOG"/>
+                            </properties>
+                        </action>
                     </actions>
                     <columns resizable="true">
                         <column property="taskDefinitionKey" autoWidth="true" sortable="false">
