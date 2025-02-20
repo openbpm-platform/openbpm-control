@@ -8,11 +8,11 @@ package io.openbpm.control.view.processdefinition;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.router.Route;
-import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
-import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.jmix.flowui.Notifications;
 import io.jmix.flowui.component.checkbox.JmixCheckbox;
 import io.jmix.flowui.view.*;
+import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
+import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +28,9 @@ import java.util.Set;
 @Slf4j
 public class BulkDeleteProcessDefinitionView extends ProcessDefinitionBulkOperationView {
     private static final String CAMUNDA_EXCEPTION_WITH_REASON_MESSAGE = "REST-CLIENT-002 Error during remote Camunda engine invocation with";
+
+    @ViewComponent
+    protected MessageBundle messageBundle;
 
     @Autowired
     protected Notifications notifications;
@@ -60,6 +63,10 @@ public class BulkDeleteProcessDefinitionView extends ProcessDefinitionBulkOperat
                     processDefinitionService.deleteById(processDefinition.getId(), deleteAllRelatedInstances);
                 }
             }
+
+            notifications.create(messageBundle.getMessage("processesDeleted"))
+                    .withType(Notifications.Type.SUCCESS)
+                    .show();
         } catch (Exception e) {
             if (e instanceof RemoteProcessEngineException) {
                 log.error("Unable to delete process definitions", e);
