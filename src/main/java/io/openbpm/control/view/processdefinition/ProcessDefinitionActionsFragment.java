@@ -85,8 +85,13 @@ public class ProcessDefinitionActionsFragment extends Fragment<HorizontalLayout>
         }
         startProcessBtn.setVisible(!suspended);
 
-        suspendedVersionActionsDropdown.setVisible(suspended);
+        boolean emptyProcessInstances = processInstanceDataDc.getItems().isEmpty();
+
+        suspendedVersionActionsDropdown.setVisible(suspended && !emptyProcessInstances);
         activeVersionActionsDropdown.setVisible(!suspended);
+
+        updateDropdownMigrateItemVisibility(activeVersionActionsDropdown, !emptyProcessInstances);
+        updateDropdownMigrateItemVisibility(suspendedVersionActionsDropdown, !emptyProcessInstances);
     }
 
     @Subscribe(id = "startProcessBtn", subject = "clickListener")
@@ -198,4 +203,10 @@ public class ProcessDefinitionActionsFragment extends Fragment<HorizontalLayout>
         getCurrentView().close(StandardOutcome.CLOSE);
     }
 
+    private void updateDropdownMigrateItemVisibility(DropdownButton dropdownButton, boolean visible) {
+        DropdownButtonItem item = dropdownButton.getItem("migrate");
+        if (item != null) {
+            item.setVisible(visible);
+        }
+    }
 }
