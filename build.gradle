@@ -19,6 +19,12 @@ jmix {
 group = 'io.openbpm'
 version = '1.1.999-SNAPSHOT'
 
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
 repositories {
     mavenCentral()
     maven {
