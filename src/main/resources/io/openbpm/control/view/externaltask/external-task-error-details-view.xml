@@ -13,6 +13,7 @@
         <codeEditor id="errorDetailsCodeEditor" readOnly="true"
                     maxHeight="30em" mode="TEXT"/>
         <hbox width="100%" justifyContent="END">
+            <button id="copy" icon="vaadin:copy" text="msg://externalTaskStacktraceView.copy"/>
             <button action="close"/>
         </hbox>
     </layout>
