@@ -6,18 +6,29 @@
 package io.openbpm.control.view.bpmengine;
 
 import com.vaadin.flow.component.AbstractField;
+import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import io.jmix.core.EntityStates;
 import io.jmix.core.SaveContext;
 import io.jmix.flowui.Fragments;
+import io.jmix.flowui.Notifications;
 import io.jmix.flowui.component.SupportsTypedValue;
 import io.jmix.flowui.component.checkbox.JmixCheckbox;
 import io.jmix.flowui.component.radiobuttongroup.JmixRadioButtonGroup;
 import io.jmix.flowui.component.textfield.TypedTextField;
 import io.jmix.flowui.fragment.Fragment;
-import io.jmix.flowui.view.*;
+import io.jmix.flowui.kit.component.button.JmixButton;
+import io.jmix.flowui.view.EditedEntityContainer;
+import io.jmix.flowui.view.Install;
+import io.jmix.flowui.view.MessageBundle;
+import io.jmix.flowui.view.StandardDetailView;
+import io.jmix.flowui.view.Subscribe;
+import io.jmix.flowui.view.Target;
+import io.jmix.flowui.view.ViewComponent;
+import io.jmix.flowui.view.ViewController;
+import io.jmix.flowui.view.ViewDescriptor;
 import io.openbpm.control.action.TestEngineConnectionAction;
 import io.openbpm.control.entity.engine.AuthType;
 import io.openbpm.control.entity.engine.BpmEngine;
@@ -25,10 +36,14 @@ import io.openbpm.control.entity.engine.EngineType;
 import io.openbpm.control.service.engine.EngineService;
 import io.openbpm.control.view.main.MainView;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Set;
 
 @Route(value = "bpm/engines/:id", layout = MainView.class)
@@ -36,24 +51,32 @@ import java.util.Set;
 @ViewDescriptor(path = "bpm-engine-detail-view.xml")
 @EditedEntityContainer("bpmEngineDc")
 public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
+
     protected static final Logger log = LoggerFactory.getLogger(BpmEngineDetailView.class);
-    @ViewComponent
-    protected Div authBox;
-    @ViewComponent
-    protected JmixRadioButtonGroup<AuthType> authTypeGroup;
+
     @Autowired
     protected Fragments fragments;
     @Autowired
     protected EngineService engineService;
+    @Autowired
+    private Notifications notifications;
+    @Autowired
+    protected EntityStates entityStates;
 
     @ViewComponent
     protected MessageBundle messageBundle;
-    @Autowired
-    protected EntityStates entityStates;
+    @ViewComponent
+    protected Div authBox;
+    @ViewComponent
+    protected JmixRadioButtonGroup<AuthType> authTypeGroup;
     @ViewComponent
     protected JmixCheckbox defaultField;
     @ViewComponent
     protected TestEngineConnectionAction testConnectionAction;
+    @ViewComponent
+    private TypedTextField<String> baseUrlField;
+    @ViewComponent
+    private JmixButton testConnectionBtn;
 
     @Subscribe
     public void onInitEntity(final InitEntityEvent<BpmEngine> event) {
@@ -75,6 +98,9 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
         if (BooleanUtils.isTrue(engine.getIsDefault()) && !entityStates.isNew(engine)) {
             defaultField.setEnabled(false);
         }
+
+        testConnectionBtn.setText(testConnectionAction.getText());
+        testConnectionBtn.setIcon(testConnectionAction.getIcon());
     }
 
     @Override
@@ -137,6 +163,24 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
         if (event.isFromClient()) {
             String trimmedValue = event.getValue() != null ? event.getValue().trim() : null;
             getEditedEntity().setBaseUrl(trimmedValue);
+        }
+    }
+
+    @Subscribe(id = "testConnectionBtn", subject = "clickListener")
+    public void onTestConnectionBtnClick(final ClickEvent<JmixButton> event) {
+        if (StringUtils.isNotEmpty(baseUrlField.getTypedValue()) && isValidUrl(baseUrlField.getTypedValue())) {
+            testConnectionAction.actionPerform(event.getSource());
+        } else {
+            notifications.show(messageBundle.getMessage("bpmEngineDetailView.incorrectUrlMessage"));
+        }
+    }
+
+    private boolean isValidUrl(String url) {
+        try {
+            new URL(url).toURI();
+            return true;
+        } catch (URISyntaxException | MalformedURLException e) {
+            return false;
         }
     }
 }
