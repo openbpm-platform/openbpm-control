@@ -14,6 +14,7 @@ import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.jmix.flowui.Notifications;
 import io.jmix.flowui.component.checkbox.JmixCheckbox;
 import io.jmix.flowui.view.*;
+import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -33,6 +34,8 @@ public class DeleteProcessDefinitionView extends StandardView {
 
     @Autowired
     protected ProcessDefinitionService processDefinitionService;
+    @Autowired
+    private ProcessInstanceService processInstanceService;
 
     @ViewComponent
     protected Icon allInstancesContextHelp;
@@ -56,6 +59,9 @@ public class DeleteProcessDefinitionView extends StandardView {
     @Subscribe
     protected void onBeforeShow(BeforeShowEvent event) {
         deleteProcessInstancesCheckBox.setValue(true);
+
+        long countByProcessDefinitionId = processInstanceService.getCountByProcessDefinitionId(processDefinitionId);
+        deleteProcessInstancesCheckBox.setEnabled(countByProcessDefinitionId == 0);
     }
 
     @Subscribe("okBtn")
