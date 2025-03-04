@@ -149,22 +149,24 @@ public class DashboardFragment extends Fragment<VerticalLayout> {
             return dashboardData;
         }
 
-        long deployedProcessesCount = dashboardService.getDeployedProcessesCount(engine);
+        BpmEngine persistedEngined = engineService.findEngineByUuid(engine.getId());
+
+        long deployedProcessesCount = dashboardService.getDeployedProcessesCount(persistedEngined);
         dashboardData.setProcessCount(deployedProcessesCount);
 
-        long runningProcessCount = dashboardService.getRunningProcessCount(engine);
+        long runningProcessCount = dashboardService.getRunningProcessCount(persistedEngined);
         dashboardData.setRunningInstanceCount(runningProcessCount);
 
-        long suspendedProcessCount = dashboardService.getSuspendedProcessCount(engine);
+        long suspendedProcessCount = dashboardService.getSuspendedProcessCount(persistedEngined);
         dashboardData.setSuspendedInstanceCount(suspendedProcessCount);
 
-        List<ProcessDefinitionStatistics> processStatistics = dashboardService.getProcessDefinitionStatistics(engine);
+        List<ProcessDefinitionStatistics> processStatistics = dashboardService.getProcessDefinitionStatistics(persistedEngined);
         dashboardData.setProcessDefinitionStatistics(processStatistics);
 
-        long userTasksCount = dashboardService.getUserTasksCount(engine);
+        long userTasksCount = dashboardService.getUserTasksCount(persistedEngined);
         dashboardData.setUserTasksCount(userTasksCount);
 
-        List<ProcessExecutionGraphEntry> recentActivity = dashboardService.getRecentActivityStatistics(engine);
+        List<ProcessExecutionGraphEntry> recentActivity = dashboardService.getRecentActivityStatistics(persistedEngined);
         dashboardData.setRecentActivity(recentActivity);
 
         return dashboardData;

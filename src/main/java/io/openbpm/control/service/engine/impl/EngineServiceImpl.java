@@ -11,7 +11,6 @@ import io.jmix.core.security.CurrentAuthentication;
 import io.jmix.core.session.SessionData;
 import io.jmix.flowui.UiEventPublisher;
 import io.openbpm.control.entity.engine.BpmEngine;
-import io.openbpm.control.restsupport.FeignClientProvider;
 import io.openbpm.control.service.engine.EngineService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
@@ -70,6 +69,15 @@ public class EngineServiceImpl implements EngineService {
                         "createdDate"))
                 .optional()
                 .orElse(null));
+    }
+
+    @Override
+    public BpmEngine findEngineByUuid(UUID uuid) {
+        Optional<BpmEngine> bpmEngine = dataManager.load(BpmEngine.class)
+                .condition(PropertyCondition.equal("id", uuid))
+                .optional();
+
+        return bpmEngine.orElse(null);
     }
 
     @Override
