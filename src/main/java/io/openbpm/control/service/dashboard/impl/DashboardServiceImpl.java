@@ -274,6 +274,7 @@ public class DashboardServiceImpl implements DashboardService {
     public void onBpmEngineChangedAfterCommit(final EntityChangedEvent<BpmEngine> event) {
         Id<BpmEngine> entityId = event.getEntityId();
         if (event.getType() == EntityChangedEvent.Type.DELETED || event.getType() == EntityChangedEvent.Type.UPDATED) {
+            processDefinitionClientByEngineId.remove((UUID) entityId.getValue());
             processInstanceClientByEngineId.remove((UUID) entityId.getValue());
             historyApiClientByEngineId.remove((UUID) entityId.getValue());
             taskClientByEngineId.remove((UUID) entityId.getValue());

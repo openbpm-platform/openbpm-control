@@ -9,6 +9,7 @@ import io.openbpm.control.entity.engine.BpmEngine;
 import org.springframework.lang.Nullable;
 
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * Provides methods to manage the configured BPM engines.
@@ -22,6 +23,15 @@ public interface EngineService {
      */
     @Nullable
     BpmEngine getSelectedEngine();
+
+    /**
+     * Find BPM engine by UUID.
+     *
+     * @param uuid a unique key for a bpm engine
+     * @return a requested bpm engine
+     */
+    @Nullable
+    BpmEngine findEngineByUuid(UUID uuid);
 
     /**
      * Searches a BPM engine that is marked as default.

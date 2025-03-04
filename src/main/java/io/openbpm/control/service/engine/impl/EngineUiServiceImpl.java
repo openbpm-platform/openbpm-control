@@ -71,8 +71,15 @@ public class EngineUiServiceImpl implements EngineUiService {
     public EngineConnectionCheckResult checkConnection(BpmEngine bpmEngine) {
         EngineConnectionCheckResult result = metadata.create(EngineConnectionCheckResult.class);
 
+        BpmEngine persistedEngine = engineService.findEngineByUuid(bpmEngine.getId());
+        if (persistedEngine == null) {
+            log.error("There is no engine with id  {}", bpmEngine.getId());
+            result.setSuccess(false);
+            return result;
+        }
+
         VersionApiClient versionApiClient = versionClientByEngineId
-                .computeIfAbsent(bpmEngine.getId(), engineId -> createVersionApiClient(bpmEngine));
+                .computeIfAbsent(bpmEngine.getId(), engineId -> createVersionApiClient(persistedEngine));
         try {
             ResponseEntity<VersionDto> response = versionApiClient.getRestAPIVersion();
             if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
