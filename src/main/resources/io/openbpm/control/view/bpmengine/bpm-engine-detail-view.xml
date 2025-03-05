@@ -80,7 +80,7 @@
                 <button id="closeButton" action="closeAction"/>
             </hbox>
 
-            <button id="testConnectionBtn" themeNames="tertiary-inline"
+            <button id="testConnectionBtn" action="testConnectionAction" themeNames="tertiary-inline"
                     classNames="pl-l"/>
         </hbox>
     </layout>
