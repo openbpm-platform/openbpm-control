@@ -1,5 +1,6 @@
 package io.openbpm.control.action;
 
+import com.google.common.base.Strings;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import io.jmix.core.AccessManager;
@@ -16,6 +17,10 @@ import io.openbpm.control.exception.EngineConnectionFailedException;
 import io.openbpm.control.service.engine.EngineUiService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
+import java.net.URL;
 
 @ActionType(TestEngineConnectionAction.ID)
 public class TestEngineConnectionAction extends SecuredBaseAction {
@@ -72,6 +77,14 @@ public class TestEngineConnectionAction extends SecuredBaseAction {
     @Override
     public void actionPerform(Component component) {
         if (engine != null) {
+            if (!isValidUrl(engine.getBaseUrl())) {
+                notifications.create(messages.getMessage("engineNotAvailable.title"),
+                        messages.formatMessage("", "engineNotAvailable.incorrectUrl",
+                                Strings.nullToEmpty(engine.getBaseUrl())))
+                        .withType(Notifications.Type.ERROR)
+                        .show();
+                return;
+            }
             try {
                 engineUiService.getVersion(engine);
                 notifications.create(messages.formatMessage("", "engineAvailable", engine.getBaseUrl()))
@@ -94,7 +107,6 @@ public class TestEngineConnectionAction extends SecuredBaseAction {
         }
     }
 
-
     @Override
     protected boolean isPermitted() {
         if (engine == null) {
@@ -111,5 +123,14 @@ public class TestEngineConnectionAction extends SecuredBaseAction {
         }
 
         return super.isPermitted();
+    }
+
+    private boolean isValidUrl(String url) {
+        try {
+            new URL(url).toURI();
+            return true;
+        } catch (URISyntaxException | MalformedURLException e) {
+            return false;
+        }
     }
 }
