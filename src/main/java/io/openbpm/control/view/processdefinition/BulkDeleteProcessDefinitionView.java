@@ -13,6 +13,7 @@ import io.jmix.flowui.component.checkbox.JmixCheckbox;
 import io.jmix.flowui.view.*;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
+import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -38,6 +39,9 @@ public class BulkDeleteProcessDefinitionView extends ProcessDefinitionBulkOperat
     @Autowired
     protected ProcessDefinitionService processDefinitionService;
 
+    @Autowired
+    private ProcessInstanceService processInstanceService;
+
     @ViewComponent
     protected JmixCheckbox deleteAllVersionsCheckBox;
 
@@ -47,6 +51,21 @@ public class BulkDeleteProcessDefinitionView extends ProcessDefinitionBulkOperat
     @Subscribe
     protected void onBeforeShow(BeforeShowEvent event) {
         deleteProcessInstancesCheckBox.setValue(true);
+
+        boolean hasRunningInstances = false;
+        for (ProcessDefinitionData processDefinitionData : processDefinitions) {
+            long countByProcessDefinitionId = processInstanceService.getCountByProcessDefinitionId(
+                    processDefinitionData.getProcessDefinitionId());
+            if (countByProcessDefinitionId > 0) {
+                hasRunningInstances = true;
+                break;
+            }
+        }
+
+        if (hasRunningInstances) {
+            allInstancesContextHelp.setTooltipText(messageBundle.getMessage("bulkDeleteAllRunningInstances.tooltip"));
+        }
+        deleteProcessInstancesCheckBox.setEnabled(!hasRunningInstances);
     }
 
     @Subscribe("okBtn")
