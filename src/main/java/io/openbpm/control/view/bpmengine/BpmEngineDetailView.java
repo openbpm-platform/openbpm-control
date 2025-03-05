@@ -6,7 +6,6 @@
 package io.openbpm.control.view.bpmengine;
 
 import com.vaadin.flow.component.AbstractField;
-import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -36,14 +35,10 @@ import io.openbpm.control.entity.engine.EngineType;
 import io.openbpm.control.service.engine.EngineService;
 import io.openbpm.control.view.main.MainView;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Set;
 
 @Route(value = "bpm/engines/:id", layout = MainView.class)
@@ -74,8 +69,6 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
     @ViewComponent
     protected TestEngineConnectionAction testConnectionAction;
     @ViewComponent
-    private TypedTextField<String> baseUrlField;
-    @ViewComponent
     private JmixButton testConnectionBtn;
 
     @Subscribe
@@ -98,9 +91,6 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
         if (BooleanUtils.isTrue(engine.getIsDefault()) && !entityStates.isNew(engine)) {
             defaultField.setEnabled(false);
         }
-
-        testConnectionBtn.setText(testConnectionAction.getText());
-        testConnectionBtn.setIcon(testConnectionAction.getIcon());
     }
 
     @Override
@@ -163,24 +153,6 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
         if (event.isFromClient()) {
             String trimmedValue = event.getValue() != null ? event.getValue().trim() : null;
             getEditedEntity().setBaseUrl(trimmedValue);
-        }
-    }
-
-    @Subscribe(id = "testConnectionBtn", subject = "clickListener")
-    public void onTestConnectionBtnClick(final ClickEvent<JmixButton> event) {
-        if (StringUtils.isNotEmpty(baseUrlField.getTypedValue()) && isValidUrl(baseUrlField.getTypedValue())) {
-            testConnectionAction.actionPerform(event.getSource());
-        } else {
-            notifications.show(messageBundle.getMessage("bpmEngineDetailView.incorrectUrlMessage"));
-        }
-    }
-
-    private boolean isValidUrl(String url) {
-        try {
-            new URL(url).toURI();
-            return true;
-        } catch (URISyntaxException | MalformedURLException e) {
-            return false;
         }
     }
 }
