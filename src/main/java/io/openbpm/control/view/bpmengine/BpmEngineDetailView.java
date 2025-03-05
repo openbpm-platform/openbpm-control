@@ -12,13 +12,11 @@ import com.vaadin.flow.router.Route;
 import io.jmix.core.EntityStates;
 import io.jmix.core.SaveContext;
 import io.jmix.flowui.Fragments;
-import io.jmix.flowui.Notifications;
 import io.jmix.flowui.component.SupportsTypedValue;
 import io.jmix.flowui.component.checkbox.JmixCheckbox;
 import io.jmix.flowui.component.radiobuttongroup.JmixRadioButtonGroup;
 import io.jmix.flowui.component.textfield.TypedTextField;
 import io.jmix.flowui.fragment.Fragment;
-import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.view.EditedEntityContainer;
 import io.jmix.flowui.view.Install;
 import io.jmix.flowui.view.MessageBundle;
@@ -54,8 +52,6 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
     @Autowired
     protected EngineService engineService;
     @Autowired
-    private Notifications notifications;
-    @Autowired
     protected EntityStates entityStates;
 
     @ViewComponent
@@ -68,8 +64,6 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
     protected JmixCheckbox defaultField;
     @ViewComponent
     protected TestEngineConnectionAction testConnectionAction;
-    @ViewComponent
-    private JmixButton testConnectionBtn;
 
     @Subscribe
     public void onInitEntity(final InitEntityEvent<BpmEngine> event) {
