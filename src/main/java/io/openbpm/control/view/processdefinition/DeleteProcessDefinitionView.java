@@ -44,6 +44,8 @@ public class DeleteProcessDefinitionView extends StandardView {
     protected JmixCheckbox deleteProcessInstancesCheckBox;
 
     protected String processDefinitionId;
+    @ViewComponent
+    private MessageBundle messageBundle;
 
     @SuppressWarnings("LombokSetterMayBeUsed")
     public void setProcessDefinitionId(String processDefinitionId) {
@@ -61,6 +63,9 @@ public class DeleteProcessDefinitionView extends StandardView {
         deleteProcessInstancesCheckBox.setValue(true);
 
         long countByProcessDefinitionId = processInstanceService.getCountByProcessDefinitionId(processDefinitionId);
+        if (countByProcessDefinitionId > 0) {
+            allInstancesContextHelp.setTooltipText(messageBundle.getMessage("deleteAllRunningInstances.tooltip"));
+        }
         deleteProcessInstancesCheckBox.setEnabled(countByProcessDefinitionId == 0);
     }
 
