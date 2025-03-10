@@ -17,7 +17,15 @@ import io.jmix.flowui.component.checkbox.JmixCheckbox;
 import io.jmix.flowui.component.radiobuttongroup.JmixRadioButtonGroup;
 import io.jmix.flowui.component.textfield.TypedTextField;
 import io.jmix.flowui.fragment.Fragment;
-import io.jmix.flowui.view.*;
+import io.jmix.flowui.view.EditedEntityContainer;
+import io.jmix.flowui.view.Install;
+import io.jmix.flowui.view.MessageBundle;
+import io.jmix.flowui.view.StandardDetailView;
+import io.jmix.flowui.view.Subscribe;
+import io.jmix.flowui.view.Target;
+import io.jmix.flowui.view.ViewComponent;
+import io.jmix.flowui.view.ViewController;
+import io.jmix.flowui.view.ViewDescriptor;
 import io.openbpm.control.action.TestEngineConnectionAction;
 import io.openbpm.control.entity.engine.AuthType;
 import io.openbpm.control.entity.engine.BpmEngine;
@@ -36,20 +44,22 @@ import java.util.Set;
 @ViewDescriptor(path = "bpm-engine-detail-view.xml")
 @EditedEntityContainer("bpmEngineDc")
 public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
+
     protected static final Logger log = LoggerFactory.getLogger(BpmEngineDetailView.class);
-    @ViewComponent
-    protected Div authBox;
-    @ViewComponent
-    protected JmixRadioButtonGroup<AuthType> authTypeGroup;
+
     @Autowired
     protected Fragments fragments;
     @Autowired
     protected EngineService engineService;
+    @Autowired
+    protected EntityStates entityStates;
 
     @ViewComponent
     protected MessageBundle messageBundle;
-    @Autowired
-    protected EntityStates entityStates;
+    @ViewComponent
+    protected Div authBox;
+    @ViewComponent
+    protected JmixRadioButtonGroup<AuthType> authTypeGroup;
     @ViewComponent
     protected JmixCheckbox defaultField;
     @ViewComponent
