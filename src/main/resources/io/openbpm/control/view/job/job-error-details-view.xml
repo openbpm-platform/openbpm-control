@@ -7,12 +7,14 @@
 <view xmlns="http://jmix.io/schema/flowui/view"
       title="msg://jobErrorDetailsView.title">
     <actions>
+        <action id="copy" type="control_copyComponentValueToClipboard"/>
         <action id="close" type="view_close"/>
     </actions>
     <layout>
         <codeEditor id="errorDetailsCodeEditor" readOnly="true"
                     maxHeight="30em" mode="TEXT"/>
         <hbox width="100%" justifyContent="END">
+            <button action="copy"/>
             <button action="close"/>
         </hbox>
     </layout>

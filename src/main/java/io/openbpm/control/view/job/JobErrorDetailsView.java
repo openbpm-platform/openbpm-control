@@ -5,10 +5,10 @@
 
 package io.openbpm.control.view.job;
 
-
 import com.vaadin.flow.router.Route;
 import io.jmix.flowui.component.codeeditor.CodeEditor;
 import io.jmix.flowui.view.*;
+import io.openbpm.control.action.CopyComponentValueToClipboardAction;
 import io.openbpm.control.service.job.JobService;
 import io.openbpm.control.view.main.MainView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +22,8 @@ public class JobErrorDetailsView extends StandardView {
 
     @ViewComponent
     protected CodeEditor errorDetailsCodeEditor;
+    @ViewComponent
+    protected CopyComponentValueToClipboardAction copy;
 
     protected String jobId;
     protected boolean fromHistory = false;
@@ -44,5 +46,6 @@ public class JobErrorDetailsView extends StandardView {
         }
 
         errorDetailsCodeEditor.setValue(errorDetails);
+        copy.setTarget(errorDetailsCodeEditor);
     }
 }
