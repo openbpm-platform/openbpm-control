@@ -12,6 +12,7 @@ import io.jmix.flowui.accesscontext.UiEntityContext;
 import io.jmix.flowui.action.ActionType;
 import io.jmix.flowui.action.SecuredBaseAction;
 import io.jmix.flowui.kit.component.ComponentUtils;
+import io.openbpm.control.entity.engine.AuthType;
 import io.openbpm.control.entity.engine.BpmEngine;
 import io.openbpm.control.exception.EngineConnectionFailedException;
 import io.openbpm.control.service.engine.EngineUiService;
@@ -84,6 +85,29 @@ public class TestEngineConnectionAction extends SecuredBaseAction {
                         .withType(Notifications.Type.ERROR)
                         .show();
                 return;
+            }
+            if (engine.getAuthEnabled() && engine.getAuthType() != null) {
+                if (AuthType.BASIC == engine.getAuthType() && StringUtils.isEmpty(engine.getBasicAuthUsername())) {
+                    notifications.create(messages.getMessage("engineNotAvailable.title"),
+                                    messages.getMessage("engineNotAvailable.emptyAuthUsername"))
+                            .withType(Notifications.Type.ERROR)
+                            .show();
+                    return;
+                } else if (AuthType.BASIC == engine.getAuthType()
+                        && StringUtils.isEmpty(engine.getBasicAuthPassword())) {
+                    notifications.create(messages.getMessage("engineNotAvailable.title"),
+                                    messages.getMessage("engineNotAvailable.emptyAuthPassword"))
+                            .withType(Notifications.Type.ERROR)
+                            .show();
+                    return;
+                } else if (AuthType.HTTP_HEADER == engine.getAuthType()
+                        && StringUtils.isEmpty(engine.getHttpHeaderName())) {
+                    notifications.create(messages.getMessage("engineNotAvailable.title"),
+                                    messages.getMessage("engineNotAvailable.emptyHeaderName"))
+                            .withType(Notifications.Type.ERROR)
+                            .show();
+                    return;
+                }
             }
             try {
                 engineUiService.getVersion(engine);
