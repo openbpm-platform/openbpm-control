@@ -85,13 +85,8 @@ public class ProcessDefinitionActionsFragment extends Fragment<HorizontalLayout>
         }
         startProcessBtn.setVisible(!suspended);
 
-        boolean emptyProcessInstances = processInstanceDataDc.getItems().isEmpty();
-
-        suspendedVersionActionsDropdown.setVisible(suspended && !emptyProcessInstances);
+        suspendedVersionActionsDropdown.setVisible(suspended);
         activeVersionActionsDropdown.setVisible(!suspended);
-
-        updateDropdownMigrateItemVisibility(activeVersionActionsDropdown, !emptyProcessInstances);
-        updateDropdownMigrateItemVisibility(suspendedVersionActionsDropdown, !emptyProcessInstances);
     }
 
     @Subscribe(id = "startProcessBtn", subject = "clickListener")
@@ -201,12 +196,5 @@ public class ProcessDefinitionActionsFragment extends Fragment<HorizontalLayout>
     @Subscribe(id = "closeBtn", subject = "clickListener")
     public void onCloseBtnClick(final ClickEvent<JmixButton> event) {
         getCurrentView().close(StandardOutcome.CLOSE);
-    }
-
-    private void updateDropdownMigrateItemVisibility(DropdownButton dropdownButton, boolean visible) {
-        DropdownButtonItem item = dropdownButton.getItem("migrate");
-        if (item != null) {
-            item.setVisible(visible);
-        }
     }
 }

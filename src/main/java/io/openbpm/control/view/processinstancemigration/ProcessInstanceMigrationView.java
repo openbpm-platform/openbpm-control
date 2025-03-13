@@ -14,6 +14,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import io.jmix.flowui.kit.component.button.JmixButton;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
 import io.openbpm.control.service.processinstance.MigrationService;
@@ -21,6 +22,7 @@ import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.jmix.flowui.Dialogs;
 import io.jmix.flowui.component.textfield.TypedTextField;
 import io.jmix.flowui.view.*;
+import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -52,6 +54,12 @@ public class ProcessInstanceMigrationView extends StandardView {
     protected TypedTextField<Object> sourceDefinitionKeyField;
     @ViewComponent
     protected TypedTextField<Object> sourceDefinitionVersionField;
+    @Autowired
+    private ProcessInstanceService processInstanceService;
+    @ViewComponent
+    private JmixButton migrateBtn;
+    @ViewComponent
+    private HorizontalLayout migrationWarningPanel;
 
     @SuppressWarnings("LombokSetterMayBeUsed")
     public void setProcessDefinitionData(ProcessDefinitionData processDefinitionData) {
@@ -91,6 +99,17 @@ public class ProcessInstanceMigrationView extends StandardView {
 
         if (processDefinitionData != null) {
             processDefinitionKeyComboBox.setValue(processDefinitionData.getKey());
+        }
+
+        if (processInstanceData != null) {
+            return;
+        }
+
+        long runningInstancesCount = processInstanceService.getCountByProcessDefinitionId(
+                processDefinitionData.getProcessDefinitionId());
+        if (runningInstancesCount == 0) {
+            migrateBtn.setEnabled(false);
+            migrationWarningPanel.setVisible(true);
         }
     }
 
