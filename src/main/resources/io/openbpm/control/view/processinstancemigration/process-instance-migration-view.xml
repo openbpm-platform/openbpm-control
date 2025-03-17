@@ -48,6 +48,11 @@
 
         </hbox>
 
+        <hbox id="migrationWarningPanel" visible="false">
+            <icon icon="vaadin:exclamation-circle"/>
+            <span text="msg://migrationDisabled" themeNames="small"/>
+        </hbox>
+
         <hbox id="actionsPanel" justifyContent="END" width="100%">
             <button id="migrateBtn"
                     text="msg://processInstanceMigrationView.migrate"
