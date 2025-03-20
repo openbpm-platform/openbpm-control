@@ -29,4 +29,5 @@
         <item view="datatl_entityInspectorListView" title="msg://io.jmix.datatoolsflowui.view.entityinspector/listTitle"
               icon="TOOLS"/>
     </menu>
+    <item view="Deployment.list" title="msg://io.openbpm.control.view.deploymentdata/deploymentListView.title"/>
 </menu-config>

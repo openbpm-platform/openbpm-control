@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://deploymentListView.title"
+      focusComponent="deploymentDatasDataGrid">
+    <data>
+        <collection id="deploymentDatasDc" class="io.openbpm.control.entity.DeploymentData">
+            <loader id="deploymentDatasDl" readOnly="true"/>
+        </collection>
+        <instance id="deploymentFilterDc" class="io.openbpm.control.entity.filter.DeploymentFilter"/>
+    </data>
+    <facets>
+        <urlQueryParameters>
+            <pagination component="pagination"/>
+        </urlQueryParameters>
+    </facets>
+    <actions>
+        <action id="applyFilter" text="msg:///actions.Apply" icon="SEARCH"/>
+    </actions>
+    <layout>
+        <hbox id="filterPanel" width="100%" padding="true" spacing="false">
+            <details id="filterDetails" opened="true" width="100%" summaryText="msg://filter">
+                <formLayout id="filterFormLayout" dataContainer="deploymentFilterDc">
+                    <responsiveSteps>
+                        <responsiveStep minWidth="0" columns="1"/>
+                        <responsiveStep minWidth="28em" columns="2"/>
+                        <responsiveStep minWidth="42em" columns="4"/>
+                        <responsiveStep minWidth="60em" columns="4"/>
+                        <responsiveStep minWidth="80em" columns="5"/>
+                    </responsiveSteps>
+
+                    <textField property="nameLike" id="nameField" label="msg://processDefinitionList.nameContains"
+                               placeholder="msg://startTypingName" clearButtonVisible="true"/>
+                    <textField property="keyLike" id="keyField" label="msg://processDefinitionList.keyContains"
+                               placeholder="msg://startTypingKey" clearButtonVisible="true"/>
+
+                    <comboBox id="stateComboBox" placeholder="msg://selectState" allowCustomValue="false"
+                              label="msg://processDefinitionList.status" property="state" clearButtonVisible="true"
+                              itemsEnum="io.openbpm.control.entity.processdefinition.ProcessDefinitionState">
+                    </comboBox>
+                    <checkbox property="latestVersionOnly" id="lastVersionOnlyCb"
+                              label="msg://processDefinitionList.lastVersionOnly"/>
+
+                    <hbox alignSelf="END">
+                        <button id="applyFilterBtn"
+                                action="applyFilter"
+                                themeNames="primary"
+                                icon="SEARCH"/>
+                        <button id="clearBtn"
+                                text="msg:///actions.Clear"
+                                icon="CLOSE_SMALL"/>
+                    </hbox>
+                </formLayout>
+            </details>
+        </hbox>
+        <hbox id="buttonsPanel" classNames="buttons-panel">
+            <button id="createButton" action="deploymentDatasDataGrid.create"/>
+            <button id="editButton" action="deploymentDatasDataGrid.edit"/>
+            <button id="removeButton" action="deploymentDatasDataGrid.remove"/>
+            <simplePagination id="pagination" dataLoader="deploymentDatasDl"/>
+        </hbox>
+        <dataGrid id="deploymentDatasDataGrid"
+                  width="100%"
+                  minHeight="20em"
+                  dataContainer="deploymentDatasDc"
+                  columnReorderingAllowed="true">
+            <actions>
+                <action id="create" type="list_create"/>
+                <action id="edit" type="list_edit"/>
+                <action id="remove" type="list_remove"/>
+            </actions>
+            <columns resizable="true">
+                <column property="deploymentId"/>
+                <column property="source"/>
+                <column property="name"/>
+                <column property="deploymentTime"/>
+                <column property="tenantId"/>
+            </columns>
+        </dataGrid>
+    </layout>
+</view>

@@ -6,11 +6,18 @@
 package io.openbpm.control.service.deployment.impl;
 
 import feign.FeignException;
+import feign.utils.ExceptionUtils;
+import io.jmix.core.Sort;
 import io.openbpm.control.entity.DeploymentData;
+import io.openbpm.control.entity.filter.DeploymentFilter;
+import io.openbpm.control.exception.EngineNotSelectedException;
 import io.openbpm.control.mapper.DeploymentMapper;
 import io.openbpm.control.service.deployment.DeploymentContext;
+import io.openbpm.control.service.deployment.DeploymentLoadContext;
 import io.openbpm.control.service.deployment.DeploymentService;
 import lombok.extern.slf4j.Slf4j;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.community.rest.client.api.DeploymentApiClient;
 import org.camunda.community.rest.client.model.DeploymentDto;
@@ -19,6 +26,12 @@ import org.camunda.community.rest.impl.builder.DelegatingDeploymentBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+
+import java.net.ConnectException;
+import java.util.List;
+
+import static io.openbpm.control.util.QueryUtils.addDeploymentFilters;
+import static io.openbpm.control.util.QueryUtils.addDeploymentSort;
 
 @Service("control_DeploymentService")
 @Slf4j
@@ -64,5 +77,43 @@ public class DeploymentServiceImpl implements DeploymentService {
         }
 
         return null;
+    }
+
+    @Override
+    public List<DeploymentData> findAll(DeploymentLoadContext context) {
+        try {
+            DeploymentQuery deploymentQuery = createDeploymentQuery(context.getFilter(), context.getSort());
+
+            List<Deployment> deployments;
+            if (context.getFirstResult() != null && context.getMaxResults() != null) {
+                deployments = deploymentQuery.listPage(context.getFirstResult(), context.getMaxResults());
+            } else {
+                deployments = deploymentQuery.list();
+            }
+
+            return deployments
+                    .stream()
+                    .map(deploymentMapper::fromProcessDefinitionModel)
+                    .toList();
+        } catch (Exception e) {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if (rootCause instanceof EngineNotSelectedException) {
+                log.warn("Unable to load deployments because BPM engine not selected");
+                return List.of();
+            }
+            if (rootCause instanceof ConnectException) {
+                log.error("Unable to load deployments because of connection error: ", e);
+                return List.of();
+            }
+            throw e;
+        }
+    }
+
+    protected DeploymentQuery createDeploymentQuery(@Nullable DeploymentFilter filter, @Nullable Sort sort) {
+        DeploymentQuery deploymentQuery = remoteRepositoryService.createDeploymentQuery();
+
+        addDeploymentFilters(deploymentQuery, filter);
+        addDeploymentSort(deploymentQuery, sort);
+        return deploymentQuery;
     }
 }

@@ -6,8 +6,12 @@
 package io.openbpm.control.service.deployment;
 
 import io.openbpm.control.entity.DeploymentData;
+import io.openbpm.control.service.processdefinition.ProcessDefinitionLoadContext;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.springframework.lang.Nullable;
+
+import java.util.List;
 
 /**
  * Provides methods to deploy processes to the BPM engine and get data about process deployment.
@@ -30,4 +34,12 @@ public interface DeploymentService {
      */
     @Nullable
     DeploymentData findById(String deploymentId);
+
+    /**
+     * Loads deployments from the engine using the specified context.
+     *
+     * @param context a context to load deployments
+     * @return a list of deployments
+     */
+    List<DeploymentData> findAll(DeploymentLoadContext context);
 }

@@ -6,12 +6,14 @@
 package io.openbpm.control.util;
 
 import io.jmix.core.Sort;
+import io.openbpm.control.entity.filter.DeploymentFilter;
 import io.openbpm.control.entity.filter.ProcessDefinitionFilter;
 import io.openbpm.control.entity.filter.ProcessInstanceFilter;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionState;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.camunda.bpm.engine.query.Query;
+import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.community.rest.client.model.HistoricProcessInstanceQueryDto;
@@ -21,6 +23,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -143,6 +146,28 @@ public class QueryUtils {
         addIfTrue(filter.getState() == ProcessDefinitionState.SUSPENDED, processDefinitionQuery::suspended);
     }
 
+    public static void addDeploymentFilters(DeploymentQuery deploymentQuery, @Nullable DeploymentFilter filter) {
+        if (filter == null) {
+            return;
+        }
+
+        addIfStringNotEmpty(filter.getDeploymentId(), deploymentQuery::deploymentId);
+
+        wrapAndAddStringIfNotEmpty(filter.getNameLike(), deploymentQuery::deploymentNameLike);
+
+        addIfStringNotEmpty(filter.getSource(), deploymentQuery::deploymentSource);
+
+        addCollectionIfNotEmpty(filter.getTenantIdIn(), deploymentQuery::tenantIdIn);
+        addIfTrue(filter.getWithoutTenantId(), deploymentQuery::withoutTenantId);
+
+        if (filter.getDeploymentAfter() != null) {
+            deploymentQuery.deploymentAfter(Date.from(filter.getDeploymentAfter().toInstant()));
+        }
+        if (filter.getDeploymentBefore() != null) {
+            deploymentQuery.deploymentBefore(Date.from(filter.getDeploymentBefore().toInstant()));
+        }
+    }
+
     public static void addDefinitionSort(ProcessDefinitionQuery processDefinitionQuery, @Nullable Sort sort) {
         if (sort != null) {
             for (Sort.Order order : sort.getOrders()) {
@@ -155,6 +180,23 @@ public class QueryUtils {
                 }
 
                 addSortDirection(processDefinitionQuery, !unknownValueUsed, order);
+            }
+        }
+    }
+
+    public static void addDeploymentSort(DeploymentQuery deploymentQuery, @Nullable Sort sort) {
+        if (sort != null) {
+            for (Sort.Order order : sort.getOrders()) {
+                boolean unknownValueUsed = false;
+                switch (order.getProperty()) {
+                    case "id" -> deploymentQuery.orderByDeploymentId();
+                    case "name" -> deploymentQuery.orderByDeploymentName();
+                    case "time" -> deploymentQuery.orderByDeploymentTime();
+                    case "tenantId" -> deploymentQuery.orderByTenantId();
+                    default -> unknownValueUsed = true;
+                }
+
+                addSortDirection(deploymentQuery, !unknownValueUsed, order);
             }
         }
     }

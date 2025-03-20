@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://deploymentDetailView.title"
+      focusComponent="form">
+    <data>
+        <instance id="deploymentDataDc"
+                  class="io.openbpm.control.entity.DeploymentData">
+            <loader id="deploymentDataDl"/>
+        </instance>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+    </facets>
+    <actions>
+        <action id="saveAction" type="detail_saveClose"/>
+        <action id="closeAction" type="detail_close"/>
+    </actions>
+    <layout>
+        <formLayout id="form" dataContainer="deploymentDataDc">
+            <responsiveSteps>
+                <responsiveStep minWidth="0" columns="1"/>
+                <responsiveStep minWidth="40em" columns="2"/>
+            </responsiveSteps>
+            <textField id="deploymentIdField" property="deploymentId"/>
+            <textField id="sourceField" property="source"/>
+            <textField id="nameField" property="name"/>
+            <dateTimePicker id="deploymentTimeField" property="deploymentTime"/>
+            <textField id="tenantIdField" property="tenantId"/>
+        </formLayout>
+        <hbox id="detailActions">
+            <button id="saveAndCloseButton" action="saveAction"/>
+            <button id="closeButton" action="closeAction"/>
+        </hbox>
+    </layout>
+</view>
