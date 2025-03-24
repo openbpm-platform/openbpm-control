@@ -38,7 +38,7 @@ chmod +x run.sh
 ./run.sh
 ```
 
-**Для Windows:**
+**For Windows:**
 
 ```
 # Simply execute in the command prompt
