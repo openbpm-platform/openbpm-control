@@ -115,9 +115,8 @@ public class DeploymentListView extends StandardListView<DeploymentData> {
             if (engine.getAuthType() == AuthType.BASIC) {
                 requestInterceptor = new BasicAuthRequestInterceptor(engine.getBasicAuthUsername(), engine.getBasicAuthPassword());
             } else if (engine.getAuthType() == AuthType.HTTP_HEADER) {
-                requestInterceptor = requestTemplate -> {
+                requestInterceptor = requestTemplate ->
                     requestTemplate.header(engine.getHttpHeaderName(), engine.getHttpHeaderValue());
-                };
             }
         }
         return requestInterceptor;

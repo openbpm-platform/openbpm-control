@@ -2,6 +2,7 @@ package io.openbpm.control.entity.deployment;
 
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.entity.annotation.JmixId;
+import io.jmix.core.metamodel.annotation.InstanceName;
 import io.jmix.core.metamodel.annotation.JmixEntity;
 
 import java.util.UUID;
@@ -17,6 +18,7 @@ public class DeploymentProcessInstancesInfo {
 
     protected String processDefinitionName;
 
+    @InstanceName
     protected String processDefinitionKey;
 
     protected Long processInstanceCount;
