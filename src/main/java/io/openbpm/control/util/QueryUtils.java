@@ -36,7 +36,6 @@ public class QueryUtils {
     public static final String START_TIME = "startTime";
     public static final String END_TIME = "endTime";
 
-
     public static void addRuntimeFilters(ProcessInstanceQuery processInstanceQuery, @Nullable ProcessInstanceFilter filter) {
         if (filter == null) {
             return;
@@ -141,6 +140,8 @@ public class QueryUtils {
         addCollectionIfNotEmpty(filter.getIdIn(), processDefinitionQuery::processDefinitionIdIn);
 
         addIfTrue(filter.getLatestVersionOnly(), processDefinitionQuery::latestVersion);
+
+        addIfStringNotEmpty(filter.getDeploymentId(), processDefinitionQuery::deploymentId);
 
         addIfTrue(filter.getState() == ProcessDefinitionState.ACTIVE, processDefinitionQuery::active);
         addIfTrue(filter.getState() == ProcessDefinitionState.SUSPENDED, processDefinitionQuery::suspended);

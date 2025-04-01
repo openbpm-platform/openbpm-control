@@ -6,14 +6,13 @@
 package io.openbpm.control.mapper;
 
 import io.jmix.core.Metadata;
-import io.openbpm.control.entity.DeploymentData;
+import io.openbpm.control.entity.deployment.DeploymentData;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.community.rest.client.model.DeploymentDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;

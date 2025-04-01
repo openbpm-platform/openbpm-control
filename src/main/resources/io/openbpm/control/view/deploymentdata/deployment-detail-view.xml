@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <view xmlns="http://jmix.io/schema/flowui/view"
       title="msg://deploymentDetailView.title"
-      focusComponent="form">
+      focusComponent="resourcesDataGrid">
     <data>
         <instance id="deploymentDataDc"
-                  class="io.openbpm.control.entity.DeploymentData">
+                  class="io.openbpm.control.entity.deployment.DeploymentData">
             <loader id="deploymentDataDl"/>
         </instance>
     </data>
@@ -12,23 +12,63 @@
         <dataLoadCoordinator auto="true"/>
     </facets>
     <actions>
-        <action id="saveAction" type="detail_saveClose"/>
         <action id="closeAction" type="detail_close"/>
+        <action id="copyToClipboardAction" type="control_copyComponentValueToClipboard"/>
     </actions>
-    <layout>
-        <formLayout id="form" dataContainer="deploymentDataDc">
-            <responsiveSteps>
-                <responsiveStep minWidth="0" columns="1"/>
-                <responsiveStep minWidth="40em" columns="2"/>
-            </responsiveSteps>
-            <textField id="deploymentIdField" property="deploymentId"/>
-            <textField id="sourceField" property="source"/>
-            <textField id="nameField" property="name"/>
-            <dateTimePicker id="deploymentTimeField" property="deploymentTime"/>
-            <textField id="tenantIdField" property="tenantId"/>
-        </formLayout>
-        <hbox id="detailActions">
-            <button id="saveAndCloseButton" action="saveAction"/>
+    <layout spacing="false">
+        <split orientation="HORIZONTAL" height="100%" width="100%" splitterPosition="20"
+               themeNames="splitter-spacing">
+            <vbox padding="false" spacing="false">
+                <formLayout id="deploymentDataForm" dataContainer="deploymentDataDc" width="100%">
+                    <responsiveSteps>
+                        <responsiveStep minWidth="0" columns="1"/>
+                        <responsiveStep minWidth="60em" columns="2"/>
+                        <responsiveStep minWidth="80em" columns="3"/>
+                    </responsiveSteps>
+                    <textField id="deploymentIdTextField" property="deploymentId" readOnly="true">
+                        <suffix>
+                            <button id="copyDeploymentId"
+                                    icon="COPY_O"
+                                    themeNames="tertiary-inline"/>
+                        </suffix>
+                    </textField>
+                    <textField id="nameTextField" property="name" readOnly="true">
+                        <suffix>
+                            <button id="copyName"
+                                    icon="COPY_O"
+                                    themeNames="tertiary-inline"/>
+                        </suffix>
+                    </textField>
+                    <dateTimePicker property="deploymentTime" readOnly="true" width="100%"/>
+                    <textField property="source" readOnly="true"/>
+                    <textField property="tenantId" readOnly="true"/>
+                </formLayout>
+                <span id="deploymentResourcesLabel"
+                      text="msg://deploymentResources.label"
+                      css="padding-top: 2em; padding-bottom: 0.25em"/>
+                <dataGrid id="resourcesDataGrid" width="100%" height="100%" metaClass="DeploymentResource"/>
+            </vbox>
+            <vbox padding="false" height="100%">
+                <tabSheet id="resourceTabSheet" width="100%" height="100%" visible="false">
+                    <suffix>
+                        <button id="downloadResourceButton"
+                                icon="lumo:download"
+                                alignSelf="END"
+                                text="Download"
+                                themeNames="tertiary-inline"
+                                visible="false"/>
+                    </suffix>
+                </tabSheet>
+                <div id="emptyResourceMessageContainer"
+                     width="100%"
+                     height="100%"
+                     css="display:flex;justify-content:center;align-items:center;"
+                     visible="true">
+                    <span text="msg://selectResourceMessage"/>
+                </div>
+            </vbox>
+        </split>
+        <hbox id="detailActions" alignSelf="END" padding="false">
             <button id="closeButton" action="closeAction"/>
         </hbox>
     </layout>

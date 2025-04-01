@@ -5,10 +5,10 @@
 
 package io.openbpm.control.service.deployment;
 
-import io.openbpm.control.entity.DeploymentData;
-import io.openbpm.control.service.processdefinition.ProcessDefinitionLoadContext;
-import org.camunda.bpm.engine.repository.Deployment;
+import io.openbpm.control.entity.deployment.DeploymentData;
+import io.openbpm.control.entity.deployment.DeploymentResource;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
+import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
@@ -42,4 +42,29 @@ public interface DeploymentService {
      * @return a list of deployments
      */
     List<DeploymentData> findAll(DeploymentLoadContext context);
+
+    /**
+     * Loads all resource names for provided deployment id.
+     * @param deploymentId id of a deployment
+     * @return a list of deployed resource names
+     */
+    List<DeploymentResource> getDeploymentResources(String deploymentId);
+
+    /**
+     * Loads resource data for provided deployment and resource ids
+     * @param deploymentId id of the deployment
+     * @param resourceId id of the resource
+     * @return resource with binary data
+     */
+    Resource getDeploymentResourceData(String deploymentId, String resourceId);
+
+    /**
+     * Deletes a deployment.
+     * @param deploymentId id of the deployment
+     * @param deleteAllRelatedInstances remove process instances
+     * @param skipCustomListeners skip custom listeners
+     * @param skipIoMappings skip IO mappings
+     */
+    void deleteById(String deploymentId, boolean deleteAllRelatedInstances, boolean skipCustomListeners,
+                    boolean skipIoMappings);
 }

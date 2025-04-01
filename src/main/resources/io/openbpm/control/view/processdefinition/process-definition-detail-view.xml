@@ -53,6 +53,13 @@
                         <details opened="true" themeNames="reverse small" summaryText="msg://deploymentGroup" width="100%"
                                  classNames="pt-s">
                             <vbox padding="false" width="100%" themeNames="spacing-xs">
+                                <textField id="deploymentIdField" readOnly="true" width="100%" classNames="pt-xs"
+                                           label="msg://deploymentId">
+                                    <suffix>
+                                        <button id="viewDeployment" icon="SEARCH" themeNames="tertiary-inline"/>
+                                    </suffix>
+                                </textField>
+
                                 <dateTimePicker id="deploymentTimeField" readOnly="true" width="100%" classNames="pt-xs"
                                                 label="msg://deploymentTime"/>
                                 <textField id="deploymentSourceField" readOnly="true" width="100%" classNames="pt-xs"

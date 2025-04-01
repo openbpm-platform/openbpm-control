@@ -8,10 +8,12 @@ package io.openbpm.control.service.deployment.impl;
 import feign.FeignException;
 import feign.utils.ExceptionUtils;
 import io.jmix.core.Sort;
-import io.openbpm.control.entity.DeploymentData;
+import io.openbpm.control.entity.deployment.DeploymentData;
+import io.openbpm.control.entity.deployment.DeploymentResource;
 import io.openbpm.control.entity.filter.DeploymentFilter;
 import io.openbpm.control.exception.EngineNotSelectedException;
 import io.openbpm.control.mapper.DeploymentMapper;
+import io.openbpm.control.mapper.DeploymentResourceMapper;
 import io.openbpm.control.service.deployment.DeploymentContext;
 import io.openbpm.control.service.deployment.DeploymentLoadContext;
 import io.openbpm.control.service.deployment.DeploymentService;
@@ -21,14 +23,17 @@ import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.community.rest.client.api.DeploymentApiClient;
 import org.camunda.community.rest.client.model.DeploymentDto;
+import org.camunda.community.rest.client.model.DeploymentResourceDto;
 import org.camunda.community.rest.impl.RemoteRepositoryService;
 import org.camunda.community.rest.impl.builder.DelegatingDeploymentBuilder;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.net.ConnectException;
 import java.util.List;
+import java.util.Optional;
 
 import static io.openbpm.control.util.QueryUtils.addDeploymentFilters;
 import static io.openbpm.control.util.QueryUtils.addDeploymentSort;
@@ -40,13 +45,16 @@ public class DeploymentServiceImpl implements DeploymentService {
 
     protected final RemoteRepositoryService remoteRepositoryService;
     protected final DeploymentMapper deploymentMapper;
+    protected final DeploymentResourceMapper deploymentResourceMapper;
     protected final DeploymentApiClient deploymentApiClient;
 
     public DeploymentServiceImpl(RemoteRepositoryService remoteRepositoryService,
                                  DeploymentMapper deploymentMapper,
+                                 DeploymentResourceMapper deploymentResourceMapper,
                                  DeploymentApiClient deploymentApiClient) {
         this.remoteRepositoryService = remoteRepositoryService;
         this.deploymentMapper = deploymentMapper;
+        this.deploymentResourceMapper = deploymentResourceMapper;
         this.deploymentApiClient = deploymentApiClient;
     }
 
@@ -107,6 +115,61 @@ public class DeploymentServiceImpl implements DeploymentService {
             }
             throw e;
         }
+    }
+
+    @Override
+    @Nullable
+    public List<DeploymentResource> getDeploymentResources(String deploymentId) {
+        try {
+
+            ResponseEntity<List<DeploymentResourceDto>> response =
+                    deploymentApiClient.getDeploymentResources(deploymentId);
+            if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
+                List<DeploymentResourceDto> deploymentResources =
+                        Optional.ofNullable(response.getBody()).orElse(List.of());
+
+                return deploymentResources
+                        .stream()
+                        .map(deploymentResourceMapper::fromDto)
+                        .toList();
+            }
+        } catch (Exception e) {
+            if (e instanceof FeignException feignException && feignException.status() == 404) {
+                log.error("Unable to find deployment with id {}", deploymentId, e);
+                return null;
+            }
+            throw e;
+        }
+
+        return null;
+    }
+
+    @Override
+    @Nullable
+    public Resource getDeploymentResourceData(String deploymentId, String resourceId) {
+        try {
+            ResponseEntity<Resource> response = deploymentApiClient.getDeploymentResourceData(deploymentId, resourceId);
+            if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
+                return response.getBody();
+            }
+
+        } catch (Exception e) {
+            if (e instanceof FeignException feignException && feignException.status() == 404) {
+                log.error("Unable to find deployment resource with id {} for deployment with id {} because of {}",
+                        resourceId, deploymentId, e.getMessage());
+                return null;
+            }
+            throw e;
+        }
+
+        return null;
+    }
+
+    @Override
+    public void deleteById(String deploymentId, boolean deleteAllRelatedInstances, boolean skipCustomListeners,
+                           boolean skipIoMappings) {
+        remoteRepositoryService.deleteDeployment(deploymentId, deleteAllRelatedInstances, skipCustomListeners,
+                skipIoMappings);
     }
 
     protected DeploymentQuery createDeploymentQuery(@Nullable DeploymentFilter filter, @Nullable Sort sort) {

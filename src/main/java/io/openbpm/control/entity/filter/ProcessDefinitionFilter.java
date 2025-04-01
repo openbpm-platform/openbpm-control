@@ -34,6 +34,8 @@ public class ProcessDefinitionFilter {
 
     protected List<String> idIn;
 
+    protected String deploymentId;
+
     @InstanceName
     protected String nameLike;
 

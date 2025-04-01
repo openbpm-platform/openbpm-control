@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <view xmlns="http://jmix.io/schema/flowui/view"
       title="msg://deploymentListView.title"
-      focusComponent="deploymentDatasDataGrid">
+      focusComponent="deploymentsDataGrid">
     <data>
-        <collection id="deploymentDatasDc" class="io.openbpm.control.entity.DeploymentData">
+        <collection id="deploymentDatasDc" class="io.openbpm.control.entity.deployment.DeploymentData">
             <loader id="deploymentDatasDl" readOnly="true"/>
         </collection>
         <instance id="deploymentFilterDc" class="io.openbpm.control.entity.filter.DeploymentFilter"/>
@@ -23,22 +23,21 @@
                     <responsiveSteps>
                         <responsiveStep minWidth="0" columns="1"/>
                         <responsiveStep minWidth="28em" columns="2"/>
-                        <responsiveStep minWidth="42em" columns="4"/>
+                        <responsiveStep minWidth="42em" columns="3"/>
                         <responsiveStep minWidth="60em" columns="4"/>
-                        <responsiveStep minWidth="80em" columns="5"/>
                     </responsiveSteps>
 
-                    <textField property="nameLike" id="nameField" label="msg://processDefinitionList.nameContains"
-                               placeholder="msg://startTypingName" clearButtonVisible="true"/>
-                    <textField property="keyLike" id="keyField" label="msg://processDefinitionList.keyContains"
-                               placeholder="msg://startTypingKey" clearButtonVisible="true"/>
-
-                    <comboBox id="stateComboBox" placeholder="msg://selectState" allowCustomValue="false"
-                              label="msg://processDefinitionList.status" property="state" clearButtonVisible="true"
-                              itemsEnum="io.openbpm.control.entity.processdefinition.ProcessDefinitionState">
-                    </comboBox>
-                    <checkbox property="latestVersionOnly" id="lastVersionOnlyCb"
-                              label="msg://processDefinitionList.lastVersionOnly"/>
+                    <textField id="nameField"
+                               property="nameLike"
+                               label="msg://filter.name.label"
+                               placeholder="msg://filter.name.placeholder"
+                               clearButtonVisible="true"/>
+                    <dateTimePicker id="deploymentAfterField"
+                                    property="deploymentAfter"
+                                    label="msg://filter.deploymentAfter.label"/>
+                    <dateTimePicker id="deploymentBeforeField"
+                                    property="deploymentBefore"
+                                    label="msg://filter.deploymentBefore.label"/>
 
                     <hbox alignSelf="END">
                         <button id="applyFilterBtn"
@@ -53,27 +52,29 @@
             </details>
         </hbox>
         <hbox id="buttonsPanel" classNames="buttons-panel">
-            <button id="createButton" action="deploymentDatasDataGrid.create"/>
-            <button id="editButton" action="deploymentDatasDataGrid.edit"/>
-            <button id="removeButton" action="deploymentDatasDataGrid.remove"/>
+            <button id="refreshBtn" action="deploymentsDataGrid.refresh" themeNames="primary success"/>
+            <button id="bulkRemoveBtn" action="deploymentsDataGrid.bulkRemove"/>
             <simplePagination id="pagination" dataLoader="deploymentDatasDl"/>
         </hbox>
-        <dataGrid id="deploymentDatasDataGrid"
+        <dataGrid id="deploymentsDataGrid"
                   width="100%"
                   minHeight="20em"
                   dataContainer="deploymentDatasDc"
-                  columnReorderingAllowed="true">
+                  columnReorderingAllowed="true"
+                  selectionMode="MULTI">
             <actions>
-                <action id="create" type="list_create"/>
-                <action id="edit" type="list_edit"/>
-                <action id="remove" type="list_remove"/>
+                <action id="refresh" type="list_refresh"/>
+                <action id="bulkRemove" type="list_itemTracking" icon="TRASH"
+                        text="msg://deploymentDataList.remove" actionVariant="DANGER"/>
+                <action id="view" type="list_edit" visible="false"/>
             </actions>
             <columns resizable="true">
                 <column property="deploymentId"/>
-                <column property="source"/>
                 <column property="name"/>
                 <column property="deploymentTime"/>
+                <column property="source"/>
                 <column property="tenantId"/>
+                <column key="actions" sortable="false" editable="false" autoWidth="true" flexGrow="0"/>
             </columns>
         </dataGrid>
     </layout>
