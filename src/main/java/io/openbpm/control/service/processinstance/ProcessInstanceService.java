@@ -103,6 +103,14 @@ public interface ProcessInstanceService {
     long getCountByProcessDefinitionId(String processDefinitionId);
 
     /**
+     * Loads the total count of running instances of the deployment with the specified identifier.
+     *
+     * @param deploymentId a deployment identifier
+     * @return count of instances
+     */
+    public long getCountByDeploymentId(String deploymentId);
+
+    /**
      * Loads the count of running instances of the process definition with the specified key.
      *
      * @param processDefinitionKey a process key

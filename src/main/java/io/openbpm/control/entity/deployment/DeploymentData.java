@@ -3,21 +3,21 @@
  * Use is subject to license terms.
  */
 
-package io.openbpm.control.entity;
+package io.openbpm.control.entity.deployment;
 
-import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.entity.annotation.JmixId;
 import io.jmix.core.metamodel.annotation.InstanceName;
 import io.jmix.core.metamodel.annotation.JmixEntity;
+import io.jmix.core.metamodel.annotation.JmixProperty;
 
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 @JmixEntity
 public class DeploymentData {
-    @JmixGeneratedValue
+
     @JmixId
-    protected UUID id;
+    @JmixProperty(mandatory = true)
+    protected String id;
 
     protected String deploymentId;
 
@@ -70,11 +70,11 @@ public class DeploymentData {
         this.deploymentId = deploymentId;
     }
 
-    public UUID getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(UUID id) {
+    public void setId(String id) {
         this.id = id;
     }
 }

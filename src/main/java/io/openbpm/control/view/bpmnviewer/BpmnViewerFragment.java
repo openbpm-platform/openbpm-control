@@ -36,7 +36,6 @@ public class BpmnViewerFragment extends Fragment<Div> {
     @ViewComponent
     protected JmixButton zoomResetBtn;
 
-
     @Subscribe
     public void onReady(ReadyEvent event) {
         viewerVBox.addClassNames(BORDER_STYLES);
@@ -81,12 +80,10 @@ public class BpmnViewerFragment extends Fragment<Div> {
         }
     }
 
-
     @Subscribe(id = "zoomResetBtn", subject = "clickListener")
     public void onZoomResetBtnClick(final ClickEvent<JmixButton> event) {
         if (bpmnViewer != null) {
             bpmnViewer.resetZoom();
         }
     }
-
 }
