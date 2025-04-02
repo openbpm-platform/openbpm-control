@@ -56,6 +56,7 @@ import io.openbpm.control.service.processdefinition.ProcessDefinitionLoadContext
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import io.openbpm.control.view.bpmnviewer.BpmnViewerFragment;
+import io.openbpm.control.view.dmnviewer.DmnViewerFragment;
 import io.openbpm.control.view.formviewer.FormViewerFragment;
 import io.openbpm.control.view.main.MainView;
 import io.openbpm.control.view.processdefinition.ProcessDefinitionDetailView;
@@ -383,11 +384,10 @@ public class DeploymentDetailView extends StandardDetailView<DeploymentData> {
     }
 
     private Component createDmnViewer(String xmlData) {
-//        DmnViewerFragment dmnViewerFragment = fragments.create(this, DmnViewerFragment.class);
-//        dmnViewerFragment.initViewer(xmlData);
+        DmnViewerFragment dmnViewerFragment = fragments.create(this, DmnViewerFragment.class);
+        dmnViewerFragment.initViewer(xmlData);
 
-//        return dmnViewerFragment;
-        return new Div();
+        return dmnViewerFragment;
     }
 
     private Component createFormViewer(String jsonData) {

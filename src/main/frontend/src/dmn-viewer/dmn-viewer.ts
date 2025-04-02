@@ -8,9 +8,19 @@ import {css, html, LitElement} from 'lit';
 // @ts-ignore
 import {customElement} from 'lit/decorators.js';
 // @ts-ignore
-//import {DmnViewer} from "dmn-js";
+import Viewer from "dmn-js/dist/dmn-viewer.development.js";
+
 // @ts-ignore
-import {DmnJS} from "dmn-js/dist/dmn-viewer.development.js";
+import {dmnJsDecisionTableStyles} from './style/dmn-js-decision-table-style.js';
+// @ts-ignore
+import {dmnJsDrdStyles} from './style/dmn-js-drd-style.js';
+// @ts-ignore
+import {dmnJsLiteralExpressionStyle} from './style/dmn-js-literal-expression-style.js';
+// @ts-ignore
+import {dmnJsSharedStyle} from './style/dmn-js-shared-style.js';
+
+// @ts-ignore
+import {dmnEmbeddedStyle} from './style/dmn-embedded-style.js';
 
 // @ts-ignore
 @customElement('openbpm-control-dmn-viewer')
@@ -18,10 +28,15 @@ import {DmnJS} from "dmn-js/dist/dmn-viewer.development.js";
 class OpenBpmControlDmnViewer extends LitElement {
 
     private readonly DMN_VIEWER_HOLDER: string = "dmnViewerHolder";
-    private readonly viewer: DmnJS;
+    private readonly viewer: Viewer;
     private shadowRoot: any;
 
     static styles = [
+        dmnEmbeddedStyle,
+        dmnJsDecisionTableStyles,
+        dmnJsDrdStyles,
+        dmnJsLiteralExpressionStyle,
+        dmnJsSharedStyle,
         css`
         `
       ];
@@ -29,8 +44,7 @@ class OpenBpmControlDmnViewer extends LitElement {
     constructor() {
         super();
 
-        this.viewer = new DmnJS();
-        this.viewer.setProperty("readOnly", true);
+        this.viewer = new Viewer();
     }
 
     static get properties() {
