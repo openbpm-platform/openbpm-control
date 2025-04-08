@@ -12,7 +12,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
-import io.openbpm.control.uicomponent.bpmnviewer.BpmProcessDefinition;
+import io.openbpm.control.dto.BpmProcessDefinition;
 import io.jmix.flowui.fragment.Fragment;
 import io.jmix.flowui.fragment.FragmentDescriptor;
 import io.jmix.flowui.view.Subscribe;

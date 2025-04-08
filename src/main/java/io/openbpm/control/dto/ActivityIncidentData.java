@@ -3,8 +3,9 @@
  * Use is subject to license terms.
  */
 
-package io.openbpm.control.uicomponent.bpmnviewer.command;
+package io.openbpm.control.dto;
 
+import io.openbpm.uikit.component.bpmnviewer.model.ElementIncidentData;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,8 +15,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ElementIncidentData {
+public class ActivityIncidentData implements ElementIncidentData {
     private String elementId;
     private Integer incidentCount;
-    private String tooltipMessage;
 }
