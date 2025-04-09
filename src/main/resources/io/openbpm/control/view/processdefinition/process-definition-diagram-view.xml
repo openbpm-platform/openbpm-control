@@ -23,7 +23,7 @@
                        label="msg://io.openbpm.control.entity.processdefinition/ProcessDefinitionData.version"
                        property="version" readOnly="true"/>
         </hbox>
-        <fragment id="viewerFragment" class="io.openbpm.control.view.bpmnviewer.BpmnViewerFragment"/>
+        <fragment id="viewerFragment" class="io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment"/>
         <hbox width="100%" justifyContent="END">
             <button id="closeBtn" action="close"/>
         </hbox>
