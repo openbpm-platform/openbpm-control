@@ -13,6 +13,7 @@ import io.openbpm.control.mapper.VariableMapper;
 import io.openbpm.control.service.variable.VariableLoadContext;
 import io.openbpm.control.service.variable.VariableService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.VariableInstanceApiClient;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static io.openbpm.control.util.EngineRestUtils.getCountResult;
 
 @Service("control_VariableService")
 @Slf4j
@@ -58,8 +61,8 @@ public class VariableServiceImpl implements VariableService {
                 true, queryDto
         );
 
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody()
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return CollectionUtils.emptyIfNull(response.getBody())
                     .stream()
                     .map(variableMapper::fromVariableDto)
                     .toList();
@@ -81,8 +84,8 @@ public class VariableServiceImpl implements VariableService {
 
         ResponseEntity<List<HistoricVariableInstanceDto>> response = historyApiClient.queryHistoricVariableInstances(loadContext.getFirstResult(), loadContext.getMaxResults(), true, queryDto);
 
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody()
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return CollectionUtils.emptyIfNull(response.getBody())
                     .stream()
                     .map(variableMapper::fromHistoricVariableInstanceDto)
                     .toList();
@@ -96,9 +99,8 @@ public class VariableServiceImpl implements VariableService {
     public long getRuntimeVariablesCount(@Nullable VariableFilter filter) {
         VariableInstanceQueryDto queryDto = createVariableInstanceQuery(filter);
         ResponseEntity<CountResultDto> response = variableInstanceApiClient.queryVariableInstancesCount(queryDto);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            Long count = response.getBody().getCount();
-            return count != null ? count : 0;
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return getCountResult(response.getBody());
         }
 
         log.error("Error on loading runtime variables count, query {}, status code {}", queryDto, response.getStatusCode());
@@ -109,9 +111,8 @@ public class VariableServiceImpl implements VariableService {
     public long getHistoricVariablesCount(@Nullable VariableFilter filter) {
         HistoricVariableInstanceQueryDto queryDto = createHistoricVariableQuery(filter);
         ResponseEntity<CountResultDto> response = historyApiClient.queryHistoricVariableInstancesCount(queryDto);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            Long count = response.getBody().getCount();
-            return count != null ? count : 0;
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return getCountResult(response.getBody());
         }
         log.error("Error on loading historic variables count, query {}, status code {}", queryDto, response.getStatusCode());
         return 0;
@@ -126,8 +127,9 @@ public class VariableServiceImpl implements VariableService {
     @Override
     public HistoricVariableInstanceData findHistoricVariableById(String variableInstanceId) {
         ResponseEntity<HistoricVariableInstanceDto> response = historyApiClient.getHistoricVariableInstance(variableInstanceId, true);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return variableMapper.fromHistoricVariableInstanceDto(response.getBody());
+        if (response.getStatusCode().is2xxSuccessful()) {
+            HistoricVariableInstanceDto variableInstanceDto = response.getBody();
+            return variableInstanceDto != null ? variableMapper.fromHistoricVariableInstanceDto(variableInstanceDto) : null;
         }
         log.error("Error on find historic variable, variable id {}, status code {}", variableInstanceId, response.getStatusCode());
         return null;
@@ -144,6 +146,8 @@ public class VariableServiceImpl implements VariableService {
                 case "activityInstanceId" ->
                         sortDto.setSortBy(VariableInstanceQueryDtoSortingInner.SortByEnum.ACTIVITYINSTANCEID);
                 case "type" -> sortDto.setSortBy(VariableInstanceQueryDtoSortingInner.SortByEnum.VARIABLETYPE);
+                default -> {
+                }
             }
 
             if (order.getDirection() == Sort.Direction.ASC) {

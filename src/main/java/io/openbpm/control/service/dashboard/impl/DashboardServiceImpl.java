@@ -21,6 +21,7 @@ import io.openbpm.control.restsupport.FeignClientCreationContext;
 import io.openbpm.control.restsupport.FeignClientProvider;
 import io.openbpm.control.service.dashboard.DashboardService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.ProcessDefinitionApiClient;
@@ -42,6 +43,8 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static io.openbpm.control.util.EngineRestUtils.getCountResult;
 
 @Service("control_DashboardService")
 @Slf4j
@@ -85,13 +88,11 @@ public class DashboardServiceImpl implements DashboardService {
                 .computeIfAbsent(bpmEngine.getId(), engineId -> createClient(bpmEngine, TaskApiClient.class));
         try {
             ResponseEntity<CountResultDto> response = taskApiClient.queryTasksCount(new TaskQueryDto());
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                Long count = response.getBody().getCount();
-                return count != null ? count : 0;
-            } else {
-                log.error("Error while user task count loading, status code {}", response.getStatusCode());
-                return 0;
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return getCountResult(response.getBody());
             }
+            log.error("Error while user task count loading, status code {}", response.getStatusCode());
+            return 0;
         } catch (FeignException e) {
             log.error("Error while user task count loading ", e);
             return 0;
@@ -112,13 +113,11 @@ public class DashboardServiceImpl implements DashboardService {
                     null, null, null,
                     null, null, null, null);
 
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                Long count = response.getBody().getCount();
-                return count != null ? count : 0;
-            } else {
-                log.error("Error while deployed processes count loading, status code {}", response.getStatusCode());
-                return 0;
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return getCountResult(response.getBody());
             }
+            log.error("Error while deployed processes count loading, status code {}", response.getStatusCode());
+            return 0;
         } catch (FeignException e) {
             log.error("Error while deployed processes count loading ", e);
             return 0;
@@ -133,13 +132,11 @@ public class DashboardServiceImpl implements DashboardService {
             ResponseEntity<CountResultDto> response = processInstanceApiClient.queryProcessInstancesCount(new ProcessInstanceQueryDto()
                     .active(true));
 
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                Long count = response.getBody().getCount();
-                return count != null ? count : 0;
-            } else {
-                log.error("Error while running process instances count loading, status code {}", response.getStatusCode());
-                return 0;
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return getCountResult(response.getBody());
             }
+            log.error("Error while running process instances count loading, status code {}", response.getStatusCode());
+            return 0;
         } catch (FeignException e) {
             log.error("Error while running process instances loading", e);
             return 0;
@@ -154,13 +151,11 @@ public class DashboardServiceImpl implements DashboardService {
             ResponseEntity<CountResultDto> response = processInstanceApiClient.queryProcessInstancesCount(new ProcessInstanceQueryDto()
                     .suspended(true));
 
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-                Long count = response.getBody().getCount();
-                return count != null ? count : 0;
-            } else {
-                log.error("Error while suspended process instances count loading, status code {}", response.getStatusCode());
-                return 0;
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return getCountResult(response.getBody());
             }
+            log.error("Error while suspended process instances count loading, status code {}", response.getStatusCode());
+            return 0;
         } catch (FeignException e) {
             log.error("Error while suspended process instances loading", e);
             return 0;
@@ -173,9 +168,9 @@ public class DashboardServiceImpl implements DashboardService {
                 .computeIfAbsent(bpmEngine.getId(), engineId -> createClient(bpmEngine, ProcessDefinitionApiClient.class));
         try {
             ResponseEntity<List<ProcessDefinitionStatisticsResultDto>> response = processDefinitionApiClient.getProcessDefinitionStatistics(true, null, null, true);
-            if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-
-                return response.getBody()
+            if (response.getStatusCode().is2xxSuccessful()) {
+                List<ProcessDefinitionStatisticsResultDto> statisticsResultDtos = response.getBody();
+                return CollectionUtils.emptyIfNull(statisticsResultDtos)
                         .stream()
                         .map(processDefinitionMapper::fromStatisticsResultDto)
                         .toList();
