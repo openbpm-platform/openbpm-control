@@ -25,13 +25,14 @@ import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.kit.component.dropdownbutton.DropdownButton;
 import io.jmix.flowui.kit.component.dropdownbutton.DropdownButtonItem;
 import io.jmix.flowui.model.CollectionContainer;
+import io.jmix.flowui.model.DataLoader;
 import io.jmix.flowui.model.HasLoader;
 import io.jmix.flowui.model.InstanceContainer;
 import io.jmix.flowui.view.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static io.openbpm.control.view.processdefinition.ProcessDefinitionDetailView.REMOVE_PROCESS_DEFINITION_CLOSE_ACTION;
 import static io.jmix.flowui.component.UiComponentUtils.getCurrentView;
+import static io.openbpm.control.view.processdefinition.ProcessDefinitionDetailView.REMOVE_PROCESS_DEFINITION_CLOSE_ACTION;
 
 @FragmentDescriptor("process-definition-actions-fragment.xml")
 public class ProcessDefinitionActionsFragment extends Fragment<HorizontalLayout> {
@@ -178,14 +179,20 @@ public class ProcessDefinitionActionsFragment extends Fragment<HorizontalLayout>
     }
 
     protected void reloadProcessDefinition() {
-        if (processDefinitionDataDc instanceof HasLoader container && container.getLoader() != null) {
-            container.getLoader().load();
+        if (processDefinitionDataDc instanceof HasLoader container) {
+            DataLoader loader = container.getLoader();
+            if (loader != null) {
+                loader.load();
+            }
         }
     }
 
     protected void reloadProcessInstances() {
-        if (processInstanceDataDc instanceof HasLoader container && container.getLoader() != null) {
-            container.getLoader().load();
+        if (processInstanceDataDc instanceof HasLoader container) {
+            DataLoader loader = container.getLoader();
+            if (loader != null) {
+                loader.load();
+            }
         }
     }
 

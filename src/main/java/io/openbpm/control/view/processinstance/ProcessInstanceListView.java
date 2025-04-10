@@ -239,10 +239,13 @@ public class ProcessInstanceListView extends StandardListView<ProcessInstanceDat
 
     @Subscribe("processInstancesGrid.view")
     public void onProcessInstancesGridEdit(ActionPerformedEvent event) {
-        if (processInstancesGrid.getSingleSelectedItem() == null) return;
+        ProcessInstanceData selectedInstance = processInstancesGrid.getSingleSelectedItem();
+        if (selectedInstance == null) {
+            return;
+        }
         viewNavigators.detailView(this, ProcessInstanceData.class)
                 .withBackwardNavigation(true)
-                .withRouteParameters(new RouteParameters("id", processInstancesGrid.getSingleSelectedItem().getId()))
+                .withRouteParameters(new RouteParameters("id", selectedInstance.getId()))
                 .navigate();
     }
 

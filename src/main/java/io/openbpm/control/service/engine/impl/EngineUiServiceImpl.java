@@ -82,9 +82,16 @@ public class EngineUiServiceImpl implements EngineUiService {
                 .computeIfAbsent(bpmEngine.getId(), engineId -> createVersionApiClient(persistedEngine));
         try {
             ResponseEntity<VersionDto> response = versionApiClient.getRestAPIVersion();
-            if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            if (response.getStatusCode().is2xxSuccessful()) {
                 result.setSuccess(true);
-                result.setVersion(response.getBody().getVersion());
+
+                VersionDto versionDto = response.getBody();
+                if (versionDto != null) {
+                    result.setVersion(versionDto.getVersion());
+                } else {
+                    log.warn("Empty response is returned while engine version loading, status code {}", response.getStatusCode());
+                    result.setVersion("");
+                }
             } else {
                 log.error("Error while engine version loading, status code {}", response.getStatusCode());
                 result.setSuccess(false);
@@ -106,7 +113,8 @@ public class EngineUiServiceImpl implements EngineUiService {
 
             ResponseEntity<VersionDto> response = camundaClient.getRestAPIVersion();
             if (response.getStatusCode().is2xxSuccessful()) {
-                return response.getBody().getVersion();
+                VersionDto versionDto = response.getBody();
+                return versionDto != null ? versionDto.getVersion() : "";
             }
 
             throw new EngineConnectionFailedException(response.getStatusCode().value(), "Unable to get an engine version");

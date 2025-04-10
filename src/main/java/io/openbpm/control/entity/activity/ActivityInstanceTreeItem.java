@@ -46,7 +46,7 @@ public class ActivityInstanceTreeItem {
     }
 
     public void setTransition(Boolean transition) {
-        transition = transition;
+        this.transition = transition;
     }
 
     public String getProcessDefinitionId() {

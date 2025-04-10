@@ -2,11 +2,14 @@
  * Copyright (c) Haulmont 2024. All Rights Reserved.
  * Use is subject to license terms.
  */
+import com.github.spotbugs.snom.Confidence
+import com.github.spotbugs.snom.Effort
 
 plugins {
     id 'io.jmix' version '2.4.1'
     id 'java'
     id 'org.jetbrains.gradle.plugin.idea-ext' version '1.1.9'
+    id 'com.github.spotbugs' version '6.1.7'
 }
 
 apply plugin: 'org.springframework.boot'
@@ -132,4 +135,47 @@ idea {
 
 vaadin {
     optimizeBundle = false
+}
+
+spotbugs {
+    ignoreFailures = false
+    omitVisitors = ['FindDoubleCheck']
+    excludeFilter = project.file('./etc/spotbugs/spotbugs-exclude-filter.xml')
+    effort = Effort.valueOf('MAX')
+    reportLevel = Confidence.valueOf('MEDIUM')
+}
+
+spotbugsMain {
+    jvmArgs = ['-Xmx1024m']
+
+    reports {
+        xml.required = false
+
+        html {
+            required = true
+            stylesheet = 'fancy-hist.xsl'
+            destination layout.buildDirectory.file("reports/spotbugs/${project.name}.html").get().asFile
+        }
+    }
+
+    onlyIf {
+        project.hasProperty('spotbugsEnabled')
+    }
+}
+
+spotbugsTest {
+    jvmArgs = ['-Xmx1024m']
+
+    reports {
+        xml.required = false
+        html {
+            required = true
+            stylesheet = 'fancy-hist.xsl'
+            destination layout.buildDirectory.file("reports/spotbugs/test-${project.name}.html").get().asFile
+        }
+    }
+
+    onlyIf {
+        project.hasProperty('spotbugsEnabled')
+    }
 }

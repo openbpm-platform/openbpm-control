@@ -108,11 +108,12 @@ public class JobsTabFragment extends Fragment<VerticalLayout> {
 
     @Subscribe("runtimeJobsGrid.edit")
     public void onRuntimeJobsEdit(ActionPerformedEvent event) {
-        if (runtimeJobsGrid.getSingleSelectedItem() == null) {
+        JobData selectedJob = runtimeJobsGrid.getSingleSelectedItem();
+        if (selectedJob == null) {
             return;
         }
         dialogWindows.detail(getCurrentView(), JobData.class)
-                .editEntity(runtimeJobsGrid.getSingleSelectedItem())
+                .editEntity(selectedJob)
                 .withAfterCloseListener(afterCloseEvent -> {
                     if (afterCloseEvent.closedWith(StandardOutcome.SAVE)) {
                         reloadJobs();

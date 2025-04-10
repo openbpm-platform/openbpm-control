@@ -104,11 +104,12 @@ public class ProcessInstancesFragment extends Fragment<VerticalLayout> {
 
     @Subscribe("processInstancesGrid.edit")
     public void onProcessDefinitionsGridViewDetails(ActionPerformedEvent event) {
-        if (processInstancesGrid.getSingleSelectedItem() == null) {
+        ProcessInstanceData selectedInstance = processInstancesGrid.getSingleSelectedItem();
+        if (selectedInstance == null) {
             return;
         }
         viewNavigators.detailView(getCurrentView(), ProcessInstanceData.class)
-                .withRouteParameters(new RouteParameters("id", processInstancesGrid.getSingleSelectedItem().getId()))
+                .withRouteParameters(new RouteParameters("id", selectedInstance.getId()))
                 .withBackwardNavigation(true)
                 .navigate();
     }
