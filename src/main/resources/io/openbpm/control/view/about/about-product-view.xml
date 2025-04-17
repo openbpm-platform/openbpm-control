@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://aboutProductView.title">
+    <actions>
+        <action id="close" type="view_close"/>
+    </actions>
+    <layout expand="root">
+        <div id="root" width="100%" height="100%">
+            <div id="rootGrid" width="100%"
+                 classNames="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-1 xl:grid-cols-3 2xl:grid-cols-4 gap-m root-grid">
+                <vbox padding="false" classNames="md:flex-row xl:flex-col" width="100%" expand="externalLinksRootDiv">
+                    <div classNames="bordered-container product-version-container" width="100%">
+                        <vbox width="100%" height="100%" themeNames="spacing-s">
+                            <flexLayout width="100%" alignItems="BASELINE">
+                                <h3 text="msg://productVersionHeader.text"/>
+                                <button id="copyProductBtn" icon="COPY_O"
+                                        classNames="icon-s text-tertiary ml-auto"
+                                        themeNames="small icon tertiary-inline"/>
+                            </flexLayout>
+                            <flexLayout width="100%" classNames="gap-s">
+                                <span text="msg://productLabel.text"/>
+                                <span id="productText" classNames="text-secondary"/>
+                            </flexLayout>
+                            <flexLayout width="100%" classNames="gap-s">
+                                <span text="msg://versionLabel.text"/>
+                                <span id="versionText" classNames="text-secondary"/>
+                            </flexLayout>
+                            <flexLayout width="100%" classNames="gap-s">
+                                <span text="msg://buildLabel.text"/>
+                                <span id="buildText" classNames="text-secondary"/>
+                            </flexLayout>
+                        </vbox>
+                    </div>
+                    <div id="externalLinksRootDiv" classNames="bordered-container" width="100%">
+                        <vbox id="externalLinksBox">
+                            <h3 text="msg://externalLinksHeader.text"/>
+                        </vbox>
+                    </div>
+                </vbox>
+                <div classNames="bordered-container col-span-2" height="100%">
+                    <vbox id="productsBox" width="100%" height="100%" themeNames="spacing-s">
+                        <h3 text="msg://ourProductsHeader.text"/>
+                    </vbox>
+                </div>
+            </div>
+        </div>
+
+        <hbox padding="false" classNames="sticky-buttons-bottom-panel">
+            <button action="close"/>
+        </hbox>
+    </layout>
+</view>

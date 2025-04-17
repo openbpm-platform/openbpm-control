@@ -29,4 +29,5 @@
         <item view="datatl_entityInspectorListView" title="msg://io.jmix.datatoolsflowui.view.entityinspector/listTitle"
               icon="TOOLS"/>
     </menu>
+    <item view="AboutProductView" title="msg://io.openbpm.control.view.about/aboutProductView.title" icon="INFO_CIRCLE_O"/>
 </menu-config>

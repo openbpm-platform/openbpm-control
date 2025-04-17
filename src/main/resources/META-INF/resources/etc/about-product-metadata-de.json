@@ -1,0 +1,40 @@
+{
+  "products": [
+    {
+      "name": "OpenBPM Studio",
+      "url": "https://plugins.jetbrains.com/plugin/25655-openbpm/",
+      "description": "Plugin zur visuellen Modellierung von BPMN-Prozessen in IntelliJ IDEA",
+      "released": true
+    },
+    {
+      "name": "OpenBPM Workspace (coming soon)",
+      "url": "https://openbpm.io",
+      "description": "Ein visuelles Werkzeug zur Erstellung eines fertigen Prototyps einer Geschäftsapplikation",
+      "released": false
+    },
+    {
+      "name": "OpenBPM TaskList (coming soon)",
+      "url": "https://openbpm.io",
+      "description": "Open-Source-Webanwendung zur Anzeige von Benutzeraufgaben",
+      "released": false
+    }
+  ],
+  "externalLinks": [
+    {
+      "label": "Webseite",
+      "url": "https://openbpm.io/"
+    },
+    {
+      "label": "OpenBPM Control Dokumentation",
+      "url": "https://github.com/openbpm-platform/openbpm-control?tab=readme-ov-file#table-of-contents"
+    },
+    {
+      "label": "Quellcode von OpenBPM Control",
+      "url": "https://github.com/openbpm-platform/openbpm-control"
+    },
+    {
+      "label": "Support",
+      "url": "https://join.slack.com/t/openbpm/shared_invite/zt-31ghauwhi-eaF8kkgtcM091pt4P4HXyA"
+    }
+  ]
+}
