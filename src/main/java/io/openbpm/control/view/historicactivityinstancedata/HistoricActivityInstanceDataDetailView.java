@@ -7,13 +7,13 @@ package io.openbpm.control.view.historicactivityinstancedata;
 
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import io.openbpm.control.entity.activity.HistoricActivityInstanceData;
-import io.openbpm.control.service.activity.ActivityService;
-import io.openbpm.control.view.main.MainView;
 import io.jmix.core.LoadContext;
 import io.jmix.flowui.component.formlayout.JmixFormLayout;
 import io.jmix.flowui.component.textfield.TypedTextField;
 import io.jmix.flowui.view.*;
+import io.openbpm.control.entity.activity.HistoricActivityInstanceData;
+import io.openbpm.control.service.activity.ActivityService;
+import io.openbpm.control.view.main.MainView;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.Duration;
@@ -52,9 +52,12 @@ public class HistoricActivityInstanceDataDetailView extends StandardDetailView<H
     }
 
     @Install(to = "historicActivityInstanceDataDl", target = Target.DATA_LOADER)
-    protected HistoricActivityInstanceData customerDlLoadDelegate(final LoadContext<HistoricActivityInstanceData> loadContext) {
+    protected HistoricActivityInstanceData historicActivityInstanceDataDlLoadDelegate(final LoadContext<HistoricActivityInstanceData> loadContext) {
         Object id = loadContext.getId();
 
-        return activityService.findById(id.toString());
+        if (id != null) {
+            return activityService.findById(id.toString());
+        }
+        return null;
     }
 }

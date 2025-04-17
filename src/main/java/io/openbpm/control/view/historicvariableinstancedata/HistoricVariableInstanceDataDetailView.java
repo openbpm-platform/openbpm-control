@@ -155,9 +155,12 @@ public class HistoricVariableInstanceDataDetailView extends StandardDetailView<H
     }
 
     @Install(to = "historicVariableInstanceDataDl", target = Target.DATA_LOADER)
-    protected HistoricVariableInstanceData customerDlLoadDelegate(final LoadContext<HistoricVariableInstanceData> loadContext) {
+    protected HistoricVariableInstanceData historicVariableInstanceDataDlLoadDelegate(final LoadContext<HistoricVariableInstanceData> loadContext) {
         Object id = loadContext.getId();
-        return variableService.findHistoricVariableById(id.toString());
+        if (id != null) {
+            return variableService.findHistoricVariableById(id.toString());
+        }
+        return null;
     }
 
 }

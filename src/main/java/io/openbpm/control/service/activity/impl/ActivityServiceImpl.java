@@ -18,13 +18,19 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.ProcessInstanceApiClient;
-import org.camunda.community.rest.client.model.*;
+import org.camunda.community.rest.client.model.ActivityInstanceDto;
+import org.camunda.community.rest.client.model.CountResultDto;
+import org.camunda.community.rest.client.model.HistoricActivityInstanceDto;
+import org.camunda.community.rest.client.model.HistoricActivityInstanceQueryDto;
+import org.camunda.community.rest.client.model.HistoricActivityInstanceQueryDtoSortingInner;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.openbpm.control.util.EngineRestUtils.getCountResult;
 
 @Service("control_ActivityService")
 @Slf4j
@@ -52,8 +58,9 @@ public class ActivityServiceImpl implements ActivityService {
 
         ResponseEntity<List<HistoricActivityInstanceDto>> response = historyApiClient.queryHistoricActivityInstances(null, null,
                 queryDto);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody()
+        if (response.getStatusCode().is2xxSuccessful()) {
+            List<HistoricActivityInstanceDto> activityInstanceDtoList = response.getBody();
+            return CollectionUtils.emptyIfNull(activityInstanceDtoList)
                     .stream()
                     .map(activityMapper::fromActivityDto)
                     .toList();
@@ -90,8 +97,9 @@ public class ActivityServiceImpl implements ActivityService {
 
         ResponseEntity<List<HistoricActivityInstanceDto>> response = historyApiClient.queryHistoricActivityInstances(null, null,
                 queryDto);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody()
+        if (response.getStatusCode().is2xxSuccessful()) {
+            List<HistoricActivityInstanceDto> historicActivityInstanceDtos = response.getBody();
+            return CollectionUtils.emptyIfNull(historicActivityInstanceDtos)
                     .stream()
                     .map(activityMapper::fromActivityDto)
                     .toList();
@@ -107,8 +115,9 @@ public class ActivityServiceImpl implements ActivityService {
 
         ResponseEntity<List<HistoricActivityInstanceDto>> response = historyApiClient.queryHistoricActivityInstances(loadContext.getFirstResult(), loadContext.getMaxResults(),
                 queryDto);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody()
+        if (response.getStatusCode().is2xxSuccessful()) {
+            List<HistoricActivityInstanceDto> activityInstanceDtoList = response.getBody();
+            return CollectionUtils.emptyIfNull(activityInstanceDtoList)
                     .stream()
                     .map(historyActivityMapper::fromHistoryActivityDto)
                     .toList();
@@ -122,9 +131,8 @@ public class ActivityServiceImpl implements ActivityService {
     public long getHistoryActivitiesCount(@Nullable ActivityFilter filter) {
         HistoricActivityInstanceQueryDto queryDto = createActivityQueryDto(filter);
         ResponseEntity<CountResultDto> response = historyApiClient.queryHistoricActivityInstancesCount(queryDto);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            Long count = response.getBody().getCount();
-            return count != null ? count : 0;
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return getCountResult(response.getBody());
         }
 
         log.error("Error while getting history activities count, {}", response.getStatusCode());
@@ -135,8 +143,9 @@ public class ActivityServiceImpl implements ActivityService {
     @Nullable
     public HistoricActivityInstanceData findById(String activityInstanceId) {
         ResponseEntity<HistoricActivityInstanceDto> response = historyApiClient.getHistoricActivityInstance(activityInstanceId);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return historyActivityMapper.fromHistoryActivityDto(response.getBody());
+        if (response.getStatusCode().is2xxSuccessful()) {
+            HistoricActivityInstanceDto activityInstanceDto = response.getBody();
+            return activityInstanceDto != null ? historyActivityMapper.fromHistoryActivityDto(activityInstanceDto) : null;
         }
         log.error("Error while getting history activity by id {}, status code: {}", activityInstanceId, response.getStatusCode());
         return null;
@@ -168,6 +177,8 @@ public class ActivityServiceImpl implements ActivityService {
                             sortOption.setSortBy(HistoricActivityInstanceQueryDtoSortingInner.SortByEnum.STARTTIME);
                     case "endTime" ->
                             sortOption.setSortBy(HistoricActivityInstanceQueryDtoSortingInner.SortByEnum.ENDTIME);
+                    default -> {
+                    }
                 }
 
                 if (order.getDirection() == Sort.Direction.ASC) {

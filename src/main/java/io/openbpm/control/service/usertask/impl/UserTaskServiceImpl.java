@@ -15,6 +15,7 @@ import io.openbpm.control.mapper.TaskMapper;
 import io.openbpm.control.service.usertask.UserTaskLoadContext;
 import io.openbpm.control.service.usertask.UserTaskService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.TaskApiClient;
@@ -30,9 +31,8 @@ import java.util.Collection;
 import java.util.List;
 
 import static io.openbpm.control.service.variable.VariableUtils.createVariableMap;
-import static io.openbpm.control.util.QueryUtils.addIfNotNull;
-import static io.openbpm.control.util.QueryUtils.addIfStringNotEmpty;
-import static io.openbpm.control.util.QueryUtils.wrapAndAddStringIfNotEmpty;
+import static io.openbpm.control.util.EngineRestUtils.getCountResult;
+import static io.openbpm.control.util.QueryUtils.*;
 
 @Service("control_UserTaskService")
 @Slf4j
@@ -60,8 +60,8 @@ public class UserTaskServiceImpl implements UserTaskService {
             taskQueryDto.setSorting(createTaskQuerySort(loadContext.getSort()));
 
             ResponseEntity<List<TaskDto>> tasksResponse = taskApiClient.queryTasks(loadContext.getFirstResult(), loadContext.getMaxResults(), taskQueryDto);
-            if (tasksResponse.getStatusCode().is2xxSuccessful() && tasksResponse.getBody() != null) {
-                return tasksResponse.getBody()
+            if (tasksResponse.getStatusCode().is2xxSuccessful()) {
+                return CollectionUtils.emptyIfNull(tasksResponse.getBody())
                         .stream()
                         .map(taskMapper::fromRuntimeTaskDto)
                         .toList();
@@ -86,9 +86,8 @@ public class UserTaskServiceImpl implements UserTaskService {
     public long getRuntimeTasksCount(@Nullable UserTaskFilter filter) {
         TaskQueryDto taskQueryDto = createTaskQueryDto(filter);
         ResponseEntity<CountResultDto> tasksResponse = taskApiClient.queryTasksCount(taskQueryDto);
-        if (tasksResponse.getStatusCode().is2xxSuccessful() && tasksResponse.hasBody()) {
-            Long count = tasksResponse.getBody().getCount();
-            return count != null ? count : 0;
+        if (tasksResponse.getStatusCode().is2xxSuccessful()) {
+            return getCountResult(tasksResponse.getBody());
         }
         log.error("Error on user task count loading, query: {}, status code: {}", taskQueryDto, tasksResponse.getStatusCode());
         return 0;
@@ -105,9 +104,10 @@ public class UserTaskServiceImpl implements UserTaskService {
     public UserTaskData findTaskById(String taskId) {
         ResponseEntity<List<HistoricTaskInstanceDto>> taskResponse = historyApiClient.queryHistoricTaskInstances(0, 1, new HistoricTaskInstanceQueryDto()
                 .taskId(taskId));
-        if (taskResponse.getStatusCode().is2xxSuccessful() && taskResponse.getBody() != null) {
-            HistoricTaskInstanceDto task = taskResponse.getBody().getFirst();
-            return taskMapper.fromTaskDto(task);
+        if (taskResponse.getStatusCode().is2xxSuccessful()) {
+            List<HistoricTaskInstanceDto> taskInstanceDtoList = taskResponse.getBody();
+            HistoricTaskInstanceDto task = CollectionUtils.isNotEmpty(taskInstanceDtoList) ? taskInstanceDtoList.getFirst() : null;
+            return task != null ? taskMapper.fromTaskDto(task) : null;
         }
         log.error("Error on user task loading, task id: {}, status code: {}", taskId, taskResponse.getStatusCode());
         return null;
@@ -121,11 +121,13 @@ public class UserTaskServiceImpl implements UserTaskService {
         ResponseEntity<List<HistoricTaskInstanceDto>> response = historyApiClient.queryHistoricTaskInstances(loadContext.getFirstResult(), loadContext.getMaxResults(),
                 queryDto);
 
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody()
+        if (response.getStatusCode().is2xxSuccessful()) {
+            List<HistoricTaskInstanceDto> taskInstanceDtoList = response.getBody();
+            return CollectionUtils.emptyIfNull(taskInstanceDtoList)
                     .stream()
                     .map(taskMapper::fromTaskDto)
                     .toList();
+
         }
         log.error("Error on historic user task loading, query: {}, status code: {}", queryDto, response.getStatusCode());
         return List.of();
@@ -136,9 +138,8 @@ public class UserTaskServiceImpl implements UserTaskService {
         HistoricTaskInstanceQueryDto queryDto = createHistoryTaskQueryDto(filter);
         ResponseEntity<CountResultDto> response = historyApiClient.queryHistoricTaskInstancesCount(queryDto);
 
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            Long count = response.getBody().getCount();
-            return count != null ? count : 0;
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return getCountResult(response.getBody());
         }
         log.error("Error on historic user task count loading, query: {}, status code: {}", queryDto, response.getStatusCode());
         return 0;
@@ -187,6 +188,8 @@ public class UserTaskServiceImpl implements UserTaskService {
                 case "createTime" -> sortOption.setSortBy(TaskQueryDtoSortingInner.SortByEnum.CREATED);
                 case "dueDate" -> sortOption.setSortBy(TaskQueryDtoSortingInner.SortByEnum.DUEDATE);
                 case "assignee" -> sortOption.setSortBy(TaskQueryDtoSortingInner.SortByEnum.ASSIGNEE);
+                default -> {
+                }
             }
 
             if (order.getDirection() == Sort.Direction.ASC) {
@@ -228,6 +231,8 @@ public class UserTaskServiceImpl implements UserTaskService {
                     case "dueDate" -> sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.DUEDATE);
                     case "assignee" ->
                             sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.ASSIGNEE);
+                    default -> {
+                    }
                 }
 
                 if (order.getDirection() == Sort.Direction.ASC) {

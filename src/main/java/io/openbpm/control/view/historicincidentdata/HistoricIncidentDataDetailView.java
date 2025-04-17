@@ -61,7 +61,10 @@ public class HistoricIncidentDataDetailView extends StandardDetailView<HistoricI
     @Install(to = "historicIncidentDataDl", target = Target.DATA_LOADER)
     protected HistoricIncidentData historicIncidentDataDlLoadDelegate(final LoadContext<HistoricIncidentData> loadContext) {
         Object id = loadContext.getId();
-        return incidentService.findHistoricIncidentById(Objects.requireNonNull(id).toString());
+        if (id != null) {
+            return incidentService.findHistoricIncidentById(id.toString());
+        }
+        return null;
     }
 
     protected void initIncidentTypeRelatedFields() {

@@ -141,8 +141,9 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
     public String getBpmnXml(String processDefinitionId) {
         try {
             ResponseEntity<ProcessDefinitionDiagramDto> processDefinitionBpmn20Xml = processDefinitionApiClient.getProcessDefinitionBpmn20Xml(processDefinitionId);
-            if (processDefinitionBpmn20Xml.getStatusCode().is2xxSuccessful() && processDefinitionBpmn20Xml.getBody() != null) {
-                return processDefinitionBpmn20Xml.getBody().getBpmn20Xml();
+            if (processDefinitionBpmn20Xml.getStatusCode().is2xxSuccessful()) {
+                ProcessDefinitionDiagramDto diagramDto = processDefinitionBpmn20Xml.getBody();
+                return diagramDto != null ? diagramDto.getBpmn20Xml() : null;
             }
             return null;
         } catch (Exception e) {

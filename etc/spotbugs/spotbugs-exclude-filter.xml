@@ -1,0 +1,52 @@
+<!--
+  ~ Copyright (c) Haulmont 2025. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<FindBugsFilter>
+    <!-- Disabled bug patterns -->
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+    </Match>
+    <Match>
+        <Bug pattern="SE_BAD_FIELD"/> <!-- We do not check serializable fields in UI components -->
+    </Match>
+    <Match>
+        <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/> <!-- We do not use platform specific new line characters -->
+    </Match>
+
+    <!-- Bad practice detected in EclipseLink generated code -->
+
+    <Match>
+        <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
+        <Method name="_persistence_get"/>
+    </Match>
+    <Match>
+        <Bug pattern="ES_COMPARING_PARAMETER_STRING_WITH_EQ"/>
+        <Method name="_persistence_set"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP"/>
+        <Method name="_persistence_get"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="EI_EXPOSE_REP2"/>
+        <Method name="_persistence_set"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
+        <Package name="io.openbpm.control.entity"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
+        <Package name="io.openbpm.control.entity.filter"/>
+    </Match>
+
+</FindBugsFilter>

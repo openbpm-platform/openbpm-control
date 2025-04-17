@@ -97,9 +97,7 @@ public class ProcessInstanceMigrationView extends StandardView {
                 .toList();
         processDefinitionKeyComboBox.setItems(processDefinitionKeys);
 
-        if (processDefinitionData != null) {
-            processDefinitionKeyComboBox.setValue(processDefinitionData.getKey());
-        }
+        processDefinitionKeyComboBox.setValue(processDefinitionData.getKey());
 
         if (processInstanceData != null) {
             return;

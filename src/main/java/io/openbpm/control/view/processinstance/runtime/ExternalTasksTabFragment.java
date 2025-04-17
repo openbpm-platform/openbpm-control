@@ -118,11 +118,12 @@ public class ExternalTasksTabFragment extends Fragment<VerticalLayout> {
 
     @Subscribe("runtimeExternalTasksGrid.edit")
     public void onRuntimeExternalTasksEdit(ActionPerformedEvent event) {
-        if (runtimeExternalTasksGrid.getSingleSelectedItem() == null) {
+        ExternalTaskData selectedTask = runtimeExternalTasksGrid.getSingleSelectedItem();
+        if (selectedTask == null) {
             return;
         }
         dialogWindows.detail(getCurrentView(), ExternalTaskData.class)
-                .editEntity(runtimeExternalTasksGrid.getSingleSelectedItem())
+                .editEntity(selectedTask)
                 .withAfterCloseListener(afterCloseEvent -> {
                     if (afterCloseEvent.closedWith(StandardOutcome.SAVE)) {
                         reloadExternalTasks();

@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service("control_MigrationService")
 @Slf4j
@@ -50,10 +51,12 @@ public class MigrationServiceImpl implements MigrationService {
     @Override
     public List<String> validateMigrationOfProcessInstances(String srcProcessDefinitionId, String targetProcessDefinitionId) {
         MigrationPlanDto migrationPlanDto = createMigrationPlan(srcProcessDefinitionId, targetProcessDefinitionId);
-        ResponseEntity<MigrationPlanReportDto> migrationPlanReportDtoResponseEntity = migrationApiClient.validateMigrationPlan(migrationPlanDto);
-        if (migrationPlanReportDtoResponseEntity.getStatusCode().is2xxSuccessful() && migrationPlanReportDtoResponseEntity.getBody() != null) {
-            MigrationPlanReportDto migrationPlanReportDto = migrationPlanReportDtoResponseEntity.getBody();
-            return migrationPlanReportDto.getInstructionReports()
+        ResponseEntity<MigrationPlanReportDto> response = migrationApiClient.validateMigrationPlan(migrationPlanDto);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            List<MigrationInstructionValidationReportDto> instructionReports = Optional.ofNullable(response.getBody())
+                    .map(MigrationPlanReportDto::getInstructionReports)
+                    .orElse(List.of());
+            return instructionReports
                     .stream()
                     .flatMap(validationInstruction -> validationInstruction.getFailures().stream())
                     .toList();

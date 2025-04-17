@@ -23,6 +23,7 @@ import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.kit.component.dropdownbutton.DropdownButton;
 import io.jmix.flowui.kit.component.dropdownbutton.DropdownButtonItem;
 import io.jmix.flowui.model.CollectionContainer;
+import io.jmix.flowui.model.DataLoader;
 import io.jmix.flowui.model.HasLoader;
 import io.jmix.flowui.view.*;
 import org.apache.commons.lang3.StringUtils;
@@ -186,8 +187,11 @@ public class ProcessDefinitionListItemActionsFragment extends Fragment<Horizonta
     }
 
     protected void reloadProcessDefinitions() {
-        if (processDefinitionsDc instanceof HasLoader container && container.getLoader() != null) {
-            container.getLoader().load();
+        if (processDefinitionsDc instanceof HasLoader container) {
+            DataLoader loader = container.getLoader();
+            if (loader != null) {
+                loader.load();
+            }
         }
     }
 
