@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fragment xmlns="http://jmix.io/schema/flowui/fragment">
+    <content>
+        <flexLayout id="root" alignItems="CENTER" classNames="gap-s">
+            <anchor id="urlField" target="BLANK"/>
+            <icon icon="ARROW_UP" classNames="text-tertiary external-link-arrow-icon" size="0.75em"/>
+        </flexLayout>
+    </content>
+</fragment>

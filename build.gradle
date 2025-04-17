@@ -5,6 +5,8 @@
 import com.github.spotbugs.snom.Confidence
 import com.github.spotbugs.snom.Effort
 
+import org.springframework.boot.gradle.tasks.buildinfo.BuildInfo
+
 plugins {
     id 'io.jmix' version '2.4.1'
     id 'java'
@@ -135,6 +137,17 @@ idea {
 
 vaadin {
     optimizeBundle = false
+}
+
+project.afterEvaluate {
+    def bootBuildInfoTask = (BuildInfo) tasks.named('bootBuildInfo').orNull //Jmix plugin adds this task
+    if (bootBuildInfoTask != null) {
+        bootBuildInfoTask.properties({
+            additional = [
+                    'buildType': project.findProperty('buildType') ?: 'sources'
+            ]
+        })
+    }
 }
 
 spotbugs {
