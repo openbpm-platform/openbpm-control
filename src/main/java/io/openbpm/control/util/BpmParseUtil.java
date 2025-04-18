@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.openbpm.control.uicomponent.bpmnviewer.BpmProcessDefinition;
+import io.openbpm.control.uicomponent.dmnviewer.DmnDecisionDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +28,18 @@ public class BpmParseUtil {
             }
         } catch (JsonProcessingException e) {
             log.error("Unable parse definitions JSON {}", processDefinitionsJson);
+        }
+        return List.of();
+    }
+
+    public static List<DmnDecisionDefinition> parseDecisionsDefinitionsJson(String decisionDefinitionsJson) {
+        try {
+            if (StringUtils.isNotBlank(decisionDefinitionsJson)) {
+                return objectMapper.readValue(decisionDefinitionsJson, new TypeReference<>() {
+                });
+            }
+        } catch (JsonProcessingException e) {
+            log.error("Unable parse definitions JSON {}", decisionDefinitionsJson);
         }
         return List.of();
     }

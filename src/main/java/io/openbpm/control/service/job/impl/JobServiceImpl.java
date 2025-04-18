@@ -146,10 +146,10 @@ public class JobServiceImpl implements JobService {
             JobQueryDtoSortingInner sortOption = new JobQueryDtoSortingInner();
 
             switch (order.getProperty()) {
-                case "id" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOBID);
-                case "retries" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOBRETRIES);
-                case "dueDate" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOBDUEDATE);
-                case "priority" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOBPRIORITY);
+                case "id" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOB_ID);
+                case "retries" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOB_RETRIES);
+                case "dueDate" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOB_DUE_DATE);
+                case "priority" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOB_PRIORITY);
             }
 
             if (order.getDirection() == Sort.Direction.ASC) {

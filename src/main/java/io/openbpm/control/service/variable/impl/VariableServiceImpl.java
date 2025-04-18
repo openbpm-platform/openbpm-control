@@ -140,10 +140,10 @@ public class VariableServiceImpl implements VariableService {
 
             VariableInstanceQueryDtoSortingInner sortDto = new VariableInstanceQueryDtoSortingInner();
             switch (property) {
-                case "name" -> sortDto.setSortBy(VariableInstanceQueryDtoSortingInner.SortByEnum.VARIABLENAME);
+                case "name" -> sortDto.setSortBy(VariableInstanceQueryDtoSortingInner.SortByEnum.VARIABLE_NAME);
                 case "activityInstanceId" ->
-                        sortDto.setSortBy(VariableInstanceQueryDtoSortingInner.SortByEnum.ACTIVITYINSTANCEID);
-                case "type" -> sortDto.setSortBy(VariableInstanceQueryDtoSortingInner.SortByEnum.VARIABLETYPE);
+                        sortDto.setSortBy(VariableInstanceQueryDtoSortingInner.SortByEnum.ACTIVITY_INSTANCE_ID);
+                case "type" -> sortDto.setSortBy(VariableInstanceQueryDtoSortingInner.SortByEnum.VARIABLE_TYPE);
             }
 
             if (order.getDirection() == Sort.Direction.ASC) {
@@ -182,7 +182,7 @@ public class VariableServiceImpl implements VariableService {
 
             HistoricVariableInstanceQueryDtoSortingInner sortDto = new HistoricVariableInstanceQueryDtoSortingInner();
             if (property.equals("name")) {
-                sortDto.setSortBy(HistoricVariableInstanceQueryDtoSortingInner.SortByEnum.VARIABLENAME);
+                sortDto.setSortBy(HistoricVariableInstanceQueryDtoSortingInner.SortByEnum.VARIABLE_NAME);
             }
 
             if (order.getDirection() == Sort.Direction.ASC) {
