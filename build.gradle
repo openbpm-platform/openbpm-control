@@ -3,6 +3,8 @@
  * Use is subject to license terms.
  */
 
+import org.springframework.boot.gradle.tasks.buildinfo.BuildInfo
+
 plugins {
     id 'io.jmix' version '2.4.1'
     id 'java'
@@ -33,16 +35,28 @@ repositories {
     maven {
         url 'https://maven.vaadin.com/vaadin-addons'
     }
+
+    if (project.hasProperty('openbpmRepoUrl')) {
+        maven {
+            url = rootProject['openbpmRepoUrl']
+            credentials {
+                username rootProject['openbpmRepoUser']
+                password rootProject['openbpmRepoPassword']
+            }
+            allowInsecureProtocol = true
+        }
+    } else {
+        maven {
+            url 'https://nexus.openbpm.io/repository/public'
+        }
+    }
 }
 
 dependencies {
-    def camundaVersion = '7.21.0'
-    def springCloudVersion = '2023.0.1'
-    def openFeignVersion = '4.1.1'
-    def mapstructVersion = '1.5.5.Final'
-    def lombokVersion = '1.18.32'
-    def vaadinSpinnerVersion = '24.1.0'
-    def jacksonModuleKotlinVersion = '2.13.3'
+    // OpenBPM
+    implementation(platform("io.openbpm.bom:openbpm-bom:$bomVersion"))
+    implementation 'io.openbpm.ui:openbpm-theme'
+    implementation 'io.openbpm.ui:openbpm-ui-kit-starter'
 
     // Jmix
     implementation 'io.jmix.core:jmix-core-starter'
@@ -61,30 +75,30 @@ dependencies {
     implementation 'io.jmix.translations:jmix-translations-ru'
 
     //Vaadin add-ons
-    implementation "org.vaadin.addons.componentfactory:spinner:${vaadinSpinnerVersion}"
+    implementation "org.vaadin.addons.componentfactory:spinner"
 
     // Spring
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    implementation "org.springframework.cloud:spring-cloud-starter-openfeign:${openFeignVersion}"
+    implementation "org.springframework.cloud:spring-cloud-dependencies"
+    implementation "org.springframework.cloud:spring-cloud-starter-openfeign"
 
-    //Actuator
+    // Actuator
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
     // Camunda
-    implementation "org.camunda.community.rest:camunda-platform-7-rest-client-spring-boot:${camundaVersion}"
-    implementation "org.camunda.bpm:camunda-bom:${camundaVersion}"
-    implementation "io.holunda.camunda-api:camunda-bpm-engine-api:${camundaVersion}"
+    implementation "org.camunda.community.rest:camunda-platform-7-rest-client-spring-boot"
+    implementation "io.holunda.camunda-api:camunda-bpm-engine-api"
 
     // Camunda util dependencies
-    implementation "com.fasterxml.jackson.module:jackson-module-kotlin:${jacksonModuleKotlinVersion}"
+    implementation "com.fasterxml.jackson.module:jackson-module-kotlin"
 
     // Preprocessors
-    implementation "org.mapstruct:mapstruct:${mapstructVersion}"
-    implementation "org.projectlombok:lombok:${lombokVersion}"
+    implementation "org.mapstruct:mapstruct:"
+    implementation "org.projectlombok:lombok"
 
-    annotationProcessor "org.projectlombok:lombok:${lombokVersion}"
-    annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    annotationProcessor platform("io.openbpm.bom:openbpm-bom:$bomVersion")
+    annotationProcessor "org.projectlombok:lombok"
+    annotationProcessor "org.mapstruct:mapstruct-processor"
 
     // Database drivers
     runtimeOnly 'org.postgresql:postgresql'
@@ -98,8 +112,9 @@ dependencies {
     testImplementation 'io.jmix.flowui:jmix-flowui-test-assist'
 
     // test: processors
-    testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
-    testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
+    testCompileOnly "org.projectlombok:lombok"
+    testAnnotationProcessor platform("io.openbpm.bom:openbpm-bom:$bomVersion")
+    testAnnotationProcessor "org.projectlombok:lombok"
 }
 
 configurations.implementation {
@@ -119,4 +134,15 @@ idea {
 
 vaadin {
     optimizeBundle = false
+}
+
+project.afterEvaluate {
+    def bootBuildInfoTask = (BuildInfo) tasks.named('bootBuildInfo').orNull //Jmix plugin adds this task
+    if (bootBuildInfoTask != null) {
+        bootBuildInfoTask.properties({
+            additional = [
+                    'buildType': project.findProperty('buildType') ?: 'sources'
+            ]
+        })
+    }
 }

@@ -42,9 +42,9 @@ import io.openbpm.control.service.deployment.DeploymentService;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceLoadContext;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
-import io.openbpm.control.view.bpmnviewer.BpmnViewerFragment;
 import io.openbpm.control.view.deploymentdata.DeploymentDetailView;
 import io.openbpm.control.view.event.TitleUpdateEvent;
+import io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 

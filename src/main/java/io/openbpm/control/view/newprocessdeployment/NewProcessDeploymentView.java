@@ -35,10 +35,10 @@ import io.openbpm.control.service.deployment.DeploymentContext;
 import io.openbpm.control.service.deployment.DeploymentService;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionLoadContext;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
-import io.openbpm.control.uicomponent.bpmnviewer.BpmProcessDefinition;
-import io.openbpm.control.uicomponent.bpmnviewer.event.ImportCompleteEvent;
-import io.openbpm.control.view.bpmnviewer.BpmnViewerFragment;
+import io.openbpm.control.dto.BpmProcessDefinition;
 import io.openbpm.control.view.main.MainView;
+import io.openbpm.uikit.component.bpmnviewer.event.XmlImportCompleteEvent;
+import io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -118,7 +118,6 @@ public class NewProcessDeploymentView extends StandardView {
         bpmnXmlUploadField.addClassNames(LumoUtility.Padding.Top.NONE);
         initEmptyPreviewStyles();
         initProcessInfoHBoxStyles();
-        viewerFragment.removeBorders();
     }
 
     @Subscribe(id = "okBtn", subject = "clickListener")
@@ -238,7 +237,7 @@ public class NewProcessDeploymentView extends StandardView {
         return existingProcesses;
     }
 
-    protected void updateImportedProcesses(ImportCompleteEvent importCompleteEvent) {
+    protected void updateImportedProcesses(XmlImportCompleteEvent importCompleteEvent) {
         this.processDefinitions = parseProcessDefinitionsJson(importCompleteEvent.getProcessDefinitionsJson());
         updateProcessCountComponents();
     }

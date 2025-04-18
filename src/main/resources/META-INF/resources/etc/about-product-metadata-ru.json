@@ -1,0 +1,50 @@
+{
+  "products": [
+    {
+      "name": "OpenBPM Studio",
+      "url": "https://openbpm.ru",
+      "description": "Плагин для визуального моделирования BPMN-процессов в IntelliJ IDEA",
+      "released": true
+    },
+    {
+      "name": "OpenBPM Workspace (скоро появится)",
+      "url": "https://openbpm.ru",
+      "description": "Инструмент для визуального создания прототипов систем с бизнес процессами",
+      "released": false
+    },
+    {
+      "name": "OpenBPM TaskList (скоро появится)",
+      "url": "https://openbpm.ru",
+      "description": "Open-source веб-приложение для отображения и работы с задачами пользователей",
+      "released": false
+    },
+    {
+      "name": "OpenBPM Engine (скоро появится)",
+      "url": "https://openbpm.ru",
+      "description": "BPM-движок, совместимый по API с Camunda 7",
+      "released": false
+    }
+  ],
+  "externalLinks": [
+    {
+      "url": "https://openbpm.ru/",
+      "label": "Вебсайт"
+    },
+    {
+      "url": "https://github.com/openbpm-platform/openbpm-control?tab=readme-ov-file#table-of-contents",
+      "label": "Документация OpenBPM Control"
+    },
+    {
+      "url": "https://github.com/openbpm-platform/openbpm-control",
+      "label": "Исходный код OpenBPM Control"
+    },
+    {
+      "url": "https://t.me/openbpm_chat",
+      "label": "Поддержка"
+    },
+    {
+      "url": "https://t.me/openbpm",
+      "label": "Телеграм канал"
+    }
+  ]
+}

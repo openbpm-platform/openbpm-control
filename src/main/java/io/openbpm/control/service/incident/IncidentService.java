@@ -8,7 +8,7 @@ package io.openbpm.control.service.incident;
 import io.openbpm.control.entity.filter.IncidentFilter;
 import io.openbpm.control.entity.incident.HistoricIncidentData;
 import io.openbpm.control.entity.incident.IncidentData;
-import io.openbpm.control.uicomponent.bpmnviewer.command.ElementIncidentData;
+import io.openbpm.control.dto.ActivityIncidentData;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public interface IncidentService {
      * @param processInstanceId a process instance identifier
      * @return open incidents
      */
-    List<ElementIncidentData> findRuntimeIncidents(String processInstanceId);
+    List<ActivityIncidentData> findRuntimeIncidents(String processInstanceId);
 
     /**
      * Loads open incidents from the engine using the specified context.

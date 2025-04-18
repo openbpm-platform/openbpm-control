@@ -75,7 +75,7 @@
             </tab>
             <tab id="bpmnViewerTab" label="msg://bpmnViewerTab" enabled="true">
                 <div width="100%" height="100%">
-                    <fragment class="io.openbpm.control.view.bpmnviewer.BpmnViewerFragment" id="viewerFragment"/>
+                    <fragment class="io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment" id="viewerFragment"/>
                 </div>
             </tab>
             <tab id="bpmnXmlTab" label="msg://bpmnXmlTab" enabled="true">

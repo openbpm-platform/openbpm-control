@@ -10,7 +10,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
-import io.openbpm.control.view.bpmnviewer.BpmnViewerFragment;
+import io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment;
 import io.openbpm.control.view.main.MainView;
 import io.jmix.flowui.model.InstanceContainer;
 import io.jmix.flowui.view.*;
@@ -39,7 +39,6 @@ public class ProcessDefinitionDiagramView extends StandardView {
     public void onInit(final InitEvent event) {
         addClassNames(LumoUtility.Padding.Top.XSMALL, LumoUtility.Padding.Left.LARGE,
                 LumoUtility.Padding.Right.LARGE);
-        viewerFragment.showInDialog();
     }
 
     @Subscribe

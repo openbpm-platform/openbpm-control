@@ -15,7 +15,7 @@ import io.openbpm.control.exception.EngineNotSelectedException;
 import io.openbpm.control.mapper.IncidentMapper;
 import io.openbpm.control.service.incident.IncidentLoadContext;
 import io.openbpm.control.service.incident.IncidentService;
-import io.openbpm.control.uicomponent.bpmnviewer.command.ElementIncidentData;
+import io.openbpm.control.dto.ActivityIncidentData;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.IncidentApiClient;
@@ -50,7 +50,7 @@ public class IncidentServiceImpl implements IncidentService {
     }
 
     @Override
-    public List<ElementIncidentData> findRuntimeIncidents(String processInstanceId) {
+    public List<ActivityIncidentData> findRuntimeIncidents(String processInstanceId) {
         ResponseEntity<List<IncidentDto>> response = incidentApiClient.getIncidents(null, null, null,
                 null, null, null, processInstanceId, null, null,
                 null, null, null, null, null, null, null, null,
@@ -63,7 +63,7 @@ public class IncidentServiceImpl implements IncidentService {
                     .entrySet().stream()
                     .map(entry -> {
                         int incidentCount = entry.getValue().intValue();
-                        return new ElementIncidentData(entry.getKey(), incidentCount, messages.formatMessage("", "viewer.incidentCount.tooltipMessage", incidentCount));
+                        return new ActivityIncidentData(entry.getKey(), incidentCount);
                     })
                     .toList();
         }
