@@ -102,6 +102,8 @@ public class DeploymentDetailView extends StandardDetailView<DeploymentData> {
     private UiComponents uiComponents;
     @Autowired
     private Fragments fragments;
+    @Autowired
+    private ViewNavigators viewNavigators;
 
     @ViewComponent
     private InstanceContainer<DeploymentData> deploymentDataDc;
@@ -125,8 +127,6 @@ public class DeploymentDetailView extends StandardDetailView<DeploymentData> {
     private String viewTabLabel;
     private String sourceTabLabel;
     private String runningInstancesTabLabel;
-    @Autowired
-    private ViewNavigators viewNavigators;
 
     public void setDeploymentData(DeploymentData deploymentData) {
         deploymentDataDc.setItem(deploymentData);

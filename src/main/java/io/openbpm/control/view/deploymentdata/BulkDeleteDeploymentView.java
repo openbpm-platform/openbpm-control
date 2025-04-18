@@ -43,9 +43,9 @@ public class BulkDeleteDeploymentView extends StandardView {
     @Autowired
     protected Notifications notifications;
     @Autowired
-    private ProcessInstanceService processInstanceService;
+    protected ProcessInstanceService processInstanceService;
     @Autowired
-    private DeploymentService deploymentService;
+    protected DeploymentService deploymentService;
 
     @ViewComponent
     protected MessageBundle messageBundle;
@@ -53,12 +53,12 @@ public class BulkDeleteDeploymentView extends StandardView {
     protected JmixCheckbox deleteProcessInstancesCheckBox;
     @ViewComponent
     protected Icon allInstancesContextHelp;
+    @ViewComponent
+    protected JmixCheckbox skipCustomListenersCheckBox;
+    @ViewComponent
+    protected JmixCheckbox skipIOMappingsCheckBox;
 
     protected Collection<DeploymentData> deployments;
-    @ViewComponent
-    private JmixCheckbox skipCustomListenersCheckBox;
-    @ViewComponent
-    private JmixCheckbox skipIOMappingsCheckBox;
 
     @Subscribe
     public void onInit(final InitEvent event) {

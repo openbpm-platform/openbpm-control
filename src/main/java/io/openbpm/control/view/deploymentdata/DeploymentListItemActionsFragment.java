@@ -36,9 +36,9 @@ public class DeploymentListItemActionsFragment extends Fragment<HorizontalLayout
     protected Notifications notifications;
     @Autowired
     protected Messages messages;
+
     @ViewComponent
     protected MessageBundle messageBundle;
-
     @ViewComponent
     protected CollectionContainer<DeploymentData> deploymentDatasDc;
     @ViewComponent
