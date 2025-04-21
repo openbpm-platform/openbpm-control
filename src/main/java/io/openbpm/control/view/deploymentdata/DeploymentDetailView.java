@@ -55,11 +55,11 @@ import io.openbpm.control.service.deployment.DeploymentService;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionLoadContext;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
-import io.openbpm.control.view.bpmnviewer.BpmnViewerFragment;
-import io.openbpm.control.view.dmnviewer.DmnViewerFragment;
-import io.openbpm.control.view.formviewer.FormViewerFragment;
 import io.openbpm.control.view.main.MainView;
 import io.openbpm.control.view.processdefinition.ProcessDefinitionDetailView;
+import io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment;
+import io.openbpm.uikit.fragment.dmnviewer.DmnViewerFragment;
+import io.openbpm.uikit.fragment.formviewer.FormViewerFragment;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 
