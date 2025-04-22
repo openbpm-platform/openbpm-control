@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://deleteDeploymentDialog.header">
+    <layout>
+        <span text="msg://deleteDeploymentDialog.text" width="100%"/>
+
+        <vbox id="deleteAllInstancesHBox" alignItems="START" justifyContent="START" themeNames="spacing-xs" padding="false">
+            <hbox spacing="false" alignItems="CENTER">
+                <checkbox id="deleteProcessInstancesCheckBox"
+                          label="msg://allInstances"/>
+                <icon icon="QUESTION_CIRCLE" id="allInstancesContextHelp" size="0.9em">
+                    <tooltip text="msg://deleteAllInstances.tooltip" position="BOTTOM_START"/>
+                </icon>
+            </hbox>
+
+            <hbox spacing="false" alignItems="CENTER">
+                <checkbox id="skipCustomListenersCheckBox"
+                          label="msg://skipCustomListeners"
+                          value="true"
+                          visible="true"/>
+                <icon icon="QUESTION_CIRCLE" id="customListenersContextHelp" size="0.9em" visible="true">
+                    <tooltip text="msg://skipCustomListeners.tooltip" position="BOTTOM_START"/>
+                </icon>
+            </hbox>
+
+            <hbox spacing="false" alignItems="CENTER">
+                <checkbox id="skipIOMappingsCheckBox"
+                          label="msg://skipIOMappings"
+                          value="true"
+                          visible="true"/>
+                <icon icon="QUESTION_CIRCLE" id="skipIOMappingsContextHelp" size="0.9em" visible="true">
+                    <tooltip text="msg://skipIOMappings.tooltip" position="BOTTOM_START"/>
+                </icon>
+            </hbox>
+        </vbox>
+
+        <hbox justifyContent="END" width="100%">
+            <button id="okBtn" text="msg:///actions.Ok" icon="CHECK"
+                    themeNames="primary"/>
+            <button id="cancelBtn" text="msg:///actions.Cancel" icon="BAN"/>
+        </hbox>
+    </layout>
+</view>

@@ -280,6 +280,26 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
     }
 
     @Override
+    public long getCountByDeploymentId(String deploymentId) {
+        ResponseEntity<CountResultDto> processInstancesCount = processInstanceApiClient.getProcessInstancesCount(
+                null, null, null,
+                null, null, null,
+                null, null, deploymentId,
+                null, null, null,
+                null, null, null,
+                null, null, null,
+                null, null, null,
+                null, null, null,
+                null, null, null,
+                null, null
+        );
+        if (processInstancesCount.getStatusCode().is2xxSuccessful() && processInstancesCount.getBody() != null) {
+            return processInstancesCount.getBody().getCount();
+        }
+        return -1;
+    }
+
+    @Override
     public long getCountByProcessDefinitionKey(String processDefinitionKey) {
         ResponseEntity<CountResultDto> processInstancesCount = processInstanceApiClient.getProcessInstancesCount(
                 null, null, null,
