@@ -17,7 +17,6 @@ import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.ProcessInstanceApiClient;
@@ -262,6 +261,26 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 null, null, null,
                 null, processDefinitionId, null,
                 null, null, null,
+                null, null, null,
+                null, null, null,
+                null, null, null,
+                null, null, null,
+                null, null, null,
+                null, null, null,
+                null, null
+        );
+        if (processInstancesCount.getStatusCode().is2xxSuccessful() && processInstancesCount.getBody() != null) {
+            return processInstancesCount.getBody().getCount();
+        }
+        return -1;
+    }
+
+    @Override
+    public long getCountByDeploymentId(String deploymentId) {
+        ResponseEntity<CountResultDto> processInstancesCount = processInstanceApiClient.getProcessInstancesCount(
+                null, null, null,
+                null, null, null,
+                null, null, deploymentId,
                 null, null, null,
                 null, null, null,
                 null, null, null,

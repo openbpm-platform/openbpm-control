@@ -5,7 +5,6 @@
 
 package io.openbpm.control.entity.filter;
 
-import io.openbpm.control.entity.processdefinition.ProcessDefinitionState;
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.entity.annotation.JmixId;
 import io.jmix.core.metamodel.annotation.InstanceName;
@@ -13,39 +12,31 @@ import io.jmix.core.metamodel.annotation.JmixEntity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @JmixEntity
 @Getter
 @Setter
-public class ProcessDefinitionFilter {
+public class DeploymentFilter {
+
     @JmixGeneratedValue
     @JmixId
     protected UUID id;
-
-    protected List<String> keyIn;
-
-    protected String state;
-
-    protected String keyLike;
-
-    protected String key;
-
-    protected List<String> idIn;
 
     protected String deploymentId;
 
     @InstanceName
     protected String nameLike;
 
-    protected Boolean latestVersionOnly = true;
+    protected OffsetDateTime deploymentAfter;
 
-    public ProcessDefinitionState getState() {
-        return state == null ? null : ProcessDefinitionState.fromId(state);
-    }
+    protected OffsetDateTime deploymentBefore;
 
-    public void setState(ProcessDefinitionState state) {
-        this.state = state == null ? null : state.getId();
-    }
+    protected String source;
+
+    protected List<String> tenantIdIn;
+
+    protected Boolean withoutTenantId;
 }
