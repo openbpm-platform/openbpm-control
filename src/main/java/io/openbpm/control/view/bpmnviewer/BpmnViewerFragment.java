@@ -14,6 +14,8 @@ import io.openbpm.control.uicomponent.bpmnviewer.BpmnViewerImpl;
 import io.openbpm.control.uicomponent.bpmnviewer.command.AddMarkerCmd;
 import io.openbpm.control.uicomponent.bpmnviewer.command.SetElementColorCmd;
 import io.openbpm.control.uicomponent.bpmnviewer.command.SetIncidentCountCmd;
+import io.openbpm.control.uicomponent.bpmnviewer.command.ShowDecisionInstanceLinkOverlay;
+import io.openbpm.control.uicomponent.bpmnviewer.event.DecisionInstanceLinkOverlayClickedEvent;
 import io.openbpm.control.uicomponent.bpmnviewer.event.ImportCompleteEvent;
 import io.jmix.flowui.fragment.Fragment;
 import io.jmix.flowui.fragment.FragmentDescriptor;
@@ -71,6 +73,12 @@ public class BpmnViewerFragment extends Fragment<Div> {
         }
     }
 
+    public void showDecisionInstanceLinkOverlay(ShowDecisionInstanceLinkOverlay cmd) {
+        if (this.bpmnViewer != null) {
+            this.bpmnViewer.showDecisionInstanceLinkOverlay(cmd);
+        }
+    }
+
     public void removeBorders() {
         viewerVBox.removeClassNames(BORDER_STYLES);
     }
@@ -78,6 +86,13 @@ public class BpmnViewerFragment extends Fragment<Div> {
     public void addImportCompleteListener(ComponentEventListener<ImportCompleteEvent> listener) {
         if (bpmnViewer != null) {
             bpmnViewer.addImportCompleteListener(listener);
+        }
+    }
+
+    public void addDecisionInstanceLinkOverlayClickListener(
+            ComponentEventListener<DecisionInstanceLinkOverlayClickedEvent> listener) {
+        if (bpmnViewer != null) {
+            bpmnViewer.addDecisionInstanceLinkOverlayClickListener(listener);
         }
     }
 

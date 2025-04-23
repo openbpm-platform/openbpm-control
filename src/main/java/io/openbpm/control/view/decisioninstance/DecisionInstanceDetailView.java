@@ -25,13 +25,18 @@ import io.jmix.flowui.view.ViewComponent;
 import io.jmix.flowui.view.ViewController;
 import io.jmix.flowui.view.ViewDescriptor;
 import io.openbpm.control.action.CopyComponentValueToClipboardAction;
+import io.openbpm.control.entity.activity.HistoricActivityInstanceData;
 import io.openbpm.control.entity.decisioninstance.HistoricDecisionInputInstanceShortData;
 import io.openbpm.control.entity.decisioninstance.HistoricDecisionInstanceShortData;
 import io.openbpm.control.entity.decisioninstance.HistoricDecisionOutputInstanceShortData;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
+import io.openbpm.control.service.activity.ActivityService;
 import io.openbpm.control.service.decisiondefinition.DecisionDefinitionService;
 import io.openbpm.control.service.decisioninstance.DecisionInstanceService;
+import io.openbpm.control.service.processinstance.ProcessInstanceService;
+import io.openbpm.control.uicomponent.dmnviewer.command.OutputData;
+import io.openbpm.control.uicomponent.dmnviewer.command.ShowDecisionInstanceCmd;
 import io.openbpm.control.view.dmnviewer.DmnViewerFragmentNew;
 import io.openbpm.control.view.processdefinition.ProcessDefinitionDetailView;
 import io.openbpm.control.view.processinstance.ProcessInstanceDetailView;
@@ -59,15 +64,19 @@ public class DecisionInstanceDetailView extends StandardDetailView<HistoricDecis
     @ViewComponent
     private CopyComponentValueToClipboardAction copyToClipboardAction;
     @ViewComponent
-    private TypedTextField<String> processInstanceIdTextField;
-    @ViewComponent
-    private TypedTextField<String> processDefinitionIdTextField;
-    @ViewComponent
     private TypedTextField<String> decisionInstanceIdTextField;
     @Autowired
     private ViewNavigators viewNavigators;
     @ViewComponent
     private HorizontalLayout detailActions;
+    @Autowired
+    private ProcessInstanceService processInstanceService;
+    @Autowired
+    private ActivityService activityService;
+    @ViewComponent
+    private TypedTextField<Object> activityNameTextField;
+    @ViewComponent
+    private TypedTextField<Object> processBusinessKeyTextField;
 
     @Subscribe
     public void onInit(final InitEvent event) {
@@ -81,8 +90,10 @@ public class DecisionInstanceDetailView extends StandardDetailView<HistoricDecis
         String dmnXml = decisionDefinitionService.getDmnXml(decisionInstanceDc.getItem().getDecisionDefinitionId());
         dmnViewerFragment.setDmnXml(dmnXml, setDmnXmlJson ->
             dmnViewerFragment.showDecisionDefinition(decisionInstanceDc.getItem().getDecisionDefinitionKey(),
-                    showDecisionDefinitionJson -> dmnViewerFragment.showDecisionInstance(decisionInstanceDc.getItem()))
+                    showDecisionDefinitionJson -> dmnViewerFragment.showDecisionInstance(createDecisionInstanceClientData(decisionInstanceDc.getItem())))
         );
+
+        initAdditionalFields();
     }
 
     @Subscribe(id = "copyDecisionInstanceId", subject = "clickListener")
@@ -119,11 +130,37 @@ public class DecisionInstanceDetailView extends StandardDetailView<HistoricDecis
         return new TextRenderer<>(e -> e.getValue() != null ? e.getValue().toString() : null);
     }
 
+    private ShowDecisionInstanceCmd createDecisionInstanceClientData(
+            HistoricDecisionInstanceShortData decisionInstance) {
+        ShowDecisionInstanceCmd decisionInstanceClientData = new ShowDecisionInstanceCmd();
+        decisionInstanceClientData.setOutputDataList(decisionInstance.getOutputs().stream().map(output -> {
+            OutputData result = new OutputData();
+            result.setValue(output.getValue() != null ? output.getValue().toString() : "");
+            result.setDataRowId(output.getRuleId());
+            result.setDataColId(output.getClauseId());
+            return result;
+        }).toList());
+        return decisionInstanceClientData;
+    }
+
     @Install(to = "decisionInstanceDl", target = Target.DATA_LOADER)
     private HistoricDecisionInstanceShortData decisionDefinitionDlDelegate(
             final LoadContext<HistoricDecisionInstanceShortData> loadContext) {
         HistoricDecisionInstanceShortData item = decisionInstanceDc.getItemOrNull();
         String id = item == null ? Objects.requireNonNull(loadContext.getId()).toString() : item.getId();
         return decisionInstanceService.getById(id);
+    }
+
+    private void initAdditionalFields() {
+        HistoricActivityInstanceData activityInstanceData = activityService.findById(
+                decisionInstanceDc.getItem().getActivityInstanceId());
+        if (activityInstanceData != null) {
+            activityNameTextField.setTypedValue(activityInstanceData.getActivityName());
+        }
+        ProcessInstanceData processInstanceData = processInstanceService.getProcessInstanceById(
+                decisionInstanceDc.getItem().getProcessInstanceId());
+        if (processInstanceData != null) {
+            processBusinessKeyTextField.setTypedValue(processInstanceData.getBusinessKey());
+        }
     }
 }

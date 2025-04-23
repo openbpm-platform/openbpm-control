@@ -7,9 +7,7 @@ import elemental.json.JsonValue;
 import io.jmix.flowui.fragment.Fragment;
 import io.jmix.flowui.fragment.FragmentDescriptor;
 import io.jmix.flowui.view.ViewComponent;
-import io.openbpm.control.entity.decisioninstance.HistoricDecisionInstanceShortData;
 import io.openbpm.control.uicomponent.dmnviewer.DmnViewer1;
-import io.openbpm.control.uicomponent.dmnviewer.command.OutputData;
 import io.openbpm.control.uicomponent.dmnviewer.command.ShowDecisionInstanceCmd;
 import io.openbpm.control.uicomponent.dmnviewer.event.ImportCompleteEvent;
 
@@ -45,9 +43,9 @@ public class DmnViewerFragmentNew extends Fragment<Div> {
         }
     }
 
-    public void showDecisionInstance(HistoricDecisionInstanceShortData decisionInstance) {
+    public void showDecisionInstance(ShowDecisionInstanceCmd cmd) {
         if (dmnViewer1 != null) {
-            dmnViewer1.showDecisionInstance(createDecisionInstanceClientData(decisionInstance));
+            dmnViewer1.showDecisionInstance(cmd);
         }
     }
 
@@ -55,19 +53,6 @@ public class DmnViewerFragmentNew extends Fragment<Div> {
         if (dmnViewer1 != null) {
             dmnViewer1.addImportCompleteListener(listener);
         }
-    }
-
-    private ShowDecisionInstanceCmd createDecisionInstanceClientData(
-            HistoricDecisionInstanceShortData decisionInstance) {
-        ShowDecisionInstanceCmd decisionInstanceClientData = new ShowDecisionInstanceCmd();
-        decisionInstanceClientData.setOutputDataList(decisionInstance.getOutputs().stream().map(output -> {
-            OutputData result = new OutputData();
-            result.setValue(output.getValue() != null ? output.getValue().toString() : "");
-            result.setDataRowId(output.getRuleId());
-            result.setDataColId(output.getClauseId());
-            return result;
-        }).toList());
-        return decisionInstanceClientData;
     }
 }
 

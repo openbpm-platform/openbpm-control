@@ -18,8 +18,10 @@ import com.vaadin.flow.shared.Registration;
 import elemental.json.JsonValue;
 import io.openbpm.control.uicomponent.bpmnviewer.command.AddMarkerCmd;
 import io.openbpm.control.uicomponent.bpmnviewer.command.RemoveMarkerCmd;
+import io.openbpm.control.uicomponent.bpmnviewer.command.ShowDecisionInstanceLinkOverlay;
 import io.openbpm.control.uicomponent.bpmnviewer.command.SetElementColorCmd;
 import io.openbpm.control.uicomponent.bpmnviewer.command.SetIncidentCountCmd;
+import io.openbpm.control.uicomponent.bpmnviewer.event.DecisionInstanceLinkOverlayClickedEvent;
 import io.openbpm.control.uicomponent.bpmnviewer.event.ImportCompleteEvent;
 import io.openbpm.control.uicomponent.bpmnviewer.event.SelectionChangedEvent;
 
@@ -91,8 +93,17 @@ public class BpmnViewerImpl extends Component implements BpmnViewer {
         callJsEncodedArgumentFunction("setIncidentCount", cmd);
     }
 
+    public void showDecisionInstanceLinkOverlay(ShowDecisionInstanceLinkOverlay cmd) {
+        callJsEncodedArgumentFunction("showDecisionInstanceTaskOverlay", cmd);
+    }
+
     public Registration addImportCompleteListener(ComponentEventListener<ImportCompleteEvent> listener) {
         return addListener(ImportCompleteEvent.class, listener);
+    }
+
+    public Registration addDecisionInstanceLinkOverlayClickListener(
+            ComponentEventListener<DecisionInstanceLinkOverlayClickedEvent> listener) {
+        return addListener(DecisionInstanceLinkOverlayClickedEvent.class, listener);
     }
 
     private void callJsEncodedArgumentFunction(String cmdName, Object cmd) {

@@ -11,6 +11,7 @@ import BpmViewer from "./bpm/BpmViewer";
 import selectionChangedEventHandler from "./component/selectionChangedEventHandler";
 import {BpmProcessDefinition} from "./component/types";
 import {XmlImportCompleteEvent} from "./component/events";
+import {BusinessRuleTaskOverlayClickedEvent} from "./component/events";
 
 // @ts-ignore
 @customElement('openbpm-control-bpmn-viewer')
@@ -25,6 +26,7 @@ class OpenBpmControlBpmViewer extends LitElement {
     private zoomScroll: any;
     private processDefinitionsJson: string | undefined;
     private overlays: any;
+    private elementRegistry:any;
 
     static styles = css`
         .highlighted:not(.djs-connection) .djs-visual > :nth-child(1) {
@@ -44,6 +46,17 @@ class OpenBpmControlBpmViewer extends LitElement {
             font-weight: bold;
             border: var(--bpmn-incident-overlay-border);
         }
+
+        .decision-instance-link-overlay {
+            background-color: var(--bpmn-decision-instance-link-overlay-background);
+            cursor: pointer;
+            display: flex;
+            border-radius: 20%;
+            justify-content: center;
+            align-items: center;
+            width: 1.4em;
+            height: 1.4em;
+        }
     `;
 
     constructor() {
@@ -53,6 +66,7 @@ class OpenBpmControlBpmViewer extends LitElement {
         this.canvas = this.viewer.get("canvas");
         this.zoomScroll = this.viewer.get("zoomScroll");
         this.overlays = this.viewer.get("overlays");
+        this.elementRegistry = this.viewer.get("elementRegistry");
 
         let viewer = this.viewer as any;
         const canvas = viewer.get("canvas");
@@ -120,6 +134,39 @@ class OpenBpmControlBpmViewer extends LitElement {
                 }
             })
         }));
+    }
+
+    public showBusinessRuleTaskOverlay(cmdJson: any) {
+        const cmd = JSON.parse(cmdJson);
+        let elements = this.elementRegistry.getAll();
+        for (let i = 0; i < elements.length; i++) {
+            let value = elements[i];
+            if (value.type == "bpmn:BusinessRuleTask" && value.id == cmd.activityId) {
+                const htmlDiv = document.createElement('div');
+                htmlDiv.innerHTML = `
+                <div class="decision-instance-link-overlay" title="${cmd.tooltipMessage}">
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 7.9L10 3V6C9.5 6 8.9 6 8 6C0 6 0 14 0 14C0 14 1 10 7.8 10C8.9 10 9.6 10 10 10V12.9L16 7.9Z" fill="#ffffff"/>
+                    </svg>
+                </div>
+                `;
+                (function(element:OpenBpmControlBpmViewer, decisionInstanceId:string) {
+                    htmlDiv.addEventListener('click', (event:MouseEvent) => {
+                        element.dispatchEvent(new BusinessRuleTaskOverlayClickedEvent(decisionInstanceId));
+                    });
+                })(this, cmd.decisionInstanceId);
+                this.awaitRun(() =>
+                    this.overlays.add(value.id, {
+                        html: htmlDiv,
+                        position: {
+                            left: -10,
+                            bottom: 15
+                        }
+                    }
+                ));
+                break;
+            }
+        };
     }
 
     public addMarker(cmdJson: any) {

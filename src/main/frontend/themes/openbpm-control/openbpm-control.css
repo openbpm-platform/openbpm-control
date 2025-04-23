@@ -19,6 +19,7 @@ html {
     --bpmn-incident-overlay-text-color: var(--lumo-error-color);
     --bpmn-incident-overlay-border: 2px solid var(--lumo-error-color);
     --toggle-button-border-color: rgba(61, 114, 214, 0.8);
+    --bpmn-decision-instance-link-overlay-background: hsl(205, 100%, 50%);
 }
 
 [part="toggle"] {

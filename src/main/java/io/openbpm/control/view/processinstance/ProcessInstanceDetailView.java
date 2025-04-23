@@ -27,9 +27,13 @@ import io.jmix.flowui.component.tabsheet.JmixTabSheet;
 import io.jmix.flowui.model.InstanceContainer;
 import io.jmix.flowui.view.*;
 import io.openbpm.control.entity.activity.ActivityShortData;
+import io.openbpm.control.entity.decisioninstance.HistoricDecisionInstanceShortData;
+import io.openbpm.control.entity.filter.DecisionInstanceFilter;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceState;
 import io.openbpm.control.service.activity.ActivityService;
+import io.openbpm.control.service.decisioninstance.DecisionInstanceLoadContext;
+import io.openbpm.control.service.decisioninstance.DecisionInstanceService;
 import io.openbpm.control.service.incident.IncidentService;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
@@ -37,7 +41,9 @@ import io.openbpm.control.uicomponent.bpmnviewer.command.AddMarkerCmd;
 import io.openbpm.control.uicomponent.bpmnviewer.command.ElementIncidentData;
 import io.openbpm.control.uicomponent.bpmnviewer.command.SetElementColorCmd;
 import io.openbpm.control.uicomponent.bpmnviewer.command.SetIncidentCountCmd;
+import io.openbpm.control.uicomponent.bpmnviewer.command.ShowDecisionInstanceLinkOverlay;
 import io.openbpm.control.view.bpmnviewer.BpmnViewerFragment;
+import io.openbpm.control.view.decisioninstance.DecisionInstanceDetailView;
 import io.openbpm.control.view.event.TitleUpdateEvent;
 import io.openbpm.control.view.processinstance.event.ExternalTaskRetriesUpdateEvent;
 import io.openbpm.control.view.processinstance.event.IncidentUpdateEvent;
@@ -97,6 +103,8 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
     protected IncidentService incidentService;
     @ViewComponent
     protected VerticalLayout emptyDiagramBox;
+    @Autowired
+    private DecisionInstanceService decisionInstanceService;
 
     @Subscribe
     public void onInit(final InitEvent event) {
@@ -156,15 +164,28 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
     }
 
     protected void initBpmnViewerFragment() {
-        String processBpmnXml = processDefinitionService.getBpmnXml(processInstanceDataDc.getItem().getProcessDefinitionId());
+        String processBpmnXml = processDefinitionService.getBpmnXml
+                (processInstanceDataDc.getItem().getProcessDefinitionId());
 
         if (!Strings.isNullOrEmpty(processBpmnXml)) {
             emptyDiagramBox.setVisible(false);
             diagramFragment.initViewer(processBpmnXml);
             diagramFragment.addImportCompleteListener(event -> handleProcessXmlImportComplete());
+            diagramFragment.addDecisionInstanceLinkOverlayClickListener(
+                    event -> handleDecisionInstanceLinkOverlayClicked(event.getDecisionInstanceId()));
         } else if (processBpmnXml == null) {
             emptyDiagramBox.setVisible(true);
             diagramFragment.setVisible(false);
+        }
+    }
+
+    private void handleDecisionInstanceLinkOverlayClicked(String decisionInstanceId) {
+        if (!Strings.isNullOrEmpty(decisionInstanceId)) {
+            viewNavigators.detailView(this, HistoricDecisionInstanceShortData.class)
+                    .withViewClass(DecisionInstanceDetailView.class)
+                    .withRouteParameters(new RouteParameters("id", decisionInstanceId))
+                    .withBackwardNavigation(true)
+                    .navigate();
         }
     }
 
@@ -189,7 +210,29 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
             if (!Strings.isNullOrEmpty(activityId)) {
                 diagramFragment.setElementColor(new SetElementColorCmd(activityId, "#000000", "var(--bpmn-history-activity-color)"));
             }
+
+            String decisionInstanceId = findDecisionInstanceByActivity(activityId);
+            if (!Strings.isNullOrEmpty(activityId)) {
+                String tooltipMessage = messages.formatMessage(
+                        "", "viewer.openDecisionInstanceOverlay.tooltipMessage", decisionInstanceId);
+                diagramFragment.showDecisionInstanceLinkOverlay(new ShowDecisionInstanceLinkOverlay(activityId,
+                        decisionInstanceId, tooltipMessage));
+            }
         }
+    }
+
+    private String findDecisionInstanceByActivity(String activityId) {
+        DecisionInstanceLoadContext loadContext = new DecisionInstanceLoadContext();
+        DecisionInstanceFilter filter = new DecisionInstanceFilter();
+        loadContext.setFilter(filter);
+
+        filter.setActivityId(activityId);
+        List<HistoricDecisionInstanceShortData> allHistoryDecisionInstances =
+                decisionInstanceService.findAllHistoryDecisionInstances(loadContext);
+        if (allHistoryDecisionInstances.size() > 0) {
+            return allHistoryDecisionInstances.get(0).getDecisionInstanceId();
+        }
+        return null;
     }
 
     protected void showRunningActivities(String processInstanceId) {

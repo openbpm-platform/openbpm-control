@@ -23,3 +23,12 @@ export class XmlImportCompleteEvent extends Event {
         this.processDefinitionsJson = processDefinitionsJson;
     }
 }
+
+export class BusinessRuleTaskOverlayClickedEvent extends Event {
+    public decisionInstanceId: string;
+
+    public constructor(decisionInstanceId: string) {
+        super("business-rule-task-overlay-clicked");
+        this.decisionInstanceId = decisionInstanceId;
+    }
+}
