@@ -93,8 +93,9 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
     @Override
     public String getHistoryErrorDetails(String externalTaskId) {
         ResponseEntity<Object> response = historyApiClient.getErrorDetailsHistoricExternalTaskLog(externalTaskId);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody().toString();
+        if (response.getStatusCode().is2xxSuccessful()) {
+            Object body = response.getBody();
+            return body != null ? body.toString() : "";
         }
         return "";
     }

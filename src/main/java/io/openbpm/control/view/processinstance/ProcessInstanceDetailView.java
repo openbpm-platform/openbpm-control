@@ -37,19 +37,18 @@ import io.openbpm.control.service.decisioninstance.DecisionInstanceService;
 import io.openbpm.control.service.incident.IncidentService;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
-import io.openbpm.control.uicomponent.bpmnviewer.command.AddMarkerCmd;
-import io.openbpm.control.uicomponent.bpmnviewer.command.ElementIncidentData;
-import io.openbpm.control.uicomponent.bpmnviewer.command.SetElementColorCmd;
-import io.openbpm.control.uicomponent.bpmnviewer.command.SetIncidentCountCmd;
-import io.openbpm.control.uicomponent.bpmnviewer.command.ShowDecisionInstanceLinkOverlay;
-import io.openbpm.control.view.bpmnviewer.BpmnViewerFragment;
-import io.openbpm.control.view.decisioninstance.DecisionInstanceDetailView;
+import io.openbpm.control.dto.ActivityIncidentData;
 import io.openbpm.control.view.event.TitleUpdateEvent;
 import io.openbpm.control.view.processinstance.event.ExternalTaskRetriesUpdateEvent;
 import io.openbpm.control.view.processinstance.event.IncidentUpdateEvent;
 import io.openbpm.control.view.processinstance.event.JobRetriesUpdateEvent;
 import io.openbpm.control.view.processinstance.history.HistoryTabFragment;
 import io.openbpm.control.view.util.ComponentHelper;
+import io.openbpm.uikit.component.bpmnviewer.command.AddMarkerCmd;
+import io.openbpm.uikit.component.bpmnviewer.command.ElementMarkerType;
+import io.openbpm.uikit.component.bpmnviewer.command.SetElementColorCmd;
+import io.openbpm.uikit.component.bpmnviewer.command.SetIncidentCountCmd;
+import io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
@@ -197,7 +196,7 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
         showFinishedActivities(processInstanceId);
 
         if (processInstanceData.getState() != ProcessInstanceState.COMPLETED) {
-            List<ElementIncidentData> incidents = incidentService.findRuntimeIncidents(processInstanceId);
+            List<ActivityIncidentData> incidents = incidentService.findRuntimeIncidents(processInstanceId);
             diagramFragment.setIncidentCount(new SetIncidentCountCmd(incidents));
         }
     }
@@ -241,7 +240,7 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
         for (ActivityShortData activityData : runningActivities) {
             String activityId = activityData.getActivityId();
             if (!Strings.isNullOrEmpty(activityId)) {
-                diagramFragment.addMarker(new AddMarkerCmd(activityId, "highlighted"));
+                diagramFragment.addMarker(new AddMarkerCmd(activityId, ElementMarkerType.RUNNING_ACTIVITY));
             }
         }
     }

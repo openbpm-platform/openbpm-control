@@ -18,11 +18,15 @@ The following Docker Compose files are provided:
 
 1. Clone this repository
 2. Open a terminal 
-3. Go to the `docker-compose` directory:
+3. Build a JAR from the sources using the following command (run from the root directory):
+   ```shell
+   .\gradlew clean bootJar -PbuildType=docker -Pvaadin.productionMode=true
+   ```
+4. Go to the `docker-compose` directory:
    ```shell 
    cd docker-compose
    ```
-4. Execute the following commands:
+5. Execute the following commands:
      - **OpenBPM Control only:** If you want to run OpenBPM Control without the Camunda 7 engine, use:
         ```shell
         docker compose -f docker-compose-core.yaml up -d
@@ -39,8 +43,8 @@ The following Docker Compose files are provided:
       ```shell
       docker container ls -f "name=openbpm-control-app" -f "name=openbpm-control-database" -f "name=camunda7-bpm-platform" -f "name=camunda7-bpm-platform-database"
       ```
-5. Open OpenBPM Control in your browser using the link [http://localhost:8081](http://localhost:8081) and login as `admin/admin`.
-6. Configure your first connection to the Camunda 7 engine. 
+6. Open OpenBPM Control in your browser using the link [http://localhost:8081](http://localhost:8081) and login as `admin/admin`.
+7. Configure your first connection to the Camunda 7 engine. 
    
    If you are running Camunda 7 using `docker-compose-full.yaml`, enter the following data:
    - **Name**: any short name for the configuring engine, e.g. `Dev stand`
@@ -49,8 +53,8 @@ The following Docker Compose files are provided:
    - **Authentication type**: Basic
    - **Username:** `admin`
    - **Password:** `admin`
-7. Click the **Test connection** to check that values are correct and the BPM engine is available.
-8. Save the Camunda 7 connection configuration.
+8. Click the **Test connection** to check that values are correct and the BPM engine is available.
+9. Save the Camunda 7 connection configuration.
 
 Now you can deploy processes to the configured BPM engine and manage process instances running on this engine.
 

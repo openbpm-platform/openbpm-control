@@ -283,7 +283,8 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
 
     @Subscribe(id = "runtimeActivityInstancesDc", target = Target.DATA_CONTAINER)
     public void onRuntimeActivityInstancesDcItemChange(InstanceContainer.ItemChangeEvent<ActivityInstanceTreeItem> event) {
-        this.variableFilter.setActivityInstanceId(event.getItem() != null ? event.getItem().getActivityInstanceId() : null);
+        ActivityInstanceTreeItem treeItem = event.getItem();
+        this.variableFilter.setActivityInstanceId(treeItem != null ? treeItem.getActivityInstanceId() : null);
 
         int selectedTabIdx = runtimeTabsheet.getSelectedIndex();
         switch (selectedTabIdx) {
@@ -306,6 +307,7 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
                     externalTasksTabFragment.refreshIfChanged(getSelectedActivityId());
                 }
             }
+            default -> {}
         }
 
         loadAndUpdateUserTasksCount();

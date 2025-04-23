@@ -33,6 +33,7 @@ import io.openbpm.control.entity.engine.EngineType;
 import io.openbpm.control.service.engine.EngineService;
 import io.openbpm.control.view.main.MainView;
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -145,7 +146,7 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
     @Subscribe("baseUrlField")
     public void onBaseUrlFieldTypedValueChange(final SupportsTypedValue.TypedValueChangeEvent<TypedTextField<String>, String> event) {
         if (event.isFromClient()) {
-            String trimmedValue = event.getValue() != null ? event.getValue().trim() : null;
+            String trimmedValue = StringUtils.trim(event.getValue());
             getEditedEntity().setBaseUrl(trimmedValue);
         }
     }

@@ -34,7 +34,11 @@
                     <span id="emptyPreviewText" width="fit-content" text="msg://noProcessForPreview"
                           alignSelf="CENTER"/>
                 </hbox>
-                <fragment id="viewerFragment" class="io.openbpm.control.view.bpmnviewer.BpmnViewerFragment" visible="false"/>
+                <fragment id="viewerFragment" class="io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment" visible="false">
+                    <properties>
+                        <property name="noBorders" value="true"/>
+                    </properties>
+                </fragment>
             </vbox>
         </vbox>
 

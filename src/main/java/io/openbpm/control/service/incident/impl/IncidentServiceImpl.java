@@ -8,6 +8,7 @@ package io.openbpm.control.service.incident.impl;
 import feign.utils.ExceptionUtils;
 import io.jmix.core.Messages;
 import io.jmix.core.Sort;
+import io.openbpm.control.dto.ActivityIncidentData;
 import io.openbpm.control.entity.filter.IncidentFilter;
 import io.openbpm.control.entity.incident.HistoricIncidentData;
 import io.openbpm.control.entity.incident.IncidentData;
@@ -15,8 +16,8 @@ import io.openbpm.control.exception.EngineNotSelectedException;
 import io.openbpm.control.mapper.IncidentMapper;
 import io.openbpm.control.service.incident.IncidentLoadContext;
 import io.openbpm.control.service.incident.IncidentService;
-import io.openbpm.control.uicomponent.bpmnviewer.command.ElementIncidentData;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.IncidentApiClient;
 import org.camunda.community.rest.client.model.CountResultDto;
@@ -31,6 +32,8 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static io.openbpm.control.util.EngineRestUtils.getCountResult;
 
 @Service("control_IncidentService")
 @Slf4j
@@ -50,7 +53,7 @@ public class IncidentServiceImpl implements IncidentService {
     }
 
     @Override
-    public List<ElementIncidentData> findRuntimeIncidents(String processInstanceId) {
+    public List<ActivityIncidentData> findRuntimeIncidents(String processInstanceId) {
         ResponseEntity<List<IncidentDto>> response = incidentApiClient.getIncidents(null, null, null,
                 null, null, null, processInstanceId, null, null,
                 null, null, null, null, null, null, null, null,
@@ -63,7 +66,7 @@ public class IncidentServiceImpl implements IncidentService {
                     .entrySet().stream()
                     .map(entry -> {
                         int incidentCount = entry.getValue().intValue();
-                        return new ElementIncidentData(entry.getKey(), incidentCount, messages.formatMessage("", "viewer.incidentCount.tooltipMessage", incidentCount));
+                        return new ActivityIncidentData(entry.getKey(), incidentCount);
                     })
                     .toList();
         }
@@ -119,8 +122,9 @@ public class IncidentServiceImpl implements IncidentService {
     public IncidentData findRuntimeIncidentById(String incidentId) {
         try {
             ResponseEntity<IncidentDto> response = incidentApiClient.getIncident(incidentId);
-            if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-                return incidentMapper.fromIncidentModel(response.getBody());
+            if (response.getStatusCode().is2xxSuccessful()) {
+                IncidentDto incidentDto = response.getBody();
+                return incidentDto != null ? incidentMapper.fromIncidentModel(incidentDto) : null;
             }
 
             log.error("Error on loading incident by id {}, status code {}", incidentId, response.getStatusCode());
@@ -147,9 +151,8 @@ public class IncidentServiceImpl implements IncidentService {
                 getTimestampAfter(filter), getActivityId(filter),
                 null, null, null, null, null, null
         );
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            Long count = response.getBody().getCount();
-            return count != null ? count : 0L;
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return getCountResult(response.getBody());
         }
         log.error("Error on incident count loading, status code {}", response.getStatusCode());
         return 0;
@@ -193,9 +196,8 @@ public class IncidentServiceImpl implements IncidentService {
                 null, null, null, null, null, null, null, null, null, null, null
         );
 
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            Long count = response.getBody().getCount();
-            return count != null ? count : 0L;
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return getCountResult(response.getBody());
         }
         log.error("Error on historic incident count loading, status code {}", response.getStatusCode());
         return 0;
@@ -210,8 +212,11 @@ public class IncidentServiceImpl implements IncidentService {
                 null, null, null, null, null, null, null, null, null, null, null,
                 null, null, 0, 1);
 
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return !response.getBody().isEmpty() ? incidentMapper.fromHistoricIncidentModel(response.getBody().getFirst()) : null;
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            List<HistoricIncidentDto> historicIncidentDtos = response.getBody();
+            HistoricIncidentDto incidentDto = CollectionUtils.isNotEmpty(historicIncidentDtos) ? historicIncidentDtos.getFirst() : null;
+
+            return incidentDto != null ? incidentMapper.fromHistoricIncidentModel(historicIncidentDtos.getFirst()) : null;
         }
 
         log.error("Error on loading historic incident by id {}, status code {}", id, response.getStatusCode());

@@ -64,6 +64,8 @@ public abstract class ProcessInstanceMapper {
             case SUSPENDED -> processInstanceData.setSuspended(true);
             case EXTERNALLY_TERMINATED -> processInstanceData.setExternallyTerminated(true);
             case INTERNALLY_TERMINATED -> processInstanceData.setInternallyTerminated(true);
+            default -> {
+            }
         }
     }
 }

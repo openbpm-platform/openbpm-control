@@ -17,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.jmix.core.LoadContext;
 import io.jmix.core.Messages;
@@ -33,7 +34,7 @@ import io.jmix.flowui.model.CollectionLoader;
 import io.jmix.flowui.model.DataLoader;
 import io.jmix.flowui.model.InstanceContainer;
 import io.jmix.flowui.view.*;
-import io.openbpm.control.entity.DeploymentData;
+import io.openbpm.control.entity.deployment.DeploymentData;
 import io.openbpm.control.entity.filter.ProcessInstanceFilter;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
@@ -41,8 +42,9 @@ import io.openbpm.control.service.deployment.DeploymentService;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceLoadContext;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
-import io.openbpm.control.view.bpmnviewer.BpmnViewerFragment;
+import io.openbpm.control.view.deploymentdata.DeploymentDetailView;
 import io.openbpm.control.view.event.TitleUpdateEvent;
+import io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -129,6 +131,8 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
     protected TypedTextField<String> deploymentSourceField;
     @ViewComponent
     protected TypedDateTimePicker<OffsetDateTime> deploymentTimeField;
+    @ViewComponent
+    private TypedTextField<Object> deploymentIdField;
 
     @Subscribe
     public void onInit(final InitEvent event) {
@@ -164,6 +168,14 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
         return title;
     }
 
+    @Subscribe(id = "viewDeployment", subject = "clickListener")
+    public void onViewDeploymentClick(final ClickEvent<JmixButton> event) {
+        viewNavigators.detailView(this, DeploymentData.class)
+                .withViewClass(DeploymentDetailView.class)
+                .withRouteParameters(new RouteParameters("id", getEditedEntity().getDeploymentId()))
+                .withBackwardNavigation(true)
+                .navigate();
+    }
 
     protected void sendUpdateViewTitleEvent() {
         this.title = messageBundle.formatMessage("processDefinitionDetail.processName", getEditedEntity().getKey());
@@ -211,7 +223,12 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
     protected void onProcessDefinitionDcItemChange(InstanceContainer.ItemChangeEvent<ProcessDefinitionData> event) {
         ProcessDefinitionData processDefinition = event.getItem();
 
-        String bpmnXml = processDefinitionService.getBpmnXml(processDefinition.getProcessDefinitionId());
+
+        String bpmnXml = "";
+        if (processDefinition != null) {
+            bpmnXml = processDefinitionService.getBpmnXml(processDefinition.getProcessDefinitionId());
+        }
+
         viewerFragment.initViewer(bpmnXml);
         bpmnXmlEditor.setValue(bpmnXml);
 
@@ -278,8 +295,8 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
     protected void initDeploymentData() {
         DeploymentData deployment = deploymentService.findById(getEditedEntity().getDeploymentId());
         if (deployment != null) {
-            String source = deployment.getSource();
-            deploymentSourceField.setTypedValue(source);
+            deploymentIdField.setTypedValue(deployment.getDeploymentId());
+            deploymentSourceField.setTypedValue(deployment.getSource());
             deploymentTimeField.setTypedValue(deployment.getDeploymentTime());
         }
     }

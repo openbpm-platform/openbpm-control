@@ -19,6 +19,7 @@
     <item view="bpm_DecisionDefinition.list" icon="vaadin:table"
           title="msg://io.openbpm.control.view.decisiondefinition/decisionDefinitionListView.title"/>
     <item view="IncidentData.list" title="msg://io.openbpm.control.view.incidentdata/incidentDataListView.title" icon="WARNING"/>
+    <item view="bpm_Deployment.list" title="msg://io.openbpm.control.view.deploymentdata/deploymentListView.title" icon="vaadin:file-process"/>
     <item view="BpmEngine.list" title="msg://io.openbpm.control.view.bpmengine/bpmEngineListView.title" icon="CLOUD"/>
     <menu id="security">
         <item view="User.list" title="msg://io.openbpm.control.view.user/UserListView.title" icon="USERS"/>
@@ -31,4 +32,5 @@
         <item view="datatl_entityInspectorListView" title="msg://io.jmix.datatoolsflowui.view.entityinspector/listTitle"
               icon="TOOLS"/>
     </menu>
+    <item view="AboutProductView" title="msg://io.openbpm.control.view.about/aboutProductView.title" icon="INFO_CIRCLE_O"/>
 </menu-config>

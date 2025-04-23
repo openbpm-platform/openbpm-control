@@ -23,6 +23,7 @@ import io.openbpm.control.view.processinstance.filter.ProcessInstanceStateHeader
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 public class ProcessInstanceListParamBinder extends AbstractUrlQueryParametersBinder {
@@ -41,8 +42,9 @@ public class ProcessInstanceListParamBinder extends AbstractUrlQueryParametersBi
 
         this.filterDc = filterDc;
         this.processInstanceDl = processInstanceDl;
-        //noinspection DataFlowIssue
-        this.stateHeaderFilter = (ProcessInstanceStateHeaderFilter) dataGrid.getColumnByKey("state").getHeaderComponent();
+        this.stateHeaderFilter = Optional.ofNullable(dataGrid.getColumnByKey("state"))
+                .map(column -> (ProcessInstanceStateHeaderFilter) column.getHeaderComponent())
+                .orElse(null);
 
         this.modeButtons = IntStream.range(0, buttonsPanel.getComponentCount())
                 .mapToObj(buttonIdx -> {
@@ -83,7 +85,9 @@ public class ProcessInstanceListParamBinder extends AbstractUrlQueryParametersBi
         QueryParameters qp = new QueryParameters(ImmutableMap.of(MODE_URL_PARAM, Collections.singletonList(mode.getId())));
         fireQueryParametersChanged(new UrlQueryParametersFacet.UrlQueryParametersChangeEvent(this, qp));
 
-        stateHeaderFilter.update(mode);
+        if (stateHeaderFilter != null) {
+            stateHeaderFilter.update(mode);
+        }
     }
 
     private void updateButtons(int activeIdx) {

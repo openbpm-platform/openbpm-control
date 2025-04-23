@@ -8,16 +8,8 @@
 }
 
 html {
-    --lumo-primary-text-color: rgb(61, 114, 214);
-    --lumo-primary-color-50pct: rgba(61, 114, 214, 0.5);
-    --lumo-primary-color-10pct: rgba(61, 114, 214, 0.1);
-    --lumo-primary-color: #3D72D6;
     --bpmn-history-activity-color: rgba(162, 224, 172, 0.45);
-    --bpmn-running-activity-color: hsla(214, 100%, 49%, 0.16);
     --dashboard-background-color: hsla(214, 61%, 25%, 0.02);
-    --bpmn-incident-overlay-bg-color: hsl(1, 92%, 91%);
-    --bpmn-incident-overlay-text-color: var(--lumo-error-color);
-    --bpmn-incident-overlay-border: 2px solid var(--lumo-error-color);
     --toggle-button-border-color: rgba(61, 114, 214, 0.8);
     --bpmn-decision-instance-link-overlay-background: hsl(205, 100%, 50%);
 }
