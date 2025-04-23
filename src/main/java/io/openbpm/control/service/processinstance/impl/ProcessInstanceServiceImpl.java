@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static io.openbpm.control.service.variable.VariableUtils.createVariableMap;
+import static io.openbpm.control.util.EngineRestUtils.getCountResult;
 import static io.openbpm.control.util.QueryUtils.addHistoryFilters;
 import static io.openbpm.control.util.QueryUtils.addHistorySort;
 
@@ -107,14 +108,12 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         try {
             ResponseEntity<CountResultDto> responseEntity = historyApiClient.queryHistoricProcessInstancesCount(queryDto);
 
-            if (responseEntity.getStatusCode().is2xxSuccessful() && responseEntity.hasBody()) {
-                //noinspection DataFlowIssue
-                return Optional.ofNullable(responseEntity.getBody().getCount()).orElse(0L);
-
-            } else {
-                log.warn("Unable to load historic process instances count, status code: '{}'", responseEntity.getStatusCode().value());
-                return 0;
+            if (responseEntity.getStatusCode().is2xxSuccessful()) {
+                return getCountResult(responseEntity.getBody());
             }
+            log.warn("Unable to load historic process instances count, status code: '{}'", responseEntity.getStatusCode().value());
+            return 0;
+
         } catch (Exception e) {
             Throwable rootCause = ExceptionUtils.getRootCause(e);
             if (rootCause instanceof EngineNotSelectedException) {
@@ -269,8 +268,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 null, null, null,
                 null, null
         );
-        if (processInstancesCount.getStatusCode().is2xxSuccessful() && processInstancesCount.getBody() != null) {
-            return processInstancesCount.getBody().getCount();
+        if (processInstancesCount.getStatusCode().is2xxSuccessful()) {
+            return getCountResult(processInstancesCount.getBody());
         }
         return -1;
     }
@@ -309,8 +308,8 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 null, null, null,
                 null, null
         );
-        if (processInstancesCount.getStatusCode().is2xxSuccessful() && processInstancesCount.getBody() != null) {
-            return processInstancesCount.getBody().getCount();
+        if (processInstancesCount.getStatusCode().is2xxSuccessful()) {
+            return getCountResult(processInstancesCount.getBody());
         }
         return -1;
     }
@@ -329,13 +328,15 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
                 .processInstanceId(responseModel.getProcessInstanceId())
                 .singleResult();
-        processInstanceData.setEndTime(historicProcessInstance.getEndTime());
-        processInstanceData.setStartTime(historicProcessInstance.getStartTime());
-        processInstanceData.setProcessDefinitionName(historicProcessInstance.getProcessDefinitionName());
-        processInstanceData.setBusinessKey(historicProcessInstance.getBusinessKey());
-        processInstanceData.setDeleteReason(historicProcessInstance.getDeleteReason());
-        processInstanceData.setProcessDefinitionKey(historicProcessInstance.getProcessDefinitionKey());
-        processInstanceData.setProcessDefinitionVersion(historicProcessInstance.getProcessDefinitionVersion());
+        if (historicProcessInstance != null) {
+            processInstanceData.setEndTime(historicProcessInstance.getEndTime());
+            processInstanceData.setStartTime(historicProcessInstance.getStartTime());
+            processInstanceData.setProcessDefinitionName(historicProcessInstance.getProcessDefinitionName());
+            processInstanceData.setBusinessKey(historicProcessInstance.getBusinessKey());
+            processInstanceData.setDeleteReason(historicProcessInstance.getDeleteReason());
+            processInstanceData.setProcessDefinitionKey(historicProcessInstance.getProcessDefinitionKey());
+            processInstanceData.setProcessDefinitionVersion(historicProcessInstance.getProcessDefinitionVersion());
+        }
         return processInstanceData;
     }
 

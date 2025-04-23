@@ -175,9 +175,12 @@ public class IncidentDataDetailView extends StandardDetailView<IncidentData> {
     }
 
     @Install(to = "incidentDataDl", target = Target.DATA_LOADER)
-    protected IncidentData incidentDlLoadDelegate(final LoadContext<IncidentData> loadContext) {
+    protected IncidentData incidentDataDlLoadDelegate(final LoadContext<IncidentData> loadContext) {
         Object id = loadContext.getId();
-        return incidentService.findRuntimeIncidentById(id.toString());
+        if (id != null) {
+            return incidentService.findRuntimeIncidentById(id.toString());
+        }
+        return null;
     }
 
     @Subscribe(id = "copyIdBtn", subject = "clickListener")

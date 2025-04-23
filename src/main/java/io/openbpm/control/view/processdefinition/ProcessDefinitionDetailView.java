@@ -223,7 +223,12 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
     protected void onProcessDefinitionDcItemChange(InstanceContainer.ItemChangeEvent<ProcessDefinitionData> event) {
         ProcessDefinitionData processDefinition = event.getItem();
 
-        String bpmnXml = processDefinitionService.getBpmnXml(processDefinition.getProcessDefinitionId());
+
+        String bpmnXml = "";
+        if (processDefinition != null) {
+            bpmnXml = processDefinitionService.getBpmnXml(processDefinition.getProcessDefinitionId());
+        }
+
         viewerFragment.initViewer(bpmnXml);
         bpmnXmlEditor.setValue(bpmnXml);
 

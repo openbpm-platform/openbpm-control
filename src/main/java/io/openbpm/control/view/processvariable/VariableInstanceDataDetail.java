@@ -175,19 +175,8 @@ public class VariableInstanceDataDetail extends StandardDetailView<VariableInsta
         VariableInstanceData variableInstance = variableInstanceDc.getItem();
         if (variableInstance.getType() != null) {
             Component valueComponent = createComponent(variableInstance);
-            if (valueComponent != null) {
-                setupValueComponent(valueComponent);
-            } else {
-                createAndSetupInfoComponent();
-            }
+            setupValueComponent(valueComponent);
         }
-    }
-
-    protected void createAndSetupInfoComponent() {
-        Div infoDiv = uiComponents.create(Div.class);
-        infoDiv.setWidth("100%");
-        infoDiv.setText(messageBundle.getMessage("variableInstanceDataEdit.cannotCreateEditComponent"));
-        valueForm.addFormItem(infoDiv, messageBundle.getMessage("variableInstanceDataEdit.value"));
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})

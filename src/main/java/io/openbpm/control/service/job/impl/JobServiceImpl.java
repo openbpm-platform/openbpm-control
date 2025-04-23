@@ -13,6 +13,7 @@ import io.openbpm.control.mapper.JobMapper;
 import io.openbpm.control.service.job.JobLoadContext;
 import io.openbpm.control.service.job.JobService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.JobApiClient;
 import org.camunda.community.rest.client.api.JobDefinitionApiClient;
@@ -23,6 +24,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static io.openbpm.control.util.EngineRestUtils.getCountResult;
 
 @Service("control_JobService")
 @Slf4j
@@ -49,8 +52,9 @@ public class JobServiceImpl implements JobService {
 
         ResponseEntity<List<JobDto>> jobsResponse = jobApiClient.queryJobs(loadContext.getFirstResult(), loadContext.getMaxResults(),
                 jobQueryDto);
-        if (jobsResponse.getStatusCode().is2xxSuccessful() && jobsResponse.hasBody()) {
-            return jobsResponse.getBody()
+        if (jobsResponse.getStatusCode().is2xxSuccessful()) {
+            List<JobDto> jobDtoList = jobsResponse.getBody();
+            return CollectionUtils.emptyIfNull(jobDtoList)
                     .stream()
                     .map(jobMapper::fromJobDto)
                     .toList();
@@ -64,9 +68,8 @@ public class JobServiceImpl implements JobService {
         JobQueryDto jobQueryDto = createJobQueryDto(jobFilter);
 
         ResponseEntity<CountResultDto> jobsResponse = jobApiClient.queryJobsCount(jobQueryDto);
-        if (jobsResponse.getStatusCode().is2xxSuccessful() && jobsResponse.hasBody()) {
-            Long count = jobsResponse.getBody().getCount();
-            return count != null ? count : 0;
+        if (jobsResponse.getStatusCode().is2xxSuccessful()) {
+            return getCountResult(jobsResponse.getBody());
         }
         log.error("Error on loading runtime jobs count: query {}, status code {}", jobQueryDto, jobsResponse.getStatusCode());
         return 0;
@@ -76,8 +79,9 @@ public class JobServiceImpl implements JobService {
     @Nullable
     public JobDefinitionData findJobDefinition(String jobDefinitionId) {
         ResponseEntity<JobDefinitionDto> response = jobDefinitionApiClient.getJobDefinition(jobDefinitionId);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return jobMapper.fromJobDefinitionDto(response.getBody());
+        if (response.getStatusCode().is2xxSuccessful()) {
+            JobDefinitionDto jobDefinitionDto = response.getBody();
+            return jobDefinitionDto != null ? jobMapper.fromJobDefinitionDto(jobDefinitionDto) : null;
         }
         log.error("Error on loading stacktrace for job definition id {}, status code {}", jobDefinitionId, response.getStatusCode());
         return null;
@@ -111,8 +115,9 @@ public class JobServiceImpl implements JobService {
     @Override
     public String getErrorDetails(String jobId) {
         ResponseEntity<Object> response = jobApiClient.getStacktrace(jobId);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody().toString();
+        if (response.getStatusCode().is2xxSuccessful()) {
+            Object responseBody = response.getBody();
+            return responseBody != null ? responseBody.toString() : "";
         }
 
         return "";
@@ -121,8 +126,9 @@ public class JobServiceImpl implements JobService {
     @Override
     public String getHistoryErrorDetails(String jobId) {
         ResponseEntity<Object> response = historyApiClient.getStacktraceHistoricJobLog(jobId);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody().toString();
+        if (response.getStatusCode().is2xxSuccessful()) {
+            Object responseBody = response.getBody();
+            return responseBody != null ? responseBody.toString() : "";
         }
         return "";
     }
@@ -150,6 +156,8 @@ public class JobServiceImpl implements JobService {
                 case "retries" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOBRETRIES);
                 case "dueDate" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOBDUEDATE);
                 case "priority" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOBPRIORITY);
+                default -> {
+                }
             }
 
             if (order.getDirection() == Sort.Direction.ASC) {
