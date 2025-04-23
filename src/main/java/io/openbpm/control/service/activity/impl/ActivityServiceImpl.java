@@ -168,15 +168,15 @@ public class ActivityServiceImpl implements ActivityService {
                 HistoricActivityInstanceQueryDtoSortingInner sortOption = new HistoricActivityInstanceQueryDtoSortingInner();
                 switch (order.getProperty()) {
                     case "activityId" ->
-                            sortOption.setSortBy(HistoricActivityInstanceQueryDtoSortingInner.SortByEnum.ACTIVITYID);
+                            sortOption.setSortBy(HistoricActivityInstanceQueryDtoSortingInner.SortByEnum.ACTIVITY_ID);
                     case "activityType" ->
-                            sortOption.setSortBy(HistoricActivityInstanceQueryDtoSortingInner.SortByEnum.ACTIVITYTYPE);
+                            sortOption.setSortBy(HistoricActivityInstanceQueryDtoSortingInner.SortByEnum.ACTIVITY_TYPE);
                     case "activityName" ->
-                            sortOption.setSortBy(HistoricActivityInstanceQueryDtoSortingInner.SortByEnum.ACTIVITYNAME);
+                            sortOption.setSortBy(HistoricActivityInstanceQueryDtoSortingInner.SortByEnum.ACTIVITY_NAME);
                     case "startTime" ->
-                            sortOption.setSortBy(HistoricActivityInstanceQueryDtoSortingInner.SortByEnum.STARTTIME);
+                            sortOption.setSortBy(HistoricActivityInstanceQueryDtoSortingInner.SortByEnum.START_TIME);
                     case "endTime" ->
-                            sortOption.setSortBy(HistoricActivityInstanceQueryDtoSortingInner.SortByEnum.ENDTIME);
+                            sortOption.setSortBy(HistoricActivityInstanceQueryDtoSortingInner.SortByEnum.END_TIME);
                     default -> {
                     }
                 }
