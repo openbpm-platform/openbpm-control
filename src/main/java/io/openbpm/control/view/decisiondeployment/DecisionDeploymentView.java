@@ -35,16 +35,16 @@ import io.jmix.flowui.view.Subscribe;
 import io.jmix.flowui.view.ViewComponent;
 import io.jmix.flowui.view.ViewController;
 import io.jmix.flowui.view.ViewDescriptor;
+import io.openbpm.control.dto.DmnDecisionDefinition;
 import io.openbpm.control.entity.decisiondefinition.DecisionDefinitionData;
 import io.openbpm.control.entity.filter.DecisionDefinitionFilter;
 import io.openbpm.control.service.decisiondefinition.DecisionDefinitionLoadContext;
 import io.openbpm.control.service.decisiondefinition.DecisionDefinitionService;
 import io.openbpm.control.service.deployment.DeploymentContext;
 import io.openbpm.control.service.deployment.DeploymentService;
-import io.openbpm.control.dto.DmnDecisionDefinition;
-import io.openbpm.control.uicomponent.dmnviewer.event.ImportCompleteEvent;
-import io.openbpm.control.view.dmnviewer.DmnViewerFragmentNew;
 import io.openbpm.control.view.main.MainView;
+import io.openbpm.uikit.component.dmnviewer.event.DmnXmlImportCompleteEvent;
+import io.openbpm.uikit.fragment.dmnviewer.DmnViewerFragment;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -79,7 +79,7 @@ public class DecisionDeploymentView extends StandardView {
 
     @Autowired
     protected Metadata metadata;
-    @Autowired
+    @ViewComponent
     protected MessageBundle messageBundle;
     @Autowired
     protected Notifications notifications;
@@ -114,7 +114,7 @@ public class DecisionDeploymentView extends StandardView {
     protected Span decisionIdLabel;
 
     @ViewComponent
-    protected DmnViewerFragmentNew viewerFragment;
+    protected DmnViewerFragment viewerFragment;
 
     protected List<DmnDecisionDefinition> decisionDefinitions = new ArrayList<>();
     @Autowired
@@ -253,7 +253,7 @@ public class DecisionDeploymentView extends StandardView {
         return existingDecisions;
     }
 
-    protected void updateImportedDecisions(ImportCompleteEvent importCompleteEvent) {
+    protected void updateImportedDecisions(DmnXmlImportCompleteEvent importCompleteEvent) {
         this.decisionDefinitions = parseDecisionsDefinitionsJson(importCompleteEvent.getDecisionDefinitionsJson());
         updateDecisionsCountComponents();
     }

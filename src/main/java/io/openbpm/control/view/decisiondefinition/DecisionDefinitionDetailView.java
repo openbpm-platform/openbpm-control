@@ -10,8 +10,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.jmix.core.LoadContext;
-import io.jmix.core.Metadata;
-import io.jmix.flowui.Notifications;
 import io.jmix.flowui.UiComponents;
 import io.jmix.flowui.UiEventPublisher;
 import io.jmix.flowui.ViewNavigators;
@@ -41,8 +39,8 @@ import io.openbpm.control.service.decisiondefinition.DecisionDefinitionService;
 import io.openbpm.control.service.deployment.DeploymentService;
 import io.openbpm.control.view.decisioninstance.DecisionInstancesFragment;
 import io.openbpm.control.view.deploymentdata.DeploymentDetailView;
-import io.openbpm.control.view.dmnviewer.DmnViewerFragmentNew;
 import io.openbpm.control.view.event.TitleUpdateEvent;
+import io.openbpm.uikit.fragment.dmnviewer.DmnViewerFragment;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -81,7 +79,7 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
     @ViewComponent
     private CodeEditor dmnXmlEditor;
     @ViewComponent
-    private DmnViewerFragmentNew viewerFragment;
+    private DmnViewerFragment viewerFragment;
     @ViewComponent
     private JmixFormLayout decisionDefinitionForm;
     @ViewComponent

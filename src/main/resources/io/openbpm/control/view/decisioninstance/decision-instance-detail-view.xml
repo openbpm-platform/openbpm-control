@@ -54,7 +54,7 @@
             <split orientation="VERTICAL" width="100%" height="100%" splitterPosition="50"
                    themeNames="splitter-spacing">
                 <div>
-                    <fragment id="dmnViewerFragment" class="io.openbpm.control.view.dmnviewer.DmnViewerFragmentNew"/>
+                    <fragment id="dmnViewerFragment" class="io.openbpm.uikit.fragment.dmnviewer.DmnViewerFragment"/>
                 </div>
 
                 <tabSheet>

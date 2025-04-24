@@ -34,7 +34,7 @@
                     <span id="emptyPreviewText" width="fit-content" text="msg://noDecisionsForPreview"
                           alignSelf="CENTER"/>
                 </hbox>
-                <fragment id="viewerFragment" class="io.openbpm.control.view.dmnviewer.DmnViewerFragmentNew" visible="false"/>
+                <fragment id="viewerFragment" class="io.openbpm.uikit.fragment.dmnviewer.DmnViewerFragment" visible="false"/>
             </vbox>
         </vbox>
 

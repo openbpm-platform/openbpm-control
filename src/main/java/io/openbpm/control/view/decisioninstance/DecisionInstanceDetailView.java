@@ -35,11 +35,11 @@ import io.openbpm.control.service.activity.ActivityService;
 import io.openbpm.control.service.decisiondefinition.DecisionDefinitionService;
 import io.openbpm.control.service.decisioninstance.DecisionInstanceService;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
-import io.openbpm.control.uicomponent.dmnviewer.command.OutputData;
-import io.openbpm.control.uicomponent.dmnviewer.command.ShowDecisionInstanceCmd;
-import io.openbpm.control.view.dmnviewer.DmnViewerFragmentNew;
 import io.openbpm.control.view.processdefinition.ProcessDefinitionDetailView;
 import io.openbpm.control.view.processinstance.ProcessInstanceDetailView;
+import io.openbpm.uikit.component.dmnviewer.command.ShowDecisionInstanceCmd;
+import io.openbpm.uikit.component.dmnviewer.model.DecisionInstanceOutputData;
+import io.openbpm.uikit.fragment.dmnviewer.DmnViewerFragment;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Objects;
@@ -60,7 +60,7 @@ public class DecisionInstanceDetailView extends StandardDetailView<HistoricDecis
     @ViewComponent
     private InstanceContainer<HistoricDecisionInstanceShortData> decisionInstanceDc;
     @ViewComponent
-    private DmnViewerFragmentNew dmnViewerFragment;
+    private DmnViewerFragment dmnViewerFragment;
     @ViewComponent
     private CopyComponentValueToClipboardAction copyToClipboardAction;
     @ViewComponent
@@ -134,7 +134,7 @@ public class DecisionInstanceDetailView extends StandardDetailView<HistoricDecis
             HistoricDecisionInstanceShortData decisionInstance) {
         ShowDecisionInstanceCmd decisionInstanceClientData = new ShowDecisionInstanceCmd();
         decisionInstanceClientData.setOutputDataList(decisionInstance.getOutputs().stream().map(output -> {
-            OutputData result = new OutputData();
+            DecisionInstanceOutputData result = new DecisionInstanceOutputData();
             result.setValue(output.getValue() != null ? output.getValue().toString() : "");
             result.setDataRowId(output.getRuleId());
             result.setDataColId(output.getClauseId());
