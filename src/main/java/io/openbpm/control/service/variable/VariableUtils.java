@@ -47,7 +47,7 @@ public class VariableUtils {
         Object value = variableInstanceData.getValue();
         CamundaVariableType camundaVariableType = CamundaVariableType.fromId(variableInstanceData.getType());
         switch (camundaVariableType) {
-            case STRING -> typedValue = Variables.stringValue(value != null ? value.toString() : null);
+            case STRING -> typedValue = Variables.stringValue((String) value);
             case LONG -> typedValue = Variables.longValue((Long) value);
             case SHORT -> typedValue = Variables.shortValue((Short) value);
             case DOUBLE -> typedValue = Variables.doubleValue((Double) value);

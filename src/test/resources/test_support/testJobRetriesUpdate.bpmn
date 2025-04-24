@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (c) Haulmont 2025. All Rights Reserved.
+  - Use is subject to license terms.
+  -->
+
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1mvs4gr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.23.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.21.0">
+  <bpmn:process id="testJobRetriesUpdate" name="Test job retries update" isExecutable="true" camunda:historyTimeToLive="10">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0yq4pec</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_03i79iw">
+      <bpmn:incoming>Flow_0bh3pz5</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0yq4pec" sourceRef="StartEvent_1" targetRef="timerEvent" />
+    <bpmn:intermediateCatchEvent id="timerEvent" name="Wait 5 min">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R1/PT5M</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_0yq4pec</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ht2nn6</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1pic0bq">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P5M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1ht2nn6" sourceRef="timerEvent" targetRef="printLogTask" />
+    <bpmn:scriptTask id="printLogTask" name="Print log message" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1ht2nn6</bpmn:incoming>
+      <bpmn:outgoing>Flow_0bh3pz5</bpmn:outgoing>
+      <bpmn:script>println 'OK'</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0bh3pz5" sourceRef="printLogTask" targetRef="Event_03i79iw" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testJobRetriesUpdate">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_03i79iw_di" bpmnElement="Event_03i79iw">
+        <dc:Bounds x="582" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_00yyylp_di" bpmnElement="timerEvent">
+        <dc:Bounds x="272" y="99" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="267" y="142" width="51" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_05cv2iu_di" bpmnElement="printLogTask">
+        <dc:Bounds x="370" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0yq4pec_di" bpmnElement="Flow_0yq4pec">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="272" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ht2nn6_di" bpmnElement="Flow_1ht2nn6">
+        <di:waypoint x="308" y="117" />
+        <di:waypoint x="370" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0bh3pz5_di" bpmnElement="Flow_0bh3pz5">
+        <di:waypoint x="470" y="117" />
+        <di:waypoint x="582" y="117" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

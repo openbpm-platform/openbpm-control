@@ -26,6 +26,7 @@ OpenBPM Control is built using the open-source [Jmix](https://www.jmix.io) frame
    - [User Tasks](#user-tasks)
    - [Incidents](#incidents)
    - [Configuring Users](#configuring-users)
+- [Running the Tests](#running-the-tests)  
 - [License](#license) 
 
 
@@ -81,13 +82,13 @@ from the start. To add more users, see the [Configuring Users](#configuring-user
 To add a connection to a running BPM engine, follow these steps:
 
 1. Navigate to the **BPM engines** view using the application menu.
-2. Click **Create**. 
+2. Click **Create**.
 3. In the **New BPM engine** view, provide the following details:
     - _Name_: a short name for your server where BPM engine is running. (e.g., `Dev stand`).
     - _Base URL_.
-3. If the target BPM engine requires authenticated access, set the **Enabled** checkbox in the Authentication group to true.
+4. If the target BPM engine requires authenticated access, set the **Enabled** checkbox in the Authentication group to true.
    You can then configure the credentials needed for this connection.
-4. Click the **OK** button to save the connection.
+5. Click the **OK** button to save the connection.
 
 ![engine-list-view.png](img/engine-list-view.png)
 
@@ -205,6 +206,68 @@ To grant permissions to a user, follow these steps:
 ![role-assignments-view_2.png](img/role-assignments-view_2.png)
 
 The user can now log in to OpenBPM Control and use all the functionality.
+
+## Running the Tests <a name="running-the-tests"></a>
+
+**Prerequisites:**
+
+You must have the following installed:
+
+1. Docker
+
+OpenBPM Control tests use [Testcontainers](https://testcontainers.com/) to run database and BPM engine containers.
+and do not require a pre-prepared running instances for them.
+
+To run all tests in OpenBPM Control, use the following command:
+
+```shell
+.\gradlew test
+```
+
+By default, all integration tests related to the BPM engine features are performed on the Camunda Run (version 7.22) which
+does not have the configured authentication.
+It is possible to run tests for a specific BPM engine version and authentication using the `test-engine` Spring
+profile.
+
+When the `test-engine` profile is enabled as the active profile, the following application properties become available:
+
+1. `openbpm.control.testing.engine.type` - a type of BPM engine. Supported values: `camunda_7`. Default value:
+   `camunda_7`.
+2. `openbpm.control.testing.engine.docker-image` - the full docker image of the BPM engine. Supported
+   values: [Camunda Run docker images](https://hub.docker.com/r/camunda/camunda-bpm-platform/tags?name=run).
+   Default value: `camunda/camunda-bpm-platform:run-7.22.0`
+3. `openbpm.control.testing.engine.auth-type` - an authentication type for the BPM engine used in the tests. Supported values:
+   `Basic`. Default value: null.
+
+You can pass the values of these properties as environment variables or by using the `-P` prefix in the Gradle task command.
+
+**Example 1: Run tests for Camunda Run (version 7.21)**
+
+Using environment variable:
+
+```shell
+  SPRING_PROFILES_INCLUDE=test-engine;OPENBPM_CONTROL_TESTING_ENGINE_DOCKER_IMAGE=camunda/camunda-bpm-platform:run-7.21.0 .\gradlew test
+```
+
+Using Gradle command properties:
+
+```shell
+  .\gradlew test  -Dspring.profiles.include=test-engine -Dcontrol.testing.engine.docker-image=camunda/camunda-bpm-platform:run-7.21.0
+```
+
+**Example 2: Run tests for the default engine (Camunda Run 7.22) with basic authentication configured**
+
+Using environment variable:
+
+```shell
+  SPRING_PROFILES_INCLUDE=test-engine;OPENBPM_CONTROL_TESTING_ENGINE_AUTH_TYPE=Basic .\gradlew test
+```
+
+Using Gradle command properties:
+
+```shell
+  .\gradlew test  -Dspring.profiles.include=test-engine -Dcontrol.testing.engine.auth-type=Basic
+```
 
 ## License <a name="license"></a>
 OpenBPM Control is an open-source project distributed under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license. 

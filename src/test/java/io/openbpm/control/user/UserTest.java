@@ -5,10 +5,11 @@
 
 package io.openbpm.control.user;
 
-import io.openbpm.control.entity.User;
-import io.openbpm.control.test_support.AuthenticatedAsAdmin;
 import io.jmix.core.DataManager;
 import io.jmix.core.security.UserRepository;
+import io.openbpm.control.entity.User;
+import io.openbpm.control.test_support.AbstractIntegrationTest;
+import io.openbpm.control.test_support.AuthenticatedAsAdmin;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 @SpringBootTest
 @ExtendWith(AuthenticatedAsAdmin.class)
-public class UserTest {
+public class UserTest extends AbstractIntegrationTest {
 
     @Autowired
     DataManager dataManager;

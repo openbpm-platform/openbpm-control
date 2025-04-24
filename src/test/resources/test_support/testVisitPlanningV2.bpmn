@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (c) Haulmont 2025. All Rights Reserved.
+  - Use is subject to license terms.
+  -->
+
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1fhxb9q" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.23.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.21.0">
+    <bpmn:process id="visitPlanning" name="Visit planning" isExecutable="true" camunda:versionTag="v2" camunda:historyTimeToLive="10">
+        <bpmn:documentation>Simple process to schedule a visit by date</bpmn:documentation>
+        <bpmn:startEvent id="StartEvent_1">
+            <bpmn:outgoing>Flow_10q4poo</bpmn:outgoing>
+        </bpmn:startEvent>
+        <bpmn:userTask id="bpmnTask_3" name="Request visit details">
+            <bpmn:incoming>Flow_10q4poo</bpmn:incoming>
+            <bpmn:outgoing>bpmnSequenceFlow_7</bpmn:outgoing>
+        </bpmn:userTask>
+        <bpmn:endEvent id="bpmnEndEvent_6">
+            <bpmn:incoming>bpmnSequenceFlow_8</bpmn:incoming>
+        </bpmn:endEvent>
+        <bpmn:sequenceFlow id="bpmnSequenceFlow_7" sourceRef="bpmnTask_3" targetRef="bpmnTask_6" />
+        <bpmn:sequenceFlow id="bpmnSequenceFlow_8" sourceRef="bpmnTask_6" targetRef="bpmnEndEvent_6" />
+        <bpmn:sequenceFlow id="Flow_10q4poo" sourceRef="StartEvent_1" targetRef="bpmnTask_3" />
+        <bpmn:scriptTask id="bpmnTask_6" name="Schedule visit">
+            <bpmn:incoming>bpmnSequenceFlow_7</bpmn:incoming>
+            <bpmn:outgoing>bpmnSequenceFlow_8</bpmn:outgoing>
+            <bpmn:script>printf 'Visit scheduled'</bpmn:script>
+        </bpmn:scriptTask>
+    </bpmn:process>
+    <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="visitPlanning">
+            <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+                <dc:Bounds x="179" y="99" width="36" height="36" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BPMNShape_bpmnEndEvent_6" bpmnElement="bpmnEndEvent_6">
+                <dc:Bounds x="712" y="103" width="28" height="28" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="BPMNShape_bpmnTask_3" bpmnElement="bpmnTask_3">
+                <dc:Bounds x="310" y="77" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNShape id="Activity_0dhd3z4_di" bpmnElement="bpmnTask_6">
+                <dc:Bounds x="530" y="77" width="100" height="80" />
+            </bpmndi:BPMNShape>
+            <bpmndi:BPMNEdge id="Flow_10q4poo_di" bpmnElement="Flow_10q4poo">
+                <di:waypoint x="215" y="117" />
+                <di:waypoint x="310" y="117" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="BPMNEdge_bpmnSequenceFlow_8" bpmnElement="bpmnSequenceFlow_8">
+                <di:waypoint x="630" y="117" />
+                <di:waypoint x="712" y="117" />
+            </bpmndi:BPMNEdge>
+            <bpmndi:BPMNEdge id="BPMNEdge_bpmnSequenceFlow_7" bpmnElement="bpmnSequenceFlow_7">
+                <di:waypoint x="410" y="117" />
+                <di:waypoint x="530" y="117" />
+            </bpmndi:BPMNEdge>
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+</bpmn:definitions>

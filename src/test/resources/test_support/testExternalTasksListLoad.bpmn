@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (c) Haulmont 2025. All Rights Reserved.
+  - Use is subject to license terms.
+  -->
+
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_15c21oe" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.23.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.21.0">
+  <bpmn:process id="testExternalTasksListLoad" name="Test external tasks list load" isExecutable="true" camunda:historyTimeToLive="15">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0qfp6lv</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0qfp6lv" sourceRef="StartEvent_1" targetRef="testExternalTask" />
+    <bpmn:serviceTask id="testExternalTask" name="testExternal task" camunda:type="external" camunda:topic="test-external-task-topic">
+      <bpmn:incoming>Flow_0qfp6lv</bpmn:incoming>
+      <bpmn:outgoing>Flow_1ixcw19</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="Event_03d1fmq">
+      <bpmn:incoming>Flow_1ixcw19</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1ixcw19" sourceRef="testExternalTask" targetRef="Event_03d1fmq" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testExternalTasksListLoad">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0i6pe99_di" bpmnElement="testExternalTask">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_03d1fmq_di" bpmnElement="Event_03d1fmq">
+        <dc:Bounds x="432" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0qfp6lv_di" bpmnElement="Flow_0qfp6lv">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1ixcw19_di" bpmnElement="Flow_1ixcw19">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="432" y="117" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

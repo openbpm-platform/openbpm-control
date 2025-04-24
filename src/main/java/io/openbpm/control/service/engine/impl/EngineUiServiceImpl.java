@@ -5,6 +5,7 @@
 
 package io.openbpm.control.service.engine.impl;
 
+import com.google.common.base.Strings;
 import feign.FeignException;
 import feign.RequestInterceptor;
 import feign.auth.BasicAuthRequestInterceptor;
@@ -147,7 +148,7 @@ public class EngineUiServiceImpl implements EngineUiService {
         RequestInterceptor requestInterceptor = null;
         if (BooleanUtils.isTrue(engine.getAuthEnabled())) {
             if (engine.getAuthType() == AuthType.BASIC) {
-                requestInterceptor = new BasicAuthRequestInterceptor(engine.getBasicAuthUsername(), engine.getBasicAuthPassword());
+                requestInterceptor = new BasicAuthRequestInterceptor(Strings.nullToEmpty(engine.getBasicAuthUsername()), Strings.nullToEmpty(engine.getBasicAuthPassword()));
             } else if (engine.getAuthType() == AuthType.HTTP_HEADER) {
                 requestInterceptor = requestTemplate -> {
                     requestTemplate.header(engine.getHttpHeaderName(), engine.getHttpHeaderValue());
