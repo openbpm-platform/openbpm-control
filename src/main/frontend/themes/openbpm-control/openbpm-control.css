@@ -11,7 +11,6 @@ html {
     --bpmn-history-activity-color: rgba(162, 224, 172, 0.45);
     --dashboard-background-color: hsla(214, 61%, 25%, 0.02);
     --toggle-button-border-color: rgba(61, 114, 214, 0.8);
-    --bpmn-decision-instance-link-overlay-background: hsl(205, 100%, 50%);
 }
 
 [part="toggle"] {

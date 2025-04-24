@@ -16,7 +16,7 @@ import io.jmix.flowui.fragment.FragmentDescriptor;
 import io.jmix.flowui.view.Subscribe;
 import io.jmix.flowui.view.ViewComponent;
 import io.openbpm.control.entity.decisiondefinition.DecisionDefinitionData;
-import io.openbpm.control.uicomponent.dmnviewer.DmnDecisionDefinition;
+import io.openbpm.control.dto.DmnDecisionDefinition;
 import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;

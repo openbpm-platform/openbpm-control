@@ -8,10 +8,10 @@ package io.openbpm.control.uicomponent.bpmnviewer.event;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.DomEvent;
 import com.vaadin.flow.component.EventData;
-import io.openbpm.control.uicomponent.bpmnviewer.BpmnViewerImpl;
+import io.openbpm.uikit.component.bpmnviewer.BpmnViewer;
 
 @DomEvent("decision-instance-link-overlay-clicked")
-public class DecisionInstanceLinkOverlayClickedEvent extends ComponentEvent<BpmnViewerImpl> {
+public class DecisionInstanceLinkOverlayClickedEvent extends ComponentEvent<BpmnViewer> {
 
     private final String decisionInstanceId;
     /**
@@ -22,7 +22,7 @@ public class DecisionInstanceLinkOverlayClickedEvent extends ComponentEvent<Bpmn
      * @param fromClient <code>true</code> if the event originated from the client
      *                   side, <code>false</code> otherwise
      */
-    public DecisionInstanceLinkOverlayClickedEvent(BpmnViewerImpl source, boolean fromClient,
+    public DecisionInstanceLinkOverlayClickedEvent(BpmnViewer source, boolean fromClient,
                                                    @EventData("event.decisionInstanceId") String decisionInstanceId) {
         super(source, fromClient);
         this.decisionInstanceId = decisionInstanceId;

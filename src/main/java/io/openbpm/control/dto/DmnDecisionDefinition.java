@@ -3,7 +3,7 @@
  * Use is subject to license terms.
  */
 
-package io.openbpm.control.uicomponent.dmnviewer;
+package io.openbpm.control.dto;
 
 import lombok.Getter;
 import lombok.Setter;

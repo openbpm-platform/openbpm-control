@@ -41,7 +41,7 @@ import io.openbpm.control.service.decisiondefinition.DecisionDefinitionLoadConte
 import io.openbpm.control.service.decisiondefinition.DecisionDefinitionService;
 import io.openbpm.control.service.deployment.DeploymentContext;
 import io.openbpm.control.service.deployment.DeploymentService;
-import io.openbpm.control.uicomponent.dmnviewer.DmnDecisionDefinition;
+import io.openbpm.control.dto.DmnDecisionDefinition;
 import io.openbpm.control.uicomponent.dmnviewer.event.ImportCompleteEvent;
 import io.openbpm.control.view.dmnviewer.DmnViewerFragmentNew;
 import io.openbpm.control.view.main.MainView;

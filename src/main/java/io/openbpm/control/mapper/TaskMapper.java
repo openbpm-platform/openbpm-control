@@ -9,7 +9,6 @@ import io.jmix.core.Metadata;
 import io.openbpm.control.entity.UserTaskData;
 import org.camunda.community.rest.client.model.HistoricTaskInstanceDto;
 import org.camunda.community.rest.client.model.TaskDto;
-import org.camunda.community.rest.client.model.TaskWithAttachmentAndCommentDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +48,7 @@ public abstract class TaskMapper {
     @Mapping(target = "followUpDate", source = "followUp")
     @Mapping(target = "lastUpdateDate", source = "lastUpdated")
     @Mapping(target = "createTime", source = "created")
-    public abstract UserTaskData fromRuntimeTaskDto(TaskWithAttachmentAndCommentDto source);
+    public abstract UserTaskData fromRuntimeTaskDto(TaskDto source);
 
     UserTaskData targetClassFactory() {
         return metadata.create(UserTaskData.class);

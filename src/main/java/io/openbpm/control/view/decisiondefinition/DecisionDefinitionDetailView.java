@@ -7,12 +7,14 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.jmix.core.LoadContext;
 import io.jmix.core.Metadata;
 import io.jmix.flowui.Notifications;
 import io.jmix.flowui.UiComponents;
 import io.jmix.flowui.UiEventPublisher;
+import io.jmix.flowui.ViewNavigators;
 import io.jmix.flowui.component.codeeditor.CodeEditor;
 import io.jmix.flowui.component.combobox.JmixComboBox;
 import io.jmix.flowui.component.datetimepicker.TypedDateTimePicker;
@@ -33,11 +35,12 @@ import io.jmix.flowui.view.Target;
 import io.jmix.flowui.view.ViewComponent;
 import io.jmix.flowui.view.ViewController;
 import io.jmix.flowui.view.ViewDescriptor;
-import io.openbpm.control.entity.DeploymentData;
 import io.openbpm.control.entity.decisiondefinition.DecisionDefinitionData;
+import io.openbpm.control.entity.deployment.DeploymentData;
 import io.openbpm.control.service.decisiondefinition.DecisionDefinitionService;
 import io.openbpm.control.service.deployment.DeploymentService;
 import io.openbpm.control.view.decisioninstance.DecisionInstancesFragment;
+import io.openbpm.control.view.deploymentdata.DeploymentDetailView;
 import io.openbpm.control.view.dmnviewer.DmnViewerFragmentNew;
 import io.openbpm.control.view.event.TitleUpdateEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,10 +68,6 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
     private TypedDateTimePicker<Comparable> deploymentTimeField;
     @ViewComponent
     private TypedTextField<Object> deploymentSourceField;
-    @Autowired
-    private Notifications notifications;
-    @Autowired
-    private Metadata metadata;
     @ViewComponent
     private DecisionInstancesFragment decisionInstancesFragment;
     @ViewComponent
@@ -78,7 +77,7 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
     @Autowired
     private UiEventPublisher uiEventPublisher;
 
-    private String title = "";
+
     @ViewComponent
     private CodeEditor dmnXmlEditor;
     @ViewComponent
@@ -87,6 +86,10 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
     private JmixFormLayout decisionDefinitionForm;
     @ViewComponent
     private JmixTabSheet tabSheet;
+    @Autowired
+    private ViewNavigators viewNavigators;
+
+    private String title = "";
 
     @Subscribe
     public void onInit(final InitEvent event) {
@@ -103,12 +106,11 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
 
     @Subscribe(id = "viewDeployment", subject = "clickListener")
     public void onViewDeploymentClick(final ClickEvent<JmixButton> event) {
-        notifications.show("View deployment");
-        /*   viewNavigators.detailView(this, DeploymentData.class)
+        viewNavigators.detailView(this, DeploymentData.class)
                 .withViewClass(DeploymentDetailView.class)
                 .withRouteParameters(new RouteParameters("id", getEditedEntity().getDeploymentId()))
                 .withBackwardNavigation(true)
-                .navigate();*/
+                .navigate();
     }
 
     @Subscribe
@@ -124,12 +126,6 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
     @Subscribe
     protected void onBeforeShow(BeforeShowEvent event) {
         initVersionLookup(getEditedEntity());
-//        actionsFragment.updateButtonsVisibility();
-//        processInstancesFragment.initInstancesCountLabels();
-//        String processDefinitionBpmnXml = processDefinitionService.getBpmnXml(
-//                getEditedEntity().getProcessDefinitionId());
-//        viewerFragment.initViewer(processDefinitionBpmnXml);
-
         initDeploymentData();
     }
 
