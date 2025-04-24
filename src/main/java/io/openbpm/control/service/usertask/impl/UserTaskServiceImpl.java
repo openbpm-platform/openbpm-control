@@ -59,7 +59,7 @@ public class UserTaskServiceImpl implements UserTaskService {
             TaskQueryDto taskQueryDto = createTaskQueryDto(loadContext.getFilter());
             taskQueryDto.setSorting(createTaskQuerySort(loadContext.getSort()));
 
-            ResponseEntity<List<TaskDto>> tasksResponse = taskApiClient.queryTasks(loadContext.getFirstResult(), loadContext.getMaxResults(), taskQueryDto);
+            ResponseEntity<List<TaskWithAttachmentAndCommentDto>> tasksResponse = taskApiClient.queryTasks(loadContext.getFirstResult(), loadContext.getMaxResults(), taskQueryDto);
             if (tasksResponse.getStatusCode().is2xxSuccessful()) {
                 return CollectionUtils.emptyIfNull(tasksResponse.getBody())
                         .stream()
