@@ -8,7 +8,6 @@ package io.openbpm.control.entity.filter;
 import io.jmix.core.entity.annotation.JmixGeneratedValue;
 import io.jmix.core.entity.annotation.JmixId;
 import io.jmix.core.metamodel.annotation.JmixEntity;
-import io.openbpm.control.entity.processinstance.ProcessInstanceState;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,10 +24,16 @@ public class DecisionInstanceFilter {
     protected UUID id;
 
     protected String decisionDefinitionId;
+
     protected String processDefinitionId;
+
     protected String processDefinitionKey;
+
     protected String processInstanceId;
+
     protected String activityId;
+
     protected OffsetDateTime evaluatedAfter;
+
     protected OffsetDateTime evaluatedBefore;
 }

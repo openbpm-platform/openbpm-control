@@ -35,23 +35,22 @@ public class DecisionInstanceServiceImpl implements DecisionInstanceService {
     }
 
     @Override
-    public List<HistoricDecisionInstanceShortData> findAllHistoryDecisionInstances(DecisionInstanceLoadContext loadContext) {
+    public List<HistoricDecisionInstanceShortData> findAllHistoryDecisionInstances(
+            DecisionInstanceLoadContext loadContext) {
         HistoricDecisionInstanceQuery decisionInstanceQuery = createHistoricDecisionInstanceQuery(
                 loadContext.getFilter(), loadContext.getSort());
-
         try {
             List<HistoricDecisionInstance> historicDecisionInstances;
             if (loadContext.getFirstResult() != null && loadContext.getMaxResults() != null) {
-                historicDecisionInstances = decisionInstanceQuery.listPage(loadContext.getFirstResult(), loadContext.getMaxResults());
+                historicDecisionInstances = decisionInstanceQuery.listPage(
+                        loadContext.getFirstResult(), loadContext.getMaxResults());
             } else {
                 historicDecisionInstances = decisionInstanceQuery.list();
             }
-
             return historicDecisionInstances
                     .stream()
                     .map(decisionInstanceMapper::fromHistoricDecisionInstance)
                     .toList();
-
         } catch (Exception e) {
             Throwable rootCause = ExceptionUtils.getRootCause(e);
             if (rootCause instanceof EngineNotSelectedException) {
@@ -78,13 +77,11 @@ public class DecisionInstanceServiceImpl implements DecisionInstanceService {
                 .decisionInstanceId(decisionInstanceId)
                 .includeInputs()
                 .includeOutputs();
-
         try {
             return decisionInstanceQuery.list()
                     .stream()
                     .map(decisionInstanceMapper::fromHistoricDecisionInstance)
                     .findFirst().orElse(null);
-
         } catch (Exception e) {
             Throwable rootCause = ExceptionUtils.getRootCause(e);
             if (rootCause instanceof EngineNotSelectedException) {
@@ -117,7 +114,6 @@ public class DecisionInstanceServiceImpl implements DecisionInstanceService {
                                                                                 @Nullable Sort sort) {
         HistoricDecisionInstanceQuery historicDecisionInstanceQuery =
                 new HistoricDecisionInstanceQueryImpl(historyApiClient);
-
         addDecisionInstanceFilters(historicDecisionInstanceQuery, filter);
         addDecisionInstanceSort(historicDecisionInstanceQuery, sort);
         return historicDecisionInstanceQuery;

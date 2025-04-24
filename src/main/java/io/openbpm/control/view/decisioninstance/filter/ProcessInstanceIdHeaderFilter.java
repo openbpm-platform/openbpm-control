@@ -26,6 +26,13 @@ public class ProcessInstanceIdHeaderFilter
     }
 
     @Override
+    public void apply() {
+        String value = processInstanceId.getValue();
+        filterDc.getItem().setProcessInstanceId(value);
+        filterButton.getElement().setAttribute(COLUMN_FILTER_BUTTON_ACTIVATED_ATTRIBUTE_NAME, value != null);
+    }
+
+    @Override
     protected Component createFilterComponent() {
         return createProcessInstanceIdFilter();
     }
@@ -33,14 +40,6 @@ public class ProcessInstanceIdHeaderFilter
     @Override
     protected void resetFilterValues() {
         processInstanceId.clear();
-    }
-
-    @Override
-    public void apply() {
-        String value = processInstanceId.getValue();
-        filterDc.getItem().setProcessInstanceId(value);
-
-        filterButton.getElement().setAttribute(COLUMN_FILTER_BUTTON_ACTIVATED_ATTRIBUTE_NAME, value != null);
     }
 
     protected TextField createProcessInstanceIdFilter() {
@@ -51,7 +50,6 @@ public class ProcessInstanceIdHeaderFilter
         processInstanceId.setLabel(messages.getMessage(DecisionInstanceFilter.class,
                 "DecisionInstanceFilter.processInstanceId"));
         processInstanceId.setPlaceholder(messages.getMessage(getClass(), "processInstanceId.placeHolder"));
-
         return processInstanceId;
     }
 }

@@ -81,6 +81,10 @@ public class DecisionInstancesFragment extends Fragment<VerticalLayout> {
     protected DecisionInstanceService decisionInstanceService;
     @Autowired
     protected Fragments fragments;
+    @Autowired
+    protected Metadata metadata;
+    @Autowired
+    protected ComponentHelper componentHelper;
 
     @ViewComponent
     protected InstanceContainer<DecisionDefinitionData> decisionDefinitionDc;
@@ -100,12 +104,8 @@ public class DecisionInstancesFragment extends Fragment<VerticalLayout> {
     protected SimplePagination decisionInstancesPagination;
     @ViewComponent
     protected CollectionLoader<HistoricDecisionInstanceShortData> decisionInstancesDl;
-    @Autowired
-    private Metadata metadata;
     @ViewComponent
-    private InstanceContainer<DecisionInstanceFilter> decisionInstanceFilterDc;
-    @Autowired
-    private ComponentHelper componentHelper;
+    protected InstanceContainer<DecisionInstanceFilter> decisionInstanceFilterDc;
 
     @Subscribe(target = Target.HOST_CONTROLLER)
     public void onHostInit(final View.InitEvent event) {
@@ -126,43 +126,24 @@ public class DecisionInstancesFragment extends Fragment<VerticalLayout> {
         }
     }
 
-    @Install(to = "decisionInstancesDl", target = Target.DATA_LOADER)
-    protected List<HistoricDecisionInstanceShortData> decisionInstancesLoadDelegate(
-            LoadContext<HistoricDecisionInstanceShortData> loadContext) {
-        LoadContext.Query query = loadContext.getQuery();
-        DecisionInstanceFilter filter = decisionInstanceFilterDc.getItemOrNull();
-        if (filter != null) {
-            filter.setDecisionDefinitionId(decisionDefinitionDc.getItem().getDecisionDefinitionId());
-        }
-
-        DecisionInstanceLoadContext context = new DecisionInstanceLoadContext().setFilter(filter);
-        if (query != null) {
-            context = context.setFirstResult(query.getFirstResult())
-                    .setMaxResults(query.getMaxResults())
-                    .setSort(query.getSort());
-        }
-
-        return decisionInstanceService.findAllHistoryDecisionInstances(context);
-    }
-
     @Subscribe(target = Target.HOST_CONTROLLER)
     public void onHostBeforeShow(View.BeforeShowEvent event) {
         initInstancesCountLabels();
+    }
 
+    public void initInstancesCountLabels() {
+        DecisionDefinitionData item = decisionDefinitionDc.getItem();
+        long currentVersionInstancesCount = decisionInstanceService.getCountByDecisionDefinitionId(
+                item.getDecisionDefinitionId());
+        long allVersionsInstancesCount = decisionInstanceService.getCountByDecisionDefinitionKey(item.getKey());
+        currentVersionsInstancesCountSpan.setText(": " + currentVersionInstancesCount);
+        allVersionsInstancesCountSpan.setText(": " + allVersionsInstancesCount);
     }
 
     @Subscribe(id = "decisionInstanceFilterDc", target = Target.DATA_CONTAINER)
     public void onDecisionInstanceFilterDcItemPropertyChange(
             final InstanceContainer.ItemPropertyChangeEvent<DecisionInstanceFilter> event) {
-
         decisionInstancesDl.load();
-    }
-
-    @Install(to = "decisionInstancesPagination", subject = "totalCountDelegate")
-    protected Integer decisionInstancesPaginationTotalCountDelegate(final DataLoadContext dataLoadContext) {
-        DecisionDefinitionData decisionDefinition = decisionDefinitionDc.getItem();
-        return (int) decisionInstanceService.getCountByDecisionDefinitionId(
-                decisionDefinition.getDecisionDefinitionId());
     }
 
     @Subscribe("decisionInstancesGrid.edit")
@@ -177,9 +158,37 @@ public class DecisionInstancesFragment extends Fragment<VerticalLayout> {
                 .navigate();
     }
 
+    @Subscribe(id = "decisionDefinitionDc", target = Target.DATA_CONTAINER)
+    public void onDecisionDefinitionDcItemChange(final InstanceContainer.ItemChangeEvent<DecisionDefinitionData> event) {
+        decisionInstancesDl.load();
+    }
+
+    @Install(to = "decisionInstancesDl", target = Target.DATA_LOADER)
+    protected List<HistoricDecisionInstanceShortData> decisionInstancesLoadDelegate(
+            LoadContext<HistoricDecisionInstanceShortData> loadContext) {
+        LoadContext.Query query = loadContext.getQuery();
+        DecisionInstanceFilter filter = decisionInstanceFilterDc.getItemOrNull();
+        if (filter != null) {
+            filter.setDecisionDefinitionId(decisionDefinitionDc.getItem().getDecisionDefinitionId());
+        }
+        DecisionInstanceLoadContext context = new DecisionInstanceLoadContext().setFilter(filter);
+        if (query != null) {
+            context = context.setFirstResult(query.getFirstResult())
+                    .setMaxResults(query.getMaxResults())
+                    .setSort(query.getSort());
+        }
+        return decisionInstanceService.findAllHistoryDecisionInstances(context);
+    }
+
+    @Install(to = "decisionInstancesPagination", subject = "totalCountDelegate")
+    protected Integer decisionInstancesPaginationTotalCountDelegate(final DataLoadContext dataLoadContext) {
+        DecisionDefinitionData decisionDefinition = decisionDefinitionDc.getItem();
+        return (int) decisionInstanceService.getCountByDecisionDefinitionId(
+                decisionDefinition.getDecisionDefinitionId());
+    }
+
     protected void initDataGridHeaderRow() {
         HeaderRow headerRow = decisionInstancesGrid.getHeaderRows().getFirst();
-
         addColumnFilter(headerRow, "evaluationTime", this::createEvaluationTimeColumnFilter);
         addColumnFilter(headerRow, "processDefinitionKey", this::createProcessDefinitionKeyColumnFilter);
         addColumnFilter(headerRow, "processInstanceId", this::createProcessInstanceIdColumnFilter);
@@ -221,7 +230,6 @@ public class DecisionInstancesFragment extends Fragment<VerticalLayout> {
             JmixButton button = uiComponents.create(JmixButton.class);
             button.setText(instance.getProcessDefinitionKey());
             button.addThemeName("tertiary-inline");
-
             button.addClickListener(event ->
                     viewNavigators.detailView(UiComponentUtils.getCurrentView(), ProcessDefinitionData.class)
                     .withViewClass(ProcessDefinitionDetailView.class)
@@ -248,17 +256,6 @@ public class DecisionInstancesFragment extends Fragment<VerticalLayout> {
         });
     }
 
-    public void initInstancesCountLabels() {
-        DecisionDefinitionData item = decisionDefinitionDc.getItem();
-
-        long currentVersionInstancesCount = decisionInstanceService.getCountByDecisionDefinitionId(
-                item.getDecisionDefinitionId());
-
-        long allVersionsInstancesCount = decisionInstanceService.getCountByDecisionDefinitionKey(item.getKey());
-        currentVersionsInstancesCountSpan.setText(": " + currentVersionInstancesCount);
-        allVersionsInstancesCountSpan.setText(": " + allVersionsInstancesCount);
-    }
-
     protected void initFilter() {
         DecisionInstanceFilter filter = metadata.create(DecisionInstanceFilter.class);
         decisionInstanceFilterDc.setItem(filter);
@@ -268,11 +265,6 @@ public class DecisionInstancesFragment extends Fragment<VerticalLayout> {
         decisionInstanceVBox.addClassNames(LumoUtility.Padding.Top.SMALL, LumoUtility.Padding.Left.XSMALL);
         allVersionsInstancesCountSpan.addClassNames(LumoUtility.FontWeight.BOLD);
         currentVersionsInstancesCountSpan.addClassNames(LumoUtility.FontWeight.BOLD);
-    }
-
-    @Subscribe(id = "decisionDefinitionDc", target = Target.DATA_CONTAINER)
-    public void onDecisionDefinitionDcItemChange(final InstanceContainer.ItemChangeEvent<DecisionDefinitionData> event) {
-        decisionInstancesDl.load();
     }
 
     protected <T extends ContainerDataGridHeaderFilter> void addColumnFilter(

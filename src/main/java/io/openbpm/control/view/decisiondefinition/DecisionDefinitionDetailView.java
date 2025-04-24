@@ -54,14 +54,21 @@ import java.util.Objects;
 @PrimaryDetailView(DecisionDefinitionData.class)
 public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDefinitionData> {
 
-    @ViewComponent
-    private InstanceContainer<DecisionDefinitionData> decisionDefinitionDc;
     @Autowired
     private DecisionDefinitionService decisionDefinitionService;
-    @ViewComponent
-    private JmixComboBox<DecisionDefinitionData> versionComboBox;
     @Autowired
     private DeploymentService deploymentService;
+    @Autowired
+    private UiComponents uiComponents;
+    @Autowired
+    private UiEventPublisher uiEventPublisher;
+    @Autowired
+    private ViewNavigators viewNavigators;
+
+    @ViewComponent
+    private InstanceContainer<DecisionDefinitionData> decisionDefinitionDc;
+    @ViewComponent
+    private JmixComboBox<DecisionDefinitionData> versionComboBox;
     @ViewComponent
     private TypedDateTimePicker<Comparable> deploymentTimeField;
     @ViewComponent
@@ -70,12 +77,6 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
     private DecisionInstancesFragment decisionInstancesFragment;
     @ViewComponent
     private MessageBundle messageBundle;
-    @Autowired
-    private UiComponents uiComponents;
-    @Autowired
-    private UiEventPublisher uiEventPublisher;
-
-
     @ViewComponent
     private CodeEditor dmnXmlEditor;
     @ViewComponent
@@ -84,8 +85,6 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
     private JmixFormLayout decisionDefinitionForm;
     @ViewComponent
     private JmixTabSheet tabSheet;
-    @Autowired
-    private ViewNavigators viewNavigators;
 
     private String title = "";
 
@@ -94,12 +93,6 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
         addClassNames(LumoUtility.Padding.NONE);
         initTabIcons();
         decisionDefinitionForm.addClassName(LumoUtility.Padding.Right.XSMALL);
-    }
-
-    protected void initTabIcons() {
-        tabSheet.getTabAt(0).addComponentAsFirst(VaadinIcon.INFO_CIRCLE_O.create());
-        tabSheet.getTabAt(1).addComponentAsFirst(VaadinIcon.SITEMAP.create());
-        tabSheet.getTabAt(2).addComponentAsFirst(VaadinIcon.FILE_CODE.create());
     }
 
     @Subscribe(id = "viewDeployment", subject = "clickListener")
@@ -127,8 +120,15 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
         initDeploymentData();
     }
 
+    protected void initTabIcons() {
+        tabSheet.getTabAt(0).addComponentAsFirst(VaadinIcon.INFO_CIRCLE_O.create());
+        tabSheet.getTabAt(1).addComponentAsFirst(VaadinIcon.SITEMAP.create());
+        tabSheet.getTabAt(2).addComponentAsFirst(VaadinIcon.FILE_CODE.create());
+    }
+
     @Install(to = "decisionDefinitionDl", target = Target.DATA_LOADER)
-    private DecisionDefinitionData decisionDefinitionDlDelegate(final LoadContext<DecisionDefinitionData> loadContext) {
+    protected DecisionDefinitionData decisionDefinitionDlDelegate(
+            final LoadContext<DecisionDefinitionData> loadContext) {
         DecisionDefinitionData item = decisionDefinitionDc.getItemOrNull();
         String id = item == null ? Objects.requireNonNull(loadContext.getId()).toString() : item.getId();
         return decisionDefinitionService.getById(id);
@@ -165,7 +165,8 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
 
         Span version = uiComponents.create(Span.class);
         version.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.FontWeight.BOLD);
-        version.setText(messageBundle.formatMessage("decisionDefinition.title.version", getEditedEntity().getVersion()));
+        version.setText(messageBundle.formatMessage("decisionDefinition.title.version",
+                getEditedEntity().getVersion()));
 
         flexLayout.add(version);
 

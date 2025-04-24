@@ -15,15 +15,25 @@ public class HistoricDecisionInstanceShortData {
     protected String id;
 
     protected String decisionInstanceId;
+
     protected String decisionDefinitionId;
+
     protected String decisionDefinitionKey;
+
     protected OffsetDateTime evaluationTime;
+
     protected String processDefinitionKey;
+
     protected String processDefinitionId;
+
     protected String processInstanceId;
+
     protected String activityId;
+
     protected String activityInstanceId;
+
     protected List<HistoricDecisionInputInstanceShortData> inputs;
+
     protected List<HistoricDecisionOutputInstanceShortData> outputs;
 
     public String getId() {

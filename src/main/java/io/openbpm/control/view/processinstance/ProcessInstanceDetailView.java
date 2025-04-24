@@ -70,28 +70,30 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
     public static final int RUNTIME_TAB_IDX = 0;
     public static final int HISTORY_TAB_IDX = 1;
 
-    protected String title = "";
-
     @Autowired
     protected UiComponents uiComponents;
-    @ViewComponent
-    protected MessageBundle messageBundle;
     @Autowired
     protected UiEventPublisher uiEventPublisher;
     @Autowired
     protected Fragments fragments;
     @Autowired
     protected ViewNavigators viewNavigators;
-
     @Autowired
     protected ProcessDefinitionService processDefinitionService;
     @Autowired
     protected ProcessInstanceService processInstanceService;
     @Autowired
     protected ActivityService activityService;
-
     @Autowired
     protected ComponentHelper componentHelper;
+    @Autowired
+    protected Messages messages;
+    @Autowired
+    protected IncidentService incidentService;
+    @Autowired
+    protected DecisionInstanceService decisionInstanceService;
+    @Autowired
+    protected Metadata metadata;
 
     @ViewComponent
     protected JmixTabSheet relatedEntitiesTabSheet;
@@ -99,16 +101,12 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
     protected InstanceContainer<ProcessInstanceData> processInstanceDataDc;
     @ViewComponent
     protected BpmnViewerFragment diagramFragment;
-    @Autowired
-    protected Messages messages;
-    @Autowired
-    protected IncidentService incidentService;
     @ViewComponent
     protected VerticalLayout emptyDiagramBox;
-    @Autowired
-    private DecisionInstanceService decisionInstanceService;
-    @Autowired
-    private Metadata metadata;
+    @ViewComponent
+    protected MessageBundle messageBundle;
+
+    protected String title = "";
 
     @Subscribe
     public void onInit(final InitEvent event) {
@@ -118,21 +116,18 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
         historyTab.setId(HISTORY_TAB_ID);
         historyTab.setLabel(messageBundle.getMessage("historyTabCaption"));
         historyTab.addComponentAsFirst(VaadinIcon.TIME_BACKWARD.create());
-        relatedEntitiesTabSheet.add(historyTab, new LazyTabContent(() -> fragments.create(this, HistoryTabFragment.class)), HISTORY_TAB_IDX);
+        relatedEntitiesTabSheet.add(historyTab,
+                new LazyTabContent(() -> fragments.create(this, HistoryTabFragment.class)), HISTORY_TAB_IDX);
     }
-
 
     @SuppressWarnings("JmixIncorrectCreateGuiComponent")
     @Subscribe
     public void onBeforeShow(BeforeShowEvent event) {
         ProcessInstanceData processInstanceData = processInstanceDataDc.getItem();
-
         if (processInstanceData.getEndTime() != null) {
             relatedEntitiesTabSheet.getTabAt(RUNTIME_TAB_IDX).setEnabled(false);
             Tab historyTab = relatedEntitiesTabSheet.getTabAt(HISTORY_TAB_IDX);
-
             relatedEntitiesTabSheet.setSelectedTab(historyTab);
-
             //force init a tab content because attach event is not triggered
             LazyTabContent contentByTab = (LazyTabContent) relatedEntitiesTabSheet.getContentByTab(historyTab);
             contentByTab.init();
@@ -141,18 +136,12 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
                 historyTabFragment.refresh();
             }
         }
-
         initBpmnViewerFragment();
     }
 
     @Subscribe
     public void onReady(final ReadyEvent event) {
         sendUpdateViewTitleEvent();
-    }
-
-    @Install(to = "processInstanceLoader", target = Target.DATA_LOADER)
-    protected ProcessInstanceData processInstanceLoaderLoadDelegate(final LoadContext<ProcessInstanceData> loadContext) {
-        return processInstanceService.getProcessInstanceById(Objects.requireNonNull(loadContext.getId()).toString());
     }
 
     @Subscribe("relatedEntitiesTabSheet")
@@ -167,10 +156,42 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
         }
     }
 
+    @EventListener
+    public void handleIncidentUpdate(IncidentUpdateEvent event) {
+        initBpmnViewerFragment();
+    }
+
+    @EventListener
+    public void handleJobRetriesUpdate(JobRetriesUpdateEvent event) {
+        initBpmnViewerFragment();
+    }
+
+    @EventListener
+    public void handleExternalRetriesUpdate(ExternalTaskRetriesUpdateEvent event) {
+        initBpmnViewerFragment();
+    }
+
+    public void reopenView() {
+        String instanceId = processInstanceDataDc.getItem().getInstanceId();
+        close(StandardOutcome.DISCARD).then(() -> viewNavigators.view(this, ProcessInstanceDetailView.class)
+                .withRouteParameters(new RouteParameters("id", instanceId))
+                .withBackwardNavigation(false)
+                .navigate());
+    }
+
+    @Override
+    public String getPageTitle() {
+        return title;
+    }
+
+    @Install(to = "processInstanceLoader", target = Target.DATA_LOADER)
+    protected ProcessInstanceData processInstanceLoaderLoadDelegate(final LoadContext<ProcessInstanceData> loadContext) {
+        return processInstanceService.getProcessInstanceById(Objects.requireNonNull(loadContext.getId()).toString());
+    }
+
     protected void initBpmnViewerFragment() {
         String processBpmnXml = processDefinitionService.getBpmnXml
                 (processInstanceDataDc.getItem().getProcessDefinitionId());
-
         if (!Strings.isNullOrEmpty(processBpmnXml)) {
             emptyDiagramBox.setVisible(false);
             diagramFragment.initViewer(processBpmnXml);
@@ -180,16 +201,6 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
         } else if (processBpmnXml == null) {
             emptyDiagramBox.setVisible(true);
             diagramFragment.setVisible(false);
-        }
-    }
-
-    private void handleDecisionInstanceLinkOverlayClicked(String decisionInstanceId) {
-        if (!Strings.isNullOrEmpty(decisionInstanceId)) {
-            viewNavigators.detailView(this, HistoricDecisionInstanceShortData.class)
-                    .withViewClass(DecisionInstanceDetailView.class)
-                    .withRouteParameters(new RouteParameters("id", decisionInstanceId))
-                    .withBackwardNavigation(true)
-                    .navigate();
         }
     }
 
@@ -225,21 +236,6 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
         }
     }
 
-    private String findDecisionInstanceByActivity(String activityId) {
-        DecisionInstanceLoadContext loadContext = new DecisionInstanceLoadContext();
-        DecisionInstanceFilter filter = metadata.create(DecisionInstanceFilter.class);
-        loadContext.setFilter(filter);
-
-        filter.setActivityId(activityId);
-        filter.setProcessInstanceId(processInstanceDataDc.getItem().getInstanceId());
-        List<HistoricDecisionInstanceShortData> allHistoryDecisionInstances =
-                decisionInstanceService.findAllHistoryDecisionInstances(loadContext);
-        if (!allHistoryDecisionInstances.isEmpty()) {
-            return allHistoryDecisionInstances.getFirst().getDecisionInstanceId();
-        }
-        return null;
-    }
-
     protected void showRunningActivities(String processInstanceId) {
         List<ActivityShortData> runningActivities = activityService.findRunningActivities(processInstanceId);
 
@@ -249,34 +245,6 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
                 diagramFragment.addMarker(new AddMarkerCmd(activityId, ElementMarkerType.RUNNING_ACTIVITY));
             }
         }
-    }
-
-    @EventListener
-    public void handleIncidentUpdate(IncidentUpdateEvent event) {
-        initBpmnViewerFragment();
-    }
-
-    @EventListener
-    public void handleJobRetriesUpdate(JobRetriesUpdateEvent event) {
-        initBpmnViewerFragment();
-    }
-
-    @EventListener
-    public void handleExternalRetriesUpdate(ExternalTaskRetriesUpdateEvent event) {
-        initBpmnViewerFragment();
-    }
-
-    public void reopenView() {
-        String instanceId = processInstanceDataDc.getItem().getInstanceId();
-        close(StandardOutcome.DISCARD).then(() -> viewNavigators.view(this, ProcessInstanceDetailView.class)
-                .withRouteParameters(new RouteParameters("id", instanceId))
-                .withBackwardNavigation(false)
-                .navigate());
-    }
-
-    @Override
-    public String getPageTitle() {
-        return title;
     }
 
     protected void sendUpdateViewTitleEvent() {
@@ -329,5 +297,30 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
                 .getChildren()
                 .findFirst()
                 .orElse(null);
+    }
+
+    private void handleDecisionInstanceLinkOverlayClicked(String decisionInstanceId) {
+        if (!Strings.isNullOrEmpty(decisionInstanceId)) {
+            viewNavigators.detailView(this, HistoricDecisionInstanceShortData.class)
+                    .withViewClass(DecisionInstanceDetailView.class)
+                    .withRouteParameters(new RouteParameters("id", decisionInstanceId))
+                    .withBackwardNavigation(true)
+                    .navigate();
+        }
+    }
+
+    private String findDecisionInstanceByActivity(String activityId) {
+        DecisionInstanceLoadContext loadContext = new DecisionInstanceLoadContext();
+        DecisionInstanceFilter filter = metadata.create(DecisionInstanceFilter.class);
+        loadContext.setFilter(filter);
+
+        filter.setActivityId(activityId);
+        filter.setProcessInstanceId(processInstanceDataDc.getItem().getInstanceId());
+        List<HistoricDecisionInstanceShortData> allHistoryDecisionInstances =
+                decisionInstanceService.findAllHistoryDecisionInstances(loadContext);
+        if (!allHistoryDecisionInstances.isEmpty()) {
+            return allHistoryDecisionInstances.getFirst().getDecisionInstanceId();
+        }
+        return null;
     }
 }

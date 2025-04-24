@@ -56,6 +56,12 @@ public class DecisionInstanceDetailView extends StandardDetailView<HistoricDecis
     private DecisionDefinitionService decisionDefinitionService;
     @Autowired
     private DecisionInstanceService decisionInstanceService;
+    @Autowired
+    private ViewNavigators viewNavigators;
+    @Autowired
+    private ProcessInstanceService processInstanceService;
+    @Autowired
+    private ActivityService activityService;
 
     @ViewComponent
     private InstanceContainer<HistoricDecisionInstanceShortData> decisionInstanceDc;
@@ -65,14 +71,8 @@ public class DecisionInstanceDetailView extends StandardDetailView<HistoricDecis
     private CopyComponentValueToClipboardAction copyToClipboardAction;
     @ViewComponent
     private TypedTextField<String> decisionInstanceIdTextField;
-    @Autowired
-    private ViewNavigators viewNavigators;
     @ViewComponent
     private HorizontalLayout detailActions;
-    @Autowired
-    private ProcessInstanceService processInstanceService;
-    @Autowired
-    private ActivityService activityService;
     @ViewComponent
     private TypedTextField<Object> activityNameTextField;
     @ViewComponent
@@ -86,13 +86,12 @@ public class DecisionInstanceDetailView extends StandardDetailView<HistoricDecis
     @Subscribe
     public void onBeforeShow(final BeforeShowEvent event) {
         dmnViewerFragment.initViewer();
-
         String dmnXml = decisionDefinitionService.getDmnXml(decisionInstanceDc.getItem().getDecisionDefinitionId());
         dmnViewerFragment.setDmnXml(dmnXml, setDmnXmlJson ->
             dmnViewerFragment.showDecisionDefinition(decisionInstanceDc.getItem().getDecisionDefinitionKey(),
-                    showDecisionDefinitionJson -> dmnViewerFragment.showDecisionInstance(createDecisionInstanceClientData(decisionInstanceDc.getItem())))
+                    showDecisionDefinitionJson -> dmnViewerFragment.showDecisionInstance(
+                            createDecisionInstanceClientData(decisionInstanceDc.getItem())))
         );
-
         initAdditionalFields();
     }
 

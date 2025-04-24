@@ -33,19 +33,6 @@ public class EvaluationTimeHeaderFilter
     }
 
     @Override
-    protected Component createFilterComponent() {
-        Component startTimeAfterFilter = createEvaluatedAfterFilter();
-        Component startTimeBeforeFilter = createEvaluatedBeforeFilter();
-
-        VerticalLayout rootLayout = uiComponents.create(VerticalLayout.class);
-        rootLayout.setPadding(false);
-        rootLayout.setSpacing(false);
-        rootLayout.add(startTimeAfterFilter, startTimeBeforeFilter);
-
-        return rootLayout;
-    }
-
-    @Override
     public void apply() {
         LocalDateTime startTimeBefore = this.evaluatedBefore.getValue();
         if (startTimeBefore != null) {
@@ -55,7 +42,6 @@ public class EvaluationTimeHeaderFilter
         } else {
             filterDc.getItem().setEvaluatedBefore(null);
         }
-
         LocalDateTime startTimeAfter = this.evaluatedAfter.getValue();
         if (startTimeAfter != null) {
             ZoneId zoneId = this.evaluatedAfter.getZoneId();
@@ -64,9 +50,19 @@ public class EvaluationTimeHeaderFilter
         } else {
             filterDc.getItem().setEvaluatedAfter(null);
         }
-
         filterButton.getElement().setAttribute(COLUMN_FILTER_BUTTON_ACTIVATED_ATTRIBUTE_NAME, startTimeAfter != null
                 || startTimeBefore != null);
+    }
+
+    @Override
+    protected Component createFilterComponent() {
+        Component startTimeAfterFilter = createEvaluatedAfterFilter();
+        Component startTimeBeforeFilter = createEvaluatedBeforeFilter();
+        VerticalLayout rootLayout = uiComponents.create(VerticalLayout.class);
+        rootLayout.setPadding(false);
+        rootLayout.setSpacing(false);
+        rootLayout.add(startTimeAfterFilter, startTimeBeforeFilter);
+        return rootLayout;
     }
 
     @Override
@@ -83,7 +79,6 @@ public class EvaluationTimeHeaderFilter
         evaluatedBefore.setTimePlaceholder(messages.getMessage(getClass(), "selectTime"));
         evaluatedBefore.setLabel(messages.getMessage(getClass(), "evaluatedBefore.label"));
         setDefaultTime(evaluatedBefore);
-
         return evaluatedBefore;
     }
 
@@ -95,7 +90,6 @@ public class EvaluationTimeHeaderFilter
         evaluatedAfter.setTimePlaceholder(messages.getMessage(getClass(), "selectTime"));
         evaluatedAfter.setLabel(messages.getMessage(getClass(), "evaluatedAfter.label"));
         setDefaultTime(evaluatedAfter);
-
         return evaluatedAfter;
     }
 

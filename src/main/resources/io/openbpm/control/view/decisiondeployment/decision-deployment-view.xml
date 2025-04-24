@@ -18,7 +18,8 @@
                                  uploadText="msg://io.openbpm.control.view.decisiondeployment/uploadDmnXml"
                                  acceptedFileTypes=".dmn,.dmn11.xml"
                                  uploadIcon="UPLOAD"/>
-                <hbox id="decisionInfoHBox" alignItems="BASELINE" visible="false" themeNames="spacing-s" padding="false" justifyContent="END">
+                <hbox id="decisionInfoHBox" alignItems="BASELINE" visible="false" themeNames="spacing-s" padding="false"
+                      justifyContent="END">
                     <icon id="decisionCountInfoIcon" icon="INFO_CIRCLE" size="1em" alignSelf="CENTER">
                         <tooltip text="msg://noImportedDecisions" position="BOTTOM_END" hideDelay="0" manual="false"
                                  focusDelay="1000"/>
@@ -34,10 +35,10 @@
                     <span id="emptyPreviewText" width="fit-content" text="msg://noDecisionsForPreview"
                           alignSelf="CENTER"/>
                 </hbox>
-                <fragment id="viewerFragment" class="io.openbpm.uikit.fragment.dmnviewer.DmnViewerFragment" visible="false"/>
+                <fragment id="viewerFragment" class="io.openbpm.uikit.fragment.dmnviewer.DmnViewerFragment"
+                          visible="false"/>
             </vbox>
         </vbox>
-
         <hbox>
             <button id="okBtn" text="msg:///actions.Ok" icon="CHECK"
                     themeNames="primary" enabled="false"/>

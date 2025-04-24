@@ -26,6 +26,13 @@ public class ActivityIdHeaderFilter
     }
 
     @Override
+    public void apply() {
+        String value = activityId.getValue();
+        filterDc.getItem().setActivityId(value);
+        filterButton.getElement().setAttribute(COLUMN_FILTER_BUTTON_ACTIVATED_ATTRIBUTE_NAME, value != null);
+    }
+
+    @Override
     protected Component createFilterComponent() {
         return createActivityIdFilter();
     }
@@ -33,14 +40,6 @@ public class ActivityIdHeaderFilter
     @Override
     protected void resetFilterValues() {
         activityId.clear();
-    }
-
-    @Override
-    public void apply() {
-        String value = activityId.getValue();
-        filterDc.getItem().setActivityId(value);
-
-        filterButton.getElement().setAttribute(COLUMN_FILTER_BUTTON_ACTIVATED_ATTRIBUTE_NAME, value != null);
     }
 
     protected TextField createActivityIdFilter() {
@@ -51,7 +50,6 @@ public class ActivityIdHeaderFilter
         activityId.setLabel(messages.getMessage(DecisionInstanceFilter.class,
                 "DecisionInstanceFilter.activityId"));
         activityId.setPlaceholder(messages.getMessage(getClass(), "activityId.placeHolder"));
-
         return activityId;
     }
 }

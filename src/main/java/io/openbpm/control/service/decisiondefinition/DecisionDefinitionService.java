@@ -55,7 +55,7 @@ public interface DecisionDefinitionService {
      * Loads a DMN XML of the decision definition with the specified identifier.
      *
      * @param decisionDefinitionId a decision definition identifier
-     * @return a decision content in the DMN XML format
+     * @return a decision definition content in the DMN XML format
      */
     String getDmnXml(String decisionDefinitionId);
 }

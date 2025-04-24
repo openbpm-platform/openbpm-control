@@ -27,12 +27,10 @@
                         <responsiveStep minWidth="42em" columns="3"/>
                         <responsiveStep minWidth="60em" columns="4"/>
                     </responsiveSteps>
-
                     <textField property="nameLike" id="nameField" label="msg://decisionDefinitionList.nameContains"
                                placeholder="msg://startTypingName" clearButtonVisible="true"/>
                     <textField property="keyLike" id="keyField" label="msg://decisionDefinitionList.keyContains"
                                placeholder="msg://startTypingKey" clearButtonVisible="true"/>
-
                     <hbox spacing="false">
                         <checkbox property="latestVersionOnly" id="lastVersionOnlyCb"
                                   label="msg://decisionDefinitionList.lastVersionOnly"/>
@@ -41,7 +39,6 @@
                             <tooltip text="msg://keyAndLatestVersionOnly.tooltip"/>
                         </icon>
                     </hbox>
-
                     <hbox alignSelf="END">
                         <button id="applyFilterBtn"
                                 action="applyFilter"
@@ -54,7 +51,6 @@
                 </formLayout>
             </details>
         </hbox>
-
         <hbox id="buttonsPanel" classNames="buttons-panel">
             <button id="refreshBtn" action="decisionDefinitionsGrid.refresh" themeNames="primary success"/>
             <button id="deployBtn" action="decisionDefinitionsGrid.deploy"/>

@@ -5,7 +5,7 @@ import io.openbpm.control.entity.filter.DecisionDefinitionFilter;
 import io.openbpm.control.service.ItemListLoadContext;
 
 /**
- * A context that contains the following options to load incidents:
+ * A context that contains the following options to load decision definitions:
  * <ul>
  *     <li>Pagination options: first and max results</li>
  *     <li>Sort options: property and direction to sort. Supported properties:  "name", "key", "version".</li>

@@ -62,7 +62,7 @@ public class DecisionDefinitionQueryImpl extends BaseQuery<DecisionDefinitionQue
             return response.getBody().getCount();
         }
         log.error("Error on loading decisions count, status code {}", response.getStatusCode());
-        return 0;
+        return -1;
     }
 
     @Override
@@ -106,18 +106,21 @@ public class DecisionDefinitionQueryImpl extends BaseQuery<DecisionDefinitionQue
     }
 
     @Override
-    public DecisionDefinitionQuery decisionDefinitionCategory(String s) {
-        return null;
+    public DecisionDefinitionQuery decisionDefinitionCategory(String category) {
+        this.category = category;
+        return this;
     }
 
     @Override
-    public DecisionDefinitionQuery decisionDefinitionCategoryLike(String s) {
-        return null;
+    public DecisionDefinitionQuery decisionDefinitionCategoryLike(String categoryLike) {
+        this.categoryLike = categoryLike;
+        return this;
     }
 
     @Override
-    public DecisionDefinitionQuery decisionDefinitionName(String s) {
-        return null;
+    public DecisionDefinitionQuery decisionDefinitionName(String name) {
+        this.name = name;
+        return this;
     }
 
     @Override

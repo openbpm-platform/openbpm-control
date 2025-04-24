@@ -25,7 +25,7 @@ import java.util.List;
 public class HistoricDecisionInstanceQueryImpl extends BaseQuery<HistoricDecisionInstanceQuery, HistoricDecisionInstance>
         implements HistoricDecisionInstanceQuery {
 
-    private HistoryApiClient historyApiClient;
+    private final HistoryApiClient historyApiClient;
 
     private String decisionInstanceId;
     private String decisionInstanceIdIn;
@@ -106,7 +106,8 @@ public class HistoricDecisionInstanceQueryImpl extends BaseQuery<HistoricDecisio
                             getHistoryDecisionInstanceInputs(e.getInputs()),
                             getHistoryDecisionInstanceOutputs(e.getOutputs()),
                             e.getCollectResultValue(), e.getRootDecisionInstanceId(), e.getRootProcessInstanceId(),
-                            e.getDecisionRequirementsDefinitionId(), e.getDecisionRequirementsDefinitionKey(), e.getTenantId() ))
+                            e.getDecisionRequirementsDefinitionId(), e.getDecisionRequirementsDefinitionKey(),
+                            e.getTenantId() ))
                     .toList();
         }
         log.error("Error on loading decisions, status code {}", response.getStatusCode());

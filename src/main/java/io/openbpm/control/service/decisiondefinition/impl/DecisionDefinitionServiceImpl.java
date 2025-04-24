@@ -79,7 +79,6 @@ public class DecisionDefinitionServiceImpl implements DecisionDefinitionService 
         try {
             DecisionDefinitionQuery decisionDefinitionQuery = createDecisionDefinitionQuery(
                     context.getFilter(), context.getSort());
-
             List<DecisionDefinition> decisionDefinitions;
             if (context.getFirstResult() != null && context.getMaxResults() != null) {
                 decisionDefinitions = decisionDefinitionQuery.listPage(
@@ -87,7 +86,6 @@ public class DecisionDefinitionServiceImpl implements DecisionDefinitionService 
             } else {
                 decisionDefinitions = decisionDefinitionQuery.list();
             }
-
             return decisionDefinitions
                     .stream()
                     .map(decisionDefinitionMapper::fromDecisionDefinitionModel)
@@ -152,19 +150,16 @@ public class DecisionDefinitionServiceImpl implements DecisionDefinitionService 
                         decisionDefinitionId);
                 return null;
             }
-
             if (rootCause instanceof ConnectException) {
                 log.error("Unable load decision definition XML by id '{}' because of connection error: ",
                         decisionDefinitionId, e);
                 return null;
             }
-
             if (rootCause instanceof FeignException feignException && feignException.status() == 404) {
                 log.warn("Unable to load decision definition XML by id '{}' because decision does not exist",
                         decisionDefinitionId);
                 return null;
             }
-
             throw e;
         }
     }
@@ -172,7 +167,6 @@ public class DecisionDefinitionServiceImpl implements DecisionDefinitionService 
     protected DecisionDefinitionQuery createDecisionDefinitionQuery(@Nullable DecisionDefinitionFilter filter,
                                                                     @Nullable Sort sort) {
         DecisionDefinitionQuery decisionDefinitionQuery = new DecisionDefinitionQueryImpl(decisionDefinitionApiClient);
-
         addDecisionDefinitionFilters(decisionDefinitionQuery, filter);
         addDecisionDefinitionSort(decisionDefinitionQuery, sort);
         return decisionDefinitionQuery;

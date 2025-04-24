@@ -26,15 +26,12 @@ import io.jmix.flowui.view.ViewController;
 import io.jmix.flowui.view.ViewDescriptor;
 import io.openbpm.control.entity.decisiondefinition.DecisionDefinitionData;
 import io.openbpm.control.entity.filter.DecisionDefinitionFilter;
-import io.openbpm.control.entity.filter.ProcessDefinitionFilter;
 import io.openbpm.control.service.decisiondefinition.DecisionDefinitionLoadContext;
 import io.openbpm.control.service.decisiondefinition.DecisionDefinitionService;
 import io.openbpm.control.view.decisiondeployment.DecisionDeploymentView;
 import io.openbpm.control.view.main.MainView;
-import io.openbpm.control.view.newprocessdeployment.NewProcessDeploymentView;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Collection;
 import java.util.List;
 
 @Route(value = "bpmn/decision-definitions", layout = MainView.class)
@@ -46,6 +43,8 @@ public class DecisionDefinitionListView extends StandardListView<DecisionDefinit
     private Metadata metadata;
     @Autowired
     private DecisionDefinitionService decisionDefinitionService;
+    @Autowired
+    private ViewNavigators viewNavigators;
 
     @ViewComponent
     private InstanceContainer<DecisionDefinitionFilter> decisionDefinitionFilterDc;
@@ -59,8 +58,6 @@ public class DecisionDefinitionListView extends StandardListView<DecisionDefinit
     private TypedTextField<String> nameField;
     @ViewComponent
     private JmixCheckbox lastVersionOnlyCb;
-    @Autowired
-    private ViewNavigators viewNavigators;
 
     @Subscribe
     public void onInit(final InitEvent event) {
@@ -91,6 +88,16 @@ public class DecisionDefinitionListView extends StandardListView<DecisionDefinit
         decisionDefinitionsDl.load();
     }
 
+    @Subscribe("nameField")
+    public void onNameFieldComponentValueChange(
+            final AbstractField.ComponentValueChangeEvent<TypedTextField<String>, String> event) {
+        boolean nameEmpty = Strings.isNullOrEmpty(nameField.getValue());
+        if (!nameEmpty) {
+            lastVersionOnlyCb.setValue(false);
+        }
+        lastVersionOnlyCb.setReadOnly(!nameEmpty);
+    }
+
     @Subscribe("decisionDefinitionsGrid.deploy")
     protected void onDecisionDefinitionsGridDeploy(final ActionPerformedEvent event) {
         viewNavigators.view(this, DecisionDeploymentView.class)
@@ -101,7 +108,6 @@ public class DecisionDefinitionListView extends StandardListView<DecisionDefinit
     protected void initFilter() {
         DecisionDefinitionFilter filter = metadata.create(DecisionDefinitionFilter.class);
         filter.setLatestVersionOnly(true);
-
         decisionDefinitionFilterDc.setItem(filter);
     }
 
@@ -118,27 +124,16 @@ public class DecisionDefinitionListView extends StandardListView<DecisionDefinit
     }
 
     @Install(to = "decisionDefinitionsDl", target = Target.DATA_LOADER)
-    protected List<DecisionDefinitionData> decisionDefinitionsDlLoadDelegate(LoadContext<DecisionDefinitionData> loadContext) {
+    protected List<DecisionDefinitionData> decisionDefinitionsDlLoadDelegate(
+            LoadContext<DecisionDefinitionData> loadContext) {
         LoadContext.Query query = loadContext.getQuery();
         DecisionDefinitionFilter filter = decisionDefinitionFilterDc.getItemOrNull();
-
         DecisionDefinitionLoadContext context = new DecisionDefinitionLoadContext().setFilter(filter);
         if (query != null) {
             context = context.setFirstResult(query.getFirstResult())
                     .setMaxResults(query.getMaxResults())
                     .setSort(query.getSort());
         }
-
         return decisionDefinitionService.findAll(context);
-    }
-
-    @Subscribe("nameField")
-    public void onNameFieldComponentValueChange(
-            final AbstractField.ComponentValueChangeEvent<TypedTextField<String>, String> event) {
-        boolean nameEmpty = Strings.isNullOrEmpty(nameField.getValue());
-        if (!nameEmpty) {
-            lastVersionOnlyCb.setValue(false);
-        }
-        lastVersionOnlyCb.setReadOnly(!nameEmpty);
     }
 }

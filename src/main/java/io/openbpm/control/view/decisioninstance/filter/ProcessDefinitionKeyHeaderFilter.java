@@ -26,6 +26,14 @@ public class ProcessDefinitionKeyHeaderFilter
     }
 
     @Override
+    public void apply() {
+        String value = processDefinitionKey.getValue();
+        filterDc.getItem().setProcessDefinitionKey(value);
+
+        filterButton.getElement().setAttribute(COLUMN_FILTER_BUTTON_ACTIVATED_ATTRIBUTE_NAME, value != null);
+    }
+
+    @Override
     protected Component createFilterComponent() {
         return createProcessKeyFilter();
     }
@@ -33,14 +41,6 @@ public class ProcessDefinitionKeyHeaderFilter
     @Override
     protected void resetFilterValues() {
         processDefinitionKey.clear();
-    }
-
-    @Override
-    public void apply() {
-        String value = processDefinitionKey.getValue();
-        filterDc.getItem().setProcessDefinitionKey(value);
-
-        filterButton.getElement().setAttribute(COLUMN_FILTER_BUTTON_ACTIVATED_ATTRIBUTE_NAME, value != null);
     }
 
     protected TextField createProcessKeyFilter() {
@@ -51,7 +51,6 @@ public class ProcessDefinitionKeyHeaderFilter
         processDefinitionKey.setLabel(messages.getMessage(DecisionInstanceFilter.class,
                 "DecisionInstanceFilter.processDefinitionKey"));
         processDefinitionKey.setPlaceholder(messages.getMessage(getClass(), "processDefinitionKey.placeHolder"));
-
         return processDefinitionKey;
     }
 }

@@ -25,9 +25,8 @@ public interface DecisionInstanceService {
     @Nullable
     HistoricDecisionInstanceShortData getById(String decisionInstanceId);
 
-
     /**
-     * Loads from engine history the total count of dicision instances that match the specified filter.
+     * Loads from engine history the total count of decision instances that match the specified filter.
      *
      * @param filter a decision filter instance
      * @return count of decision instances

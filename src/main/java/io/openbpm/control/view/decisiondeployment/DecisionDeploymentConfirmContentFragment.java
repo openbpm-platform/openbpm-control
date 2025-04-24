@@ -23,18 +23,15 @@ import java.util.List;
 
 @FragmentDescriptor("decision-deployment-confirm-content-fragment.xml")
 public class DecisionDeploymentConfirmContentFragment extends Fragment<VerticalLayout> {
+
     @ViewComponent
     protected VerticalLayout existingDecisionsVBox;
-
     @ViewComponent
     protected Icon warningIcon;
-
     @ViewComponent
     protected H5 warningHeader;
-
     @ViewComponent
     protected UnorderedList existingDecisionsList;
-
     @ViewComponent
     protected UnorderedList deployingDecisionsList;
 

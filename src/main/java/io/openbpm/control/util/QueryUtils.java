@@ -178,14 +178,10 @@ public class QueryUtils {
         if (filter == null) {
             return;
         }
-
         wrapAndAddStringIfNotEmpty(filter.getKeyLike(), decisionDefinitionQuery::decisionDefinitionKeyLike);
         wrapAndAddStringIfNotEmpty(filter.getNameLike(), decisionDefinitionQuery::decisionDefinitionNameLike);
-
         addIfStringNotEmpty(filter.getKey(), decisionDefinitionQuery::decisionDefinitionKey);
-
         addCollectionIfNotEmpty(filter.getIdIn(), decisionDefinitionQuery::decisionDefinitionIdIn);
-
         addIfTrue(filter.getLatestVersionOnly(), decisionDefinitionQuery::latestVersion);
     }
 
@@ -194,12 +190,10 @@ public class QueryUtils {
         if (filter == null) {
             return;
         }
-
         addIfStringNotEmpty(filter.getDecisionDefinitionId(), decisionInstanceQuery::decisionDefinitionId);
         addIfStringNotEmpty(filter.getProcessDefinitionKey(), decisionInstanceQuery::processDefinitionKey);
         addIfStringNotEmpty(filter.getProcessInstanceId(), decisionInstanceQuery::processInstanceId);
         addIfStringNotEmpty(filter.getActivityId(), decisionInstanceQuery::activityIdIn);
-
         if (filter.getEvaluatedAfter() != null) {
             decisionInstanceQuery.evaluatedAfter(Date.from(filter.getEvaluatedAfter().toInstant()));
         }
@@ -251,7 +245,6 @@ public class QueryUtils {
                     case "version" -> processDefinitionQuery.orderByDecisionDefinitionVersion();
                     default -> unknownValueUsed = true;
                 }
-
                 addSortDirection(processDefinitionQuery, !unknownValueUsed, order);
             }
         }
@@ -267,12 +260,10 @@ public class QueryUtils {
                     case "tenantId" -> decisionInstanceQuery.orderByEvaluationTime();
                     default -> unknownValueUsed = true;
                 }
-
                 addSortDirection(decisionInstanceQuery, !unknownValueUsed, order);
             }
         }
     }
-
 
     public static void addIfStringNotEmpty(String filterValue, Consumer<String> filterValueConsumer) {
         if (StringUtils.hasText(filterValue)) {

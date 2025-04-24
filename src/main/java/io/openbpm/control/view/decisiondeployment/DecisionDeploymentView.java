@@ -71,16 +71,10 @@ import static io.openbpm.control.util.BpmParseUtil.parseDecisionsDefinitionsJson
 @Slf4j
 public class DecisionDeploymentView extends StandardView {
 
-    @ViewComponent
-    protected FileUploadField resourceUploadField;
-
     @Autowired
     protected DeploymentService deploymentService;
-
     @Autowired
     protected Metadata metadata;
-    @ViewComponent
-    protected MessageBundle messageBundle;
     @Autowired
     protected Notifications notifications;
     @Autowired
@@ -89,6 +83,8 @@ public class DecisionDeploymentView extends StandardView {
     protected Dialogs dialogs;
     @Autowired
     protected Fragments fragments;
+    @Autowired
+    protected DecisionDefinitionService decisionDefinitionService;
 
     @ViewComponent
     protected VerticalLayout previewVBox;
@@ -96,10 +92,10 @@ public class DecisionDeploymentView extends StandardView {
     protected Span emptyPreviewText;
     @ViewComponent
     protected HorizontalLayout emptyPreviewHBox;
-
+    @ViewComponent
+    protected MessageBundle messageBundle;
     @ViewComponent
     protected JmixButton okBtn;
-
     @ViewComponent
     protected HorizontalLayout decisionInfoHBox;
     @ViewComponent
@@ -112,13 +108,12 @@ public class DecisionDeploymentView extends StandardView {
     protected H4 decisionLabel;
     @ViewComponent
     protected Span decisionIdLabel;
-
+    @ViewComponent
+    protected FileUploadField resourceUploadField;
     @ViewComponent
     protected DmnViewerFragment viewerFragment;
 
     protected List<DmnDecisionDefinition> decisionDefinitions = new ArrayList<>();
-    @Autowired
-    private DecisionDefinitionService decisionDefinitionService;
 
     @Subscribe
     public void onInit(final InitEvent event) {
@@ -137,7 +132,6 @@ public class DecisionDeploymentView extends StandardView {
             return;
         }
         List<DecisionDefinitionData> existingDecisions = findExistingDecisionDefinitionsByKeys();
-
         dialogs.createOptionDialog()
                 .withHeader(messageBundle.getMessage("createDeploymentConfirmDialog.header"))
                 .withContent(createConfirmDialogContent(existingDecisions))
@@ -153,16 +147,14 @@ public class DecisionDeploymentView extends StandardView {
                                 .withIcon(ComponentUtils.convertToIcon(VaadinIcon.BAN))
                 )
                 .open();
-
     }
 
     @Subscribe("resourceUploadField")
-    public void onBpmnXmlUploadFieldComponentValueChange(final AbstractField.ComponentValueChangeEvent<FileUploadField, ?> event) {
+    public void onBpmnXmlUploadFieldComponentValueChange(
+            final AbstractField.ComponentValueChangeEvent<FileUploadField, ?> event) {
         boolean emptyValue = event.getValue() == null;
         viewerFragment.setVisible(!emptyValue);
-
         emptyPreviewHBox.setVisible(emptyValue);
-
         okBtn.setEnabled(!emptyValue);
         if (emptyValue) {
             this.decisionDefinitions = new ArrayList<>();
@@ -193,31 +185,31 @@ public class DecisionDeploymentView extends StandardView {
         previewVBox.addClassNames(LumoUtility.Border.ALL,
                 LumoUtility.BorderRadius.LARGE,
                 LumoUtility.BorderColor.CONTRAST_20);
-        emptyPreviewText.addClassNames(LumoUtility.TextColor.SECONDARY, LumoUtility.Width.LARGE, LumoUtility.Height.LARGE);
+        emptyPreviewText.addClassNames(
+                LumoUtility.TextColor.SECONDARY, LumoUtility.Width.LARGE, LumoUtility.Height.LARGE);
     }
 
     protected void initDecisionInfoHBoxStyles() {
         decisionInfoHBox.addClassNames(LumoUtility.Margin.Left.AUTO);
-        decisionCountLabel.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.TextColor.SECONDARY, LumoUtility.FontWeight.MEDIUM);
-        decisionIdLabel.addClassNames(LumoUtility.FontSize.LARGE, LumoUtility.TextColor.SECONDARY, LumoUtility.FontWeight.MEDIUM);
+        decisionCountLabel.addClassNames(
+                LumoUtility.FontSize.LARGE, LumoUtility.TextColor.SECONDARY, LumoUtility.FontWeight.MEDIUM);
+        decisionIdLabel.addClassNames(
+                LumoUtility.FontSize.LARGE, LumoUtility.TextColor.SECONDARY, LumoUtility.FontWeight.MEDIUM);
         decisionCountInfoIcon.addClassNames(LumoUtility.FontSize.SMALL, LumoUtility.TextColor.PRIMARY);
         setDecisionsCountTooltipClassName();
     }
 
     protected void deployBpmnXml(byte[] uploadedXml) {
         String uploadedFileName = resourceUploadField.getUploadedFileName();
-
         try (InputStream inputStream = new ByteArrayInputStream(uploadedXml)) {
             DeploymentWithDefinitions result = deploymentService.createDeployment(new DeploymentContext()
                     .withResource(uploadedFileName, inputStream));
             List<DecisionDefinition> deployedDecisionDefinitions = result.getDeployedDecisionDefinitions();
             int size = CollectionUtils.size(deployedDecisionDefinitions);
-
             notifications.create(messageBundle.formatMessage("decisionsDeployed", size))
                     .withType(Notifications.Type.SUCCESS)
                     .withDuration(2000)
                     .show();
-
             close(StandardOutcome.SAVE);
         } catch (IOException ex) {
             log.error("Error on uploaded file reading ", ex);
@@ -265,7 +257,6 @@ public class DecisionDeploymentView extends StandardView {
             return;
         }
         boolean multipleDecisionDefinitions = decisionDefinitions.size() > 1;
-
         if (multipleDecisionDefinitions) {
             Tooltip tooltip = decisionCountInfoIcon.getTooltip();
             String decisionDefinitionsString = getDecisionDefinitionsString();
@@ -289,7 +280,8 @@ public class DecisionDeploymentView extends StandardView {
     protected String getDecisionDefinitionsString() {
         return decisionDefinitions.stream().map(decisionDefinition -> {
             int idx = decisionDefinitions.indexOf(decisionDefinition) + 1;
-            return messageBundle.formatMessage("importedDecisionsKeyAndName", idx, StringUtils.defaultIfEmpty(decisionDefinition.getKey(), "-"),
+            return messageBundle.formatMessage("importedDecisionsKeyAndName", idx,
+                    StringUtils.defaultIfEmpty(decisionDefinition.getKey(), "-"),
                     StringUtils.defaultIfEmpty(decisionDefinition.getName(), "-"));
         }).collect(Collectors.joining("\n"));
     }
@@ -298,18 +290,19 @@ public class DecisionDeploymentView extends StandardView {
         //workaround to update a CSS class name for tooltip
         decisionCountInfoIcon.getElement().executeJs(
                 """
-                           if ($0.getElementsByTagName('vaadin-tooltip').length == 1) {
-                               $0.getElementsByTagName('vaadin-tooltip')[0]._overlayElement.setAttribute('class','decision-tooltip');
-                           } else {
-                               const tooltips = document.getElementsByTagName('vaadin-tooltip');
-                               for (let i=0; i<tooltips.length; i++ ) {
-                                   const tooltip = tooltips[i];
-                                   if (tooltip._overlayElement.id === $0.getAttribute('aria-describedBy')) {
-                                       tooltip._overlayElement.setAttribute('class','decision-tooltip')
-                                   }
-                               }
+                    if ($0.getElementsByTagName('vaadin-tooltip').length == 1) {
+                       $0.getElementsByTagName('vaadin-tooltip')[0]._overlayElement.setAttribute(
+                           'class','decision-tooltip');
+                    } else {
+                       const tooltips = document.getElementsByTagName('vaadin-tooltip');
+                       for (let i=0; i<tooltips.length; i++ ) {
+                           const tooltip = tooltips[i];
+                           if (tooltip._overlayElement.id === $0.getAttribute('aria-describedBy')) {
+                               tooltip._overlayElement.setAttribute('class','decision-tooltip')
                            }
-                        """, decisionCountInfoIcon);
+                       }
+                    }
+                """, decisionCountInfoIcon);
     }
 
     protected VerticalLayout createConfirmDialogContent(List<DecisionDefinitionData> existingDecisions) {
