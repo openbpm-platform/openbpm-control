@@ -59,7 +59,7 @@ public class UserTaskServiceImpl implements UserTaskService {
             TaskQueryDto taskQueryDto = createTaskQueryDto(loadContext.getFilter());
             taskQueryDto.setSorting(createTaskQuerySort(loadContext.getSort()));
 
-            ResponseEntity<List<TaskDto>> tasksResponse = taskApiClient.queryTasks(loadContext.getFirstResult(), loadContext.getMaxResults(), taskQueryDto);
+            ResponseEntity<List<TaskWithAttachmentAndCommentDto>> tasksResponse = taskApiClient.queryTasks(loadContext.getFirstResult(), loadContext.getMaxResults(), taskQueryDto);
             if (tasksResponse.getStatusCode().is2xxSuccessful()) {
                 return CollectionUtils.emptyIfNull(tasksResponse.getBody())
                         .stream()
@@ -184,9 +184,9 @@ public class UserTaskServiceImpl implements UserTaskService {
         for (Sort.Order order : sort.getOrders()) {
             switch (order.getProperty()) {
                 case "id" -> sortOption.setSortBy(TaskQueryDtoSortingInner.SortByEnum.ID);
-                case "name" -> sortOption.setSortBy(TaskQueryDtoSortingInner.SortByEnum.NAMECASEINSENSITIVE);
+                case "name" -> sortOption.setSortBy(TaskQueryDtoSortingInner.SortByEnum.NAME_CASE_INSENSITIVE);
                 case "createTime" -> sortOption.setSortBy(TaskQueryDtoSortingInner.SortByEnum.CREATED);
-                case "dueDate" -> sortOption.setSortBy(TaskQueryDtoSortingInner.SortByEnum.DUEDATE);
+                case "dueDate" -> sortOption.setSortBy(TaskQueryDtoSortingInner.SortByEnum.DUE_DATE);
                 case "assignee" -> sortOption.setSortBy(TaskQueryDtoSortingInner.SortByEnum.ASSIGNEE);
                 default -> {
                 }
@@ -221,14 +221,14 @@ public class UserTaskServiceImpl implements UserTaskService {
             HistoricTaskInstanceQueryDtoSortingInner sortOption = new HistoricTaskInstanceQueryDtoSortingInner();
             for (Sort.Order order : sort.getOrders()) {
                 switch (order.getProperty()) {
-                    case "id" -> sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.TASKID);
+                    case "id" -> sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.TASK_ID);
                     case "taskDefinitionKey" ->
-                            sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.TASKDEFINITIONKEY);
-                    case "name" -> sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.TASKNAME);
+                            sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.TASK_DEFINITION_KEY);
+                    case "name" -> sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.TASK_NAME);
                     case "startTime" ->
-                            sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.STARTTIME);
-                    case "endTime" -> sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.ENDTIME);
-                    case "dueDate" -> sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.DUEDATE);
+                            sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.START_TIME);
+                    case "endTime" -> sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.END_TIME);
+                    case "dueDate" -> sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.DUE_DATE);
                     case "assignee" ->
                             sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.ASSIGNEE);
                     default -> {
