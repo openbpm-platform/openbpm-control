@@ -97,12 +97,12 @@ public class QueryUtils {
             List<HistoricProcessInstanceQueryDtoSortingInner> sortOptions = new ArrayList<>();
             for (Sort.Order order : sort.getOrders()) {
                 HistoricProcessInstanceQueryDtoSortingInner.SortByEnum sortBy = switch (order.getProperty()) {
-                    case INSTANCE_ID -> HistoricProcessInstanceQueryDtoSortingInner.SortByEnum.INSTANCEID;
-                    case PROCESS_DEFINITION_ID -> HistoricProcessInstanceQueryDtoSortingInner.SortByEnum.DEFINITIONID;
-                    case PROCESS_DEFINITION_KEY -> HistoricProcessInstanceQueryDtoSortingInner.SortByEnum.DEFINITIONKEY;
-                    case BUSINESS_KEY -> HistoricProcessInstanceQueryDtoSortingInner.SortByEnum.BUSINESSKEY;
-                    case START_TIME -> HistoricProcessInstanceQueryDtoSortingInner.SortByEnum.STARTTIME;
-                    case END_TIME -> HistoricProcessInstanceQueryDtoSortingInner.SortByEnum.ENDTIME;
+                    case INSTANCE_ID -> HistoricProcessInstanceQueryDtoSortingInner.SortByEnum.INSTANCE_ID;
+                    case PROCESS_DEFINITION_ID -> HistoricProcessInstanceQueryDtoSortingInner.SortByEnum.DEFINITION_ID;
+                    case PROCESS_DEFINITION_KEY -> HistoricProcessInstanceQueryDtoSortingInner.SortByEnum.DEFINITION_KEY;
+                    case BUSINESS_KEY -> HistoricProcessInstanceQueryDtoSortingInner.SortByEnum.BUSINESS_KEY;
+                    case START_TIME -> HistoricProcessInstanceQueryDtoSortingInner.SortByEnum.START_TIME;
+                    case END_TIME -> HistoricProcessInstanceQueryDtoSortingInner.SortByEnum.END_TIME;
                     default -> null;
                 };
 
