@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (c) Haulmont 2025. All Rights Reserved.
+  - Use is subject to license terms.
+  -->
+
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_09a1k9t" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.23.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.21.0">
+  <bpmn:process id="testJobsListLoad" name="Test jobs list load" isExecutable="true" camunda:historyTimeToLive="15">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0htu0ak</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0htu0ak" sourceRef="StartEvent_1" targetRef="Gateway_0gdmcv5" />
+    <bpmn:parallelGateway id="Gateway_0gdmcv5">
+      <bpmn:incoming>Flow_0htu0ak</bpmn:incoming>
+      <bpmn:outgoing>Flow_1qb7zio</bpmn:outgoing>
+      <bpmn:outgoing>Flow_11fy7dt</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_1qb7zio" sourceRef="Gateway_0gdmcv5" targetRef="timerEvent" />
+    <bpmn:intermediateCatchEvent id="timerEvent" name="Wait 15 minutes" camunda:jobPriority="20">
+      <bpmn:incoming>Flow_1qb7zio</bpmn:incoming>
+      <bpmn:outgoing>Flow_1dw9u7o</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_0wu4123">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">P15M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1dw9u7o" sourceRef="timerEvent" targetRef="Gateway_0ajj2ue" />
+    <bpmn:parallelGateway id="Gateway_0ajj2ue">
+      <bpmn:incoming>Flow_1dw9u7o</bpmn:incoming>
+      <bpmn:incoming>Flow_0ctpaqn</bpmn:incoming>
+      <bpmn:outgoing>Flow_0l0nu0q</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_11fy7dt" sourceRef="Gateway_0gdmcv5" targetRef="failedScriptTask" />
+    <bpmn:scriptTask id="failedScriptTask" name="Failed script task" camunda:asyncBefore="true" camunda:exclusive="false" camunda:jobPriority="30" scriptFormat="groovy">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R0/PT5S</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_11fy7dt</bpmn:incoming>
+      <bpmn:outgoing>Flow_0ctpaqn</bpmn:outgoing>
+      <bpmn:script>throw new RuntimeException("Some external service not available")</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_0ctpaqn" sourceRef="failedScriptTask" targetRef="Gateway_0ajj2ue" />
+    <bpmn:endEvent id="Event_0rkm2al">
+      <bpmn:incoming>Flow_0l0nu0q</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0l0nu0q" sourceRef="Gateway_0ajj2ue" targetRef="Event_0rkm2al" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testJobsListLoad">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="159" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1ctayj3_di" bpmnElement="Gateway_0gdmcv5">
+        <dc:Bounds x="265" y="152" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1m6jw08_di" bpmnElement="timerEvent">
+        <dc:Bounds x="442" y="72" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="423" y="115" width="78" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1de3acc_di" bpmnElement="Gateway_0ajj2ue">
+        <dc:Bounds x="595" y="152" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_080k4zb_di" bpmnElement="failedScriptTask">
+        <dc:Bounds x="390" y="230" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0rkm2al_di" bpmnElement="Event_0rkm2al">
+        <dc:Bounds x="762" y="159" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0htu0ak_di" bpmnElement="Flow_0htu0ak">
+        <di:waypoint x="215" y="177" />
+        <di:waypoint x="265" y="177" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1qb7zio_di" bpmnElement="Flow_1qb7zio">
+        <di:waypoint x="290" y="152" />
+        <di:waypoint x="290" y="90" />
+        <di:waypoint x="442" y="90" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dw9u7o_di" bpmnElement="Flow_1dw9u7o">
+        <di:waypoint x="478" y="90" />
+        <di:waypoint x="620" y="90" />
+        <di:waypoint x="620" y="152" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_11fy7dt_di" bpmnElement="Flow_11fy7dt">
+        <di:waypoint x="290" y="202" />
+        <di:waypoint x="290" y="270" />
+        <di:waypoint x="390" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ctpaqn_di" bpmnElement="Flow_0ctpaqn">
+        <di:waypoint x="490" y="270" />
+        <di:waypoint x="620" y="270" />
+        <di:waypoint x="620" y="202" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0l0nu0q_di" bpmnElement="Flow_0l0nu0q">
+        <di:waypoint x="645" y="177" />
+        <di:waypoint x="762" y="177" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

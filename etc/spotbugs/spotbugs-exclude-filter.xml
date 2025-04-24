@@ -49,4 +49,14 @@
         <Package name="io.openbpm.control.entity.filter"/>
     </Match>
 
+    <Match>
+        <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
+        <Class name="io.openbpm.control.test_support.camunda7.CamundaRunContainer"/>
+    </Match>
+
+    <Match>
+        <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
+        <Class name="io.openbpm.control.test_support.camunda7.OperatonContainer"/>
+    </Match>
+
 </FindBugsFilter>

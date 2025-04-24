@@ -19,7 +19,7 @@
                         <textField id="sourceDefinitionKeyField" readOnly="true"/>
                     </formItem>
                     <formItem label="msg://processInstanceMigrationView.sourceProcessDefinitionVersion">
-                        <textField id="sourceDefinitionVersionField"
+                        <textField id="sourceDefinitionVersionField" datatype="int"
                                    readOnly="true"/>
                     </formItem>
                 </formLayout>

@@ -53,7 +53,7 @@ public class ProcessInstanceMigrationView extends StandardView {
     @ViewComponent
     protected TypedTextField<Object> sourceDefinitionKeyField;
     @ViewComponent
-    protected TypedTextField<Object> sourceDefinitionVersionField;
+    protected TypedTextField<Integer> sourceDefinitionVersionField;
     @Autowired
     private ProcessInstanceService processInstanceService;
     @ViewComponent
@@ -81,16 +81,16 @@ public class ProcessInstanceMigrationView extends StandardView {
         rootHBox.getChildren()
                 .filter(component -> component instanceof VerticalLayout)
                 .forEach(component ->
-                         component.addClassNames(LumoUtility.Border.ALL,
-                                 LumoUtility.BorderRadius.LARGE,
-                                 LumoUtility.BorderColor.CONTRAST_30)
-                        );
+                        component.addClassNames(LumoUtility.Border.ALL,
+                                LumoUtility.BorderRadius.LARGE,
+                                LumoUtility.BorderColor.CONTRAST_30)
+                );
     }
 
     @Subscribe
     public void onBeforeShow(BeforeShowEvent event) {
         sourceDefinitionKeyField.setValue(processDefinitionData.getKey());
-        sourceDefinitionVersionField.setValue(processDefinitionData.getVersion());
+        sourceDefinitionVersionField.setTypedValue(processDefinitionData.getVersion());
         List<String> processDefinitionKeys = processDefinitionService.findLatestVersions()
                 .stream()
                 .map(ProcessDefinitionData::getKey)
@@ -116,7 +116,11 @@ public class ProcessInstanceMigrationView extends StandardView {
         String processDefinitionKey = event.getValue();
         List<ProcessDefinitionData> definitions = processDefinitionService.findAllByKey(processDefinitionKey);
         processDefinitionVersionComboBox.setItems(definitions);
-        processDefinitionVersionComboBox.setItemLabelGenerator(ProcessDefinitionData::getVersion);
+        processDefinitionVersionComboBox.setItemLabelGenerator(item -> {
+            Integer version = item.getVersion();
+            return version != null ? String.valueOf(version) : null;
+        });
+
         if (!definitions.isEmpty()) {
             processDefinitionVersionComboBox.setValue(definitions.getFirst());
         }

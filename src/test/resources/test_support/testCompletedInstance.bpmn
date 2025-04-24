@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (c) Haulmont 2025. All Rights Reserved.
+  - Use is subject to license terms.
+  -->
+
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0fudngc" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.23.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.21.0">
+  <bpmn:process id="testCompletedInstance" name="Test completed instance" isExecutable="true" camunda:historyTimeToLive="10">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_1ntxspg</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_0ymvyih">
+      <bpmn:incoming>Flow_07b5u6p</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1ntxspg" sourceRef="StartEvent_1" targetRef="Activity_11ljxeq" />
+    <bpmn:sequenceFlow id="Flow_07b5u6p" sourceRef="Activity_11ljxeq" targetRef="Event_0ymvyih" />
+    <bpmn:scriptTask id="Activity_11ljxeq" name="Script task" scriptFormat="groovy">
+      <bpmn:incoming>Flow_1ntxspg</bpmn:incoming>
+      <bpmn:outgoing>Flow_07b5u6p</bpmn:outgoing>
+      <bpmn:script>println 'OK'</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testCompletedInstance">
+      <bpmndi:BPMNShape id="Event_0ymvyih_di" bpmnElement="Event_0ymvyih">
+        <dc:Bounds x="522" y="112" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="112" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1grmx9b_di" bpmnElement="Activity_11ljxeq">
+        <dc:Bounds x="300" y="90" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1ntxspg_di" bpmnElement="Flow_1ntxspg">
+        <di:waypoint x="188" y="130" />
+        <di:waypoint x="300" y="130" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07b5u6p_di" bpmnElement="Flow_07b5u6p">
+        <di:waypoint x="400" y="130" />
+        <di:waypoint x="522" y="130" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

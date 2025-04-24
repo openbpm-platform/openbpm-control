@@ -5,10 +5,6 @@
 
 package io.openbpm.control.user;
 
-import io.openbpm.control.OpenBpmControlApplication;
-import io.openbpm.control.entity.User;
-import io.openbpm.control.view.user.UserDetailView;
-import io.openbpm.control.view.user.UserListView;
 import io.jmix.core.DataManager;
 import io.jmix.flowui.ViewNavigators;
 import io.jmix.flowui.component.grid.DataGrid;
@@ -19,6 +15,13 @@ import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.testassist.FlowuiTestAssistConfiguration;
 import io.jmix.flowui.testassist.UiTest;
 import io.jmix.flowui.testassist.UiTestUtils;
+import io.openbpm.control.OpenBpmControlApplication;
+import io.openbpm.control.entity.User;
+import io.openbpm.control.test_support.AbstractIntegrationTest;
+import io.openbpm.control.test_support.OpenBpmControlTestConfiguration;
+import io.openbpm.control.test_support.WithRunningEngine;
+import io.openbpm.control.view.user.UserDetailView;
+import io.openbpm.control.view.user.UserListView;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -31,8 +34,9 @@ import static io.jmix.flowui.component.UiComponentUtils.getCurrentView;
  * Sample UI integration test for the User entity.
  */
 @UiTest
-@SpringBootTest(classes = {OpenBpmControlApplication.class, FlowuiTestAssistConfiguration.class})
-public class UserUiTest {
+@SpringBootTest(classes = {OpenBpmControlApplication.class, FlowuiTestAssistConfiguration.class, OpenBpmControlTestConfiguration.class})
+@WithRunningEngine
+public class UserUiTest extends AbstractIntegrationTest {
 
     @Autowired
     DataManager dataManager;

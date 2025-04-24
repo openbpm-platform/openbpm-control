@@ -63,6 +63,10 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
                 log.warn("Unable to load latest versions of process definitions because BPM engine not selected");
                 return List.of();
             }
+            if (rootCause instanceof ConnectException) {
+                log.error("Unable to load latest versions of process definitions because of connection error: ", e);
+                return List.of();
+            }
             throw e;
         }
     }
@@ -70,14 +74,27 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
     @Override
     public List<ProcessDefinitionData> findAllByKey(String processDefinitionKey) {
-        return remoteRepositoryService.createProcessDefinitionQuery()
-                .orderByProcessDefinitionVersion()
-                .asc()
-                .processDefinitionKey(processDefinitionKey)
-                .list()
-                .stream()
-                .map(processDefinitionMapper::fromProcessDefinitionModel)
-                .toList();
+        try {
+            return remoteRepositoryService.createProcessDefinitionQuery()
+                    .orderByProcessDefinitionVersion()
+                    .asc()
+                    .processDefinitionKey(processDefinitionKey)
+                    .list()
+                    .stream()
+                    .map(processDefinitionMapper::fromProcessDefinitionModel)
+                    .toList();
+        } catch (Exception e) {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if (rootCause instanceof EngineNotSelectedException) {
+                log.warn("Unable to load process definition versions by key because BPM engine not selected");
+                return List.of();
+            }
+            if (rootCause instanceof ConnectException) {
+                log.error("Unable to load process definition versions by key because of connection error: ", e);
+                return List.of();
+            }
+            throw e;
+        }
     }
 
     @Override
@@ -112,8 +129,21 @@ public class ProcessDefinitionServiceImpl implements ProcessDefinitionService {
 
     @Override
     public long getCount(@Nullable ProcessDefinitionFilter filter) {
-        ProcessDefinitionQuery processDefinitionQuery = createProcessDefinitionQuery(filter, null);
-        return processDefinitionQuery.count();
+        try {
+            ProcessDefinitionQuery processDefinitionQuery = createProcessDefinitionQuery(filter, null);
+            return processDefinitionQuery.count();
+        } catch (Exception e) {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if (rootCause instanceof EngineNotSelectedException) {
+                log.warn("Unable to load get count of process definitions because BPM engine not selected");
+                return 0;
+            }
+            if (rootCause instanceof ConnectException) {
+                log.error("Unable to load get count of process definitions because of connection error: ", e);
+                return 0;
+            }
+            throw e;
+        }
     }
 
     @Override

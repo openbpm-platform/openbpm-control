@@ -118,6 +118,9 @@ dependencies {
     testCompileOnly "org.projectlombok:lombok"
     testAnnotationProcessor platform("io.openbpm.bom:openbpm-bom:$bomVersion")
     testAnnotationProcessor "org.projectlombok:lombok"
+
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:postgresql'
 }
 
 configurations.implementation {
@@ -127,6 +130,7 @@ configurations.implementation {
 
 test {
     useJUnitPlatform()
+    systemProperties(System.getProperties())
 }
 
 idea {

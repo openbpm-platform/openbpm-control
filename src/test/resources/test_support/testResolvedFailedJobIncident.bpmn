@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (c) Haulmont 2025. All Rights Reserved.
+  - Use is subject to license terms.
+  -->
+
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1mvs4gr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.23.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.21.0">
+  <bpmn:process id="testResolvedFailedJobIncident" name="Test resolved failed job incident" isExecutable="true" camunda:historyTimeToLive="10">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_04hgvvi</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_04hgvvi" sourceRef="StartEvent_1" targetRef="throwsExceptionConditionallyTask" />
+    <bpmn:endEvent id="Event_03i79iw">
+      <bpmn:incoming>Flow_1iks3d9</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1iks3d9" sourceRef="throwsExceptionConditionallyTask" targetRef="Event_03i79iw" />
+    <bpmn:scriptTask id="throwsExceptionConditionallyTask" name="Throws exception conditionally" camunda:asyncBefore="true" camunda:exclusive="false" scriptFormat="groovy">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R0/PT1S</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_04hgvvi</bpmn:incoming>
+      <bpmn:outgoing>Flow_1iks3d9</bpmn:outgoing>
+      <bpmn:script>
+int retries = execution.getProcessEngine().getManagementService().createJobQuery()
+                .active()
+                .processInstanceId(execution.getProcessInstanceId())
+                .singleResult()
+                .getRetries();
+
+println 'Left retries for job: ' + retries
+
+if (retries &gt; 1) {
+ throw new RuntimeException("Some service not available")
+} else {
+  println 'OK with left retries: ' + retries
+}
+</bpmn:script>
+    </bpmn:scriptTask>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testResolvedFailedJobIncident">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="142" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_03i79iw_di" bpmnElement="Event_03i79iw">
+        <dc:Bounds x="462" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1jl46w6_di" bpmnElement="throwsExceptionConditionallyTask">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_04hgvvi_di" bpmnElement="Flow_04hgvvi">
+        <di:waypoint x="178" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1iks3d9_di" bpmnElement="Flow_1iks3d9">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="462" y="117" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
