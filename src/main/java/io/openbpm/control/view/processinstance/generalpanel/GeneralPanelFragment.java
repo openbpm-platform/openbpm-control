@@ -232,7 +232,7 @@ public class GeneralPanelFragment extends Fragment<FlexLayout> {
         ProcessInstanceData processInstanceData = processInstanceDataDc.getItem();
         processDefinitionData.setId(processInstanceData.getProcessDefinitionId());
         processDefinitionData.setKey(processInstanceData.getProcessDefinitionKey());
-        processDefinitionData.setVersion(String.valueOf(processInstanceData.getProcessDefinitionVersion()));
+        processDefinitionData.setVersion(processInstanceData.getProcessDefinitionVersion());
 
         DialogWindow<ProcessInstanceMigrationView> dialog =
                 dialogWindows.view(getCurrentView(), ProcessInstanceMigrationView.class)

@@ -5,6 +5,7 @@
 
 package io.openbpm.control.service.processinstance.impl;
 
+import feign.FeignException;
 import feign.utils.ExceptionUtils;
 import io.jmix.core.Sort;
 import io.openbpm.control.entity.filter.ProcessInstanceFilter;
@@ -148,6 +149,10 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             }
             if (rootCause instanceof ConnectException) {
                 log.error("Unable to load process instance by id '{}' because of connection error: ", processInstanceId, e);
+                return null;
+            }
+            if (rootCause instanceof FeignException feignException && feignException.status() == 404) {
+                log.warn("Process instance by id '{}' not found: ", processInstanceId, e);
                 return null;
             }
             throw e;

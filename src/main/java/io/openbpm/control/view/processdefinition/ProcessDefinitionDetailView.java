@@ -304,7 +304,7 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
     protected void initVersionLookup(ProcessDefinitionData processDefinition) {
         List<ProcessDefinitionData> optionsList = processDefinitionService.findAllByKey(processDefinition.getKey());
         versionComboBox.setItems(optionsList);
-        versionComboBox.setItemLabelGenerator(ProcessDefinitionData::getVersion);
+        versionComboBox.setItemLabelGenerator(item -> item.getVersion() != null ? String.valueOf(item.getVersion()) : null);
         versionComboBox.setValue(processDefinition);
     }
 

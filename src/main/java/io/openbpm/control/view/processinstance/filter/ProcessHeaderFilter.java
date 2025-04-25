@@ -131,7 +131,10 @@ public class ProcessHeaderFilter extends ProcessInstanceDataGridHeaderFilter {
         processVersionComboBox.setPlaceholder(messages.getMessage(getClass(), "enterProcessVersionValue"));
         processVersionComboBox.setLabel(messages.getMessage(getClass(), "processVersionFilterLabel"));
         processVersionComboBox.setMinWidth("10em");
-        processVersionComboBox.setItemLabelGenerator(ProcessDefinitionData::getVersion);
+        processVersionComboBox.setItemLabelGenerator(item -> {
+            Integer version = item.getVersion();
+            return version != null ? String.valueOf(version) : null;
+        });
         updateVersions(processVersionComboBox);
 
 

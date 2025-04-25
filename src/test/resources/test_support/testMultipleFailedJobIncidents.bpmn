@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Copyright (c) Haulmont 2025. All Rights Reserved.
+  - Use is subject to license terms.
+  -->
+
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1mvs4gr" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.23.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.21.0">
+  <bpmn:process id="testMultipleFailedJobIncidents" name="Test multiple failed job incident" isExecutable="true" camunda:historyTimeToLive="10">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_06uatcr</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:endEvent id="Event_03i79iw">
+      <bpmn:incoming>Flow_1dq2idy</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:scriptTask id="throwsMultipleExceptionsTask" name="Throws multiple exceptions" camunda:asyncBefore="true" camunda:exclusive="false" scriptFormat="groovy">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R0/PT5S</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_17y2z0t</bpmn:incoming>
+      <bpmn:outgoing>Flow_0jg52g4</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics camunda:asyncBefore="true" camunda:exclusive="false">
+        <bpmn:loopCardinality xsi:type="bpmn:tFormalExpression">3</bpmn:loopCardinality>
+      </bpmn:multiInstanceLoopCharacteristics>
+      <bpmn:script>throw new RuntimeException("Some another service not available")</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_06uatcr" sourceRef="StartEvent_1" targetRef="Gateway_1eobwkc" />
+    <bpmn:parallelGateway id="Gateway_1eobwkc">
+      <bpmn:incoming>Flow_06uatcr</bpmn:incoming>
+      <bpmn:outgoing>Flow_17y2z0t</bpmn:outgoing>
+      <bpmn:outgoing>Flow_19ztel7</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_17y2z0t" sourceRef="Gateway_1eobwkc" targetRef="throwsMultipleExceptionsTask" />
+    <bpmn:sequenceFlow id="Flow_0jg52g4" sourceRef="throwsMultipleExceptionsTask" targetRef="Gateway_1cqdaw4" />
+    <bpmn:parallelGateway id="Gateway_1cqdaw4">
+      <bpmn:incoming>Flow_0jg52g4</bpmn:incoming>
+      <bpmn:incoming>Flow_1oo5sau</bpmn:incoming>
+      <bpmn:outgoing>Flow_1dq2idy</bpmn:outgoing>
+    </bpmn:parallelGateway>
+    <bpmn:sequenceFlow id="Flow_1dq2idy" sourceRef="Gateway_1cqdaw4" targetRef="Event_03i79iw" />
+    <bpmn:scriptTask id="throwOneExceptionTask" name="Throws one exception" camunda:asyncBefore="true" camunda:exclusive="false" scriptFormat="groovy">
+      <bpmn:extensionElements>
+        <camunda:failedJobRetryTimeCycle>R0/PT5S</camunda:failedJobRetryTimeCycle>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_19ztel7</bpmn:incoming>
+      <bpmn:outgoing>Flow_1oo5sau</bpmn:outgoing>
+      <bpmn:script>throw new RuntimeException("Some service not available")</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_19ztel7" sourceRef="Gateway_1eobwkc" targetRef="throwOneExceptionTask" />
+    <bpmn:sequenceFlow id="Flow_1oo5sau" sourceRef="throwOneExceptionTask" targetRef="Gateway_1cqdaw4" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testMultipleFailedJobIncidents">
+      <bpmndi:BPMNShape id="Activity_1jl46w6_di" bpmnElement="throwsMultipleExceptionsTask">
+        <dc:Bounds x="410" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_1frap7c_di" bpmnElement="Gateway_1cqdaw4">
+        <dc:Bounds x="575" y="175" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0yovdzh" bpmnElement="throwOneExceptionTask">
+        <dc:Bounds x="410" y="230" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_03i79iw_di" bpmnElement="Event_03i79iw">
+        <dc:Bounds x="702" y="182" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_15t9pjy_di" bpmnElement="Gateway_1eobwkc">
+        <dc:Bounds x="275" y="165" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="152" y="172" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_17y2z0t_di" bpmnElement="Flow_17y2z0t">
+        <di:waypoint x="300" y="165" />
+        <di:waypoint x="300" y="120" />
+        <di:waypoint x="410" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jg52g4_di" bpmnElement="Flow_0jg52g4">
+        <di:waypoint x="510" y="120" />
+        <di:waypoint x="600" y="120" />
+        <di:waypoint x="600" y="175" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1oo5sau_di" bpmnElement="Flow_1oo5sau">
+        <di:waypoint x="510" y="270" />
+        <di:waypoint x="600" y="270" />
+        <di:waypoint x="600" y="225" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1dq2idy_di" bpmnElement="Flow_1dq2idy">
+        <di:waypoint x="625" y="200" />
+        <di:waypoint x="702" y="200" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_19ztel7_di" bpmnElement="Flow_19ztel7">
+        <di:waypoint x="300" y="215" />
+        <di:waypoint x="300" y="270" />
+        <di:waypoint x="410" y="270" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_06uatcr_di" bpmnElement="Flow_06uatcr">
+        <di:waypoint x="188" y="190" />
+        <di:waypoint x="275" y="190" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
