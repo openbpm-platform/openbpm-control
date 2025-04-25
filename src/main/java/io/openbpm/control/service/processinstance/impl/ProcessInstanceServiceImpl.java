@@ -288,8 +288,9 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 null, null, null,
                 null, null
         );
-        if (processInstancesCount.getStatusCode().is2xxSuccessful() && processInstancesCount.getBody() != null) {
-            return processInstancesCount.getBody().getCount();
+        CountResultDto countResultDto = processInstancesCount.getBody();
+        if (processInstancesCount.getStatusCode().is2xxSuccessful() && countResultDto != null) {
+            return countResultDto.getCount();
         }
         return -1;
     }
