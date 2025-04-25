@@ -6,7 +6,7 @@
 package io.openbpm.control.service.deployment;
 
 import io.jmix.core.Resources;
-import io.openbpm.control.entity.deployment.DeploymentData;
+import io.openbpm.control.entity.DeploymentData;
 import io.openbpm.control.test_support.AuthenticatedAsAdmin;
 import io.openbpm.control.test_support.RunningEngine;
 import io.openbpm.control.test_support.WithRunningEngine;
