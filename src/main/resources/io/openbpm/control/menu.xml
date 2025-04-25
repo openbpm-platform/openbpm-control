@@ -16,6 +16,8 @@
         </urlQueryParameters>
     </item>
     <item view="bpm_AllTasksView" title="msg://io.openbpm.control/allTasks" icon="USER_CARD"/>
+    <item view="bpm_DecisionDefinition.list" icon="vaadin:table"
+          title="msg://io.openbpm.control.view.decisiondefinition/decisionDefinitionListView.title"/>
     <item view="IncidentData.list" title="msg://io.openbpm.control.view.incidentdata/incidentDataListView.title" icon="WARNING"/>
     <item view="bpm_Deployment.list" title="msg://io.openbpm.control.view.deploymentdata/deploymentListView.title" icon="vaadin:file-process"/>
     <item view="BpmEngine.list" title="msg://io.openbpm.control.view.bpmengine/bpmEngineListView.title" icon="CLOUD"/>

@@ -7,13 +7,17 @@ package io.openbpm.control.util;
 
 import io.jmix.core.Sort;
 import io.openbpm.control.entity.filter.DeploymentFilter;
+import io.openbpm.control.entity.filter.DecisionDefinitionFilter;
+import io.openbpm.control.entity.filter.DecisionInstanceFilter;
 import io.openbpm.control.entity.filter.ProcessDefinitionFilter;
 import io.openbpm.control.entity.filter.ProcessInstanceFilter;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionState;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
+import org.camunda.bpm.engine.history.HistoricDecisionInstanceQuery;
 import org.camunda.bpm.engine.query.Query;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.community.rest.client.model.HistoricProcessInstanceQueryDto;
@@ -169,6 +173,35 @@ public class QueryUtils {
         }
     }
 
+    public static void addDecisionDefinitionFilters(DecisionDefinitionQuery decisionDefinitionQuery,
+                                                    @Nullable DecisionDefinitionFilter filter) {
+        if (filter == null) {
+            return;
+        }
+        wrapAndAddStringIfNotEmpty(filter.getKeyLike(), decisionDefinitionQuery::decisionDefinitionKeyLike);
+        wrapAndAddStringIfNotEmpty(filter.getNameLike(), decisionDefinitionQuery::decisionDefinitionNameLike);
+        addIfStringNotEmpty(filter.getKey(), decisionDefinitionQuery::decisionDefinitionKey);
+        addCollectionIfNotEmpty(filter.getIdIn(), decisionDefinitionQuery::decisionDefinitionIdIn);
+        addIfTrue(filter.getLatestVersionOnly(), decisionDefinitionQuery::latestVersion);
+    }
+
+    public static void addDecisionInstanceFilters(HistoricDecisionInstanceQuery decisionInstanceQuery,
+                                                  @Nullable DecisionInstanceFilter filter) {
+        if (filter == null) {
+            return;
+        }
+        addIfStringNotEmpty(filter.getDecisionDefinitionId(), decisionInstanceQuery::decisionDefinitionId);
+        addIfStringNotEmpty(filter.getProcessDefinitionKey(), decisionInstanceQuery::processDefinitionKey);
+        addIfStringNotEmpty(filter.getProcessInstanceId(), decisionInstanceQuery::processInstanceId);
+        addIfStringNotEmpty(filter.getActivityId(), decisionInstanceQuery::activityIdIn);
+        if (filter.getEvaluatedAfter() != null) {
+            decisionInstanceQuery.evaluatedAfter(Date.from(filter.getEvaluatedAfter().toInstant()));
+        }
+        if (filter.getEvaluatedBefore() != null) {
+            decisionInstanceQuery.evaluatedBefore(Date.from(filter.getEvaluatedBefore().toInstant()));
+        }
+    }
+
     public static void addDefinitionSort(ProcessDefinitionQuery processDefinitionQuery, @Nullable Sort sort) {
         if (sort != null) {
             for (Sort.Order order : sort.getOrders()) {
@@ -202,6 +235,35 @@ public class QueryUtils {
         }
     }
 
+    public static void addDecisionDefinitionSort(DecisionDefinitionQuery processDefinitionQuery, @Nullable Sort sort) {
+        if (sort != null) {
+            for (Sort.Order order : sort.getOrders()) {
+                boolean unknownValueUsed = false;
+                switch (order.getProperty()) {
+                    case "name" -> processDefinitionQuery.orderByDecisionDefinitionName();
+                    case "key" -> processDefinitionQuery.orderByDecisionDefinitionKey();
+                    case "version" -> processDefinitionQuery.orderByDecisionDefinitionVersion();
+                    default -> unknownValueUsed = true;
+                }
+                addSortDirection(processDefinitionQuery, !unknownValueUsed, order);
+            }
+        }
+    }
+
+    public static void addDecisionInstanceSort(HistoricDecisionInstanceQuery decisionInstanceQuery,
+                                               @Nullable Sort sort) {
+        if (sort != null) {
+            for (Sort.Order order : sort.getOrders()) {
+                boolean unknownValueUsed = false;
+                switch (order.getProperty()) {
+                    case "evaluationTime" -> decisionInstanceQuery.orderByEvaluationTime();
+                    case "tenantId" -> decisionInstanceQuery.orderByEvaluationTime();
+                    default -> unknownValueUsed = true;
+                }
+                addSortDirection(decisionInstanceQuery, !unknownValueUsed, order);
+            }
+        }
+    }
 
     public static void addIfStringNotEmpty(String filterValue, Consumer<String> filterValueConsumer) {
         if (StringUtils.hasText(filterValue)) {

@@ -128,10 +128,6 @@ public class DeploymentDetailView extends StandardDetailView<DeploymentData> {
     private String sourceTabLabel;
     private String runningInstancesTabLabel;
 
-    public void setDeploymentData(DeploymentData deploymentData) {
-        deploymentDataDc.setItem(deploymentData);
-    }
-
     @Subscribe
     public void onInit(final InitEvent event) {
         viewTabLabel = messages.getMessage(getClass(), "viewTab.title");
@@ -190,8 +186,6 @@ public class DeploymentDetailView extends StandardDetailView<DeploymentData> {
         } else {
             showUnsupportedResource(deploymentResourceData);
         }
-
-
     }
 
     @Subscribe(id = "deploymentDataDc", target = Target.DATA_CONTAINER)
@@ -371,8 +365,6 @@ public class DeploymentDetailView extends StandardDetailView<DeploymentData> {
 
         grid.setItems(deploymentProcessInstancesInfos);
 
-//        grid.add
-
         return grid;
     }
 
@@ -385,7 +377,8 @@ public class DeploymentDetailView extends StandardDetailView<DeploymentData> {
 
     private Component createDmnViewer(String xmlData) {
         DmnViewerFragment dmnViewerFragment = fragments.create(this, DmnViewerFragment.class);
-        dmnViewerFragment.initViewer(xmlData);
+        dmnViewerFragment.initViewer();
+        dmnViewerFragment.setDmnXml(xmlData);
 
         return dmnViewerFragment;
     }
