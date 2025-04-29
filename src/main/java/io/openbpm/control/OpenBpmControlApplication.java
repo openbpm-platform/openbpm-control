@@ -55,6 +55,7 @@ public class OpenBpmControlApplication implements AppShellConfigurator {
 
     @EventListener
     public void printApplicationUrl(final ApplicationStartedEvent event) {
+
         throw new RuntimeException("I'm an error!");
     }
 }
