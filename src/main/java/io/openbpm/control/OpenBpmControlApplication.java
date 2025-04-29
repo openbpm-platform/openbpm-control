@@ -55,9 +55,6 @@ public class OpenBpmControlApplication implements AppShellConfigurator {
 
     @EventListener
     public void printApplicationUrl(final ApplicationStartedEvent event) {
-        LoggerFactory.getLogger(OpenBpmControlApplication.class).info("Application started at "
-                + "http://localhost:"
-                + environment.getProperty("local.server.port")
-                + Strings.nullToEmpty(environment.getProperty("server.servlet.context-path")));
+        throw new RuntimeException("I'm an error!");
     }
 }
