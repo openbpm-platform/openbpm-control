@@ -69,8 +69,9 @@ public class HistoricDecisionInstanceQueryImpl extends BaseQuery<HistoricDecisio
                 getTenantIds() != null ? String.join(",", getTenantIds()) : null, getTenantIdsSet(), evaluatedBefore,
                 evaluatedAfter, userId, rootDecisionInstanceId,
                 rootDecisionInstancesOnly, decisionRequirementsDefinitionId, decisionRequirementsDefinitionKey);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody().getCount();
+        CountResultDto countResultDto = response.getBody();
+        if (response.getStatusCode().is2xxSuccessful() && countResultDto != null) {
+            return countResultDto.getCount();
         }
         log.error("Error on loading decisions count, status code {}", response.getStatusCode());
         return -1;
@@ -93,8 +94,9 @@ public class HistoricDecisionInstanceQueryImpl extends BaseQuery<HistoricDecisio
                 rootDecisionInstancesOnly, decisionRequirementsDefinitionId, decisionRequirementsDefinitionKey,
                 includeInputs, includeOutputs, disableBinaryFetching, disableCustomObjectDeserialization,
                 orderBy, orderDirection, firstResult, maxResult);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody()
+        List<HistoricDecisionInstanceDto> historicDecisionInstanceDtoList = response.getBody();
+        if (response.getStatusCode().is2xxSuccessful() && historicDecisionInstanceDtoList != null) {
+            return historicDecisionInstanceDtoList
                     .stream()
                     .map(e -> (HistoricDecisionInstance) new HistoricDecisionInstanceImpl(
                             e.getId(), e.getDecisionDefinitionId(), e.getDecisionDefinitionKey(),

@@ -138,9 +138,9 @@ public class DecisionDefinitionServiceImpl implements DecisionDefinitionService 
         try {
             ResponseEntity<DecisionDefinitionDiagramDto> decisionDefinitionDmnXml =
                     decisionDefinitionApiClient.getDecisionDefinitionDmnXmlById(decisionDefinitionId);
-            if (decisionDefinitionDmnXml.getStatusCode().is2xxSuccessful()
-                    && decisionDefinitionDmnXml.getBody() != null) {
-                return decisionDefinitionDmnXml.getBody().getDmnXml();
+            DecisionDefinitionDiagramDto decisionDefinitionDiagramDto = decisionDefinitionDmnXml.getBody();
+            if (decisionDefinitionDmnXml.getStatusCode().is2xxSuccessful() && decisionDefinitionDiagramDto != null) {
+                return decisionDefinitionDiagramDto.getDmnXml();
             }
             return null;
         } catch (Exception e) {
