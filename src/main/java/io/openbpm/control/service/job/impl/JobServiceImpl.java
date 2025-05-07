@@ -5,6 +5,7 @@
 
 package io.openbpm.control.service.job.impl;
 
+import com.google.common.base.Strings;
 import io.jmix.core.Sort;
 import io.openbpm.control.entity.filter.JobFilter;
 import io.openbpm.control.entity.job.JobData;
@@ -114,10 +115,9 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public String getErrorDetails(String jobId) {
-        ResponseEntity<Object> response = jobApiClient.getStacktrace(jobId);
+        ResponseEntity<String> response = jobApiClient.getStacktrace(jobId);
         if (response.getStatusCode().is2xxSuccessful()) {
-            Object responseBody = response.getBody();
-            return responseBody != null ? responseBody.toString() : "";
+            return Strings.nullToEmpty(response.getBody());
         }
 
         return "";
@@ -125,10 +125,9 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public String getHistoryErrorDetails(String jobId) {
-        ResponseEntity<Object> response = historyApiClient.getStacktraceHistoricJobLog(jobId);
+        ResponseEntity<String> response = historyApiClient.getStacktraceHistoricJobLog(jobId);
         if (response.getStatusCode().is2xxSuccessful()) {
-            Object responseBody = response.getBody();
-            return responseBody != null ? responseBody.toString() : "";
+            return Strings.nullToEmpty(response.getBody());
         }
         return "";
     }

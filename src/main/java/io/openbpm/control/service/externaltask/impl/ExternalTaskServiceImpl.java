@@ -5,6 +5,7 @@
 
 package io.openbpm.control.service.externaltask.impl;
 
+import com.google.common.base.Strings;
 import io.jmix.core.Sort;
 import io.openbpm.control.entity.ExternalTaskData;
 import io.openbpm.control.entity.filter.ExternalTaskFilter;
@@ -92,10 +93,9 @@ public class ExternalTaskServiceImpl implements ExternalTaskService {
 
     @Override
     public String getHistoryErrorDetails(String externalTaskId) {
-        ResponseEntity<Object> response = historyApiClient.getErrorDetailsHistoricExternalTaskLog(externalTaskId);
+        ResponseEntity<String> response = historyApiClient.getErrorDetailsHistoricExternalTaskLog(externalTaskId);
         if (response.getStatusCode().is2xxSuccessful()) {
-            Object body = response.getBody();
-            return body != null ? body.toString() : "";
+            return Strings.nullToEmpty(response.getBody());
         }
         return "";
     }
