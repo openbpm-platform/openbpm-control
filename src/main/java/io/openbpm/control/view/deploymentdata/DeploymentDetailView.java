@@ -155,16 +155,21 @@ public class DeploymentDetailView extends StandardDetailView<DeploymentData> {
     @Subscribe(id = "downloadResourceButton", subject = "clickListener")
     public void onDownloadResourceButtonClick(final ClickEvent<JmixButton> event) {
         DeploymentResource selectedResource = resourcesDataGrid.getSingleSelectedItem();
-        Resource deploymentResourceData = deploymentService.getDeploymentResourceData(
-                selectedResource.getDeploymentId(), selectedResource.getResourceId());
-        byte[] byteArrayContent = getByteArrayContent(deploymentResourceData);
-        downloader.download(() -> new ByteArrayInputStream(byteArrayContent), selectedResource.getName());
+        if (selectedResource != null) {
+            Resource deploymentResourceData = deploymentService.getDeploymentResourceData(
+                    selectedResource.getDeploymentId(), selectedResource.getResourceId());
+            byte[] byteArrayContent = getByteArrayContent(deploymentResourceData);
+            downloader.download(() -> new ByteArrayInputStream(byteArrayContent), selectedResource.getName());
+        }
     }
 
     @Subscribe("resourcesDataGrid")
     public void onResourcesDataGridSelection(
             final SelectionEvent<DataGrid<DeploymentResource>, DeploymentResource> event) {
         DeploymentResource selectedResourceName = event.getSource().getSingleSelectedItem();
+        if (selectedResourceName == null) {
+            return;
+        }
         String resourceName = selectedResourceName.getName();
         Resource deploymentResourceData = deploymentService.getDeploymentResourceData(
                 selectedResourceName.getDeploymentId(), selectedResourceName.getResourceId());
@@ -191,10 +196,12 @@ public class DeploymentDetailView extends StandardDetailView<DeploymentData> {
     @Subscribe(id = "deploymentDataDc", target = Target.DATA_CONTAINER)
     protected void onDeploymentDataDcItemChange(InstanceContainer.ItemChangeEvent<DeploymentData> event) {
         DeploymentData deploymentData = event.getItem();
-        List<DeploymentResource> deploymentResourceNames = deploymentService.getDeploymentResources(
-                deploymentData.getDeploymentId());
-        resourcesDataGrid.setItems(new ArrayList<>(
-                deploymentResourceNames != null ? deploymentResourceNames : List.of()));
+        if (deploymentData != null) {
+            List<DeploymentResource> deploymentResourceNames = deploymentService.getDeploymentResources(
+                    deploymentData.getDeploymentId());
+            resourcesDataGrid.setItems(new ArrayList<>(
+                    deploymentResourceNames != null ? deploymentResourceNames : List.of()));
+        }
     }
 
     @Install(to = "deploymentDataDl", target = Target.DATA_LOADER)

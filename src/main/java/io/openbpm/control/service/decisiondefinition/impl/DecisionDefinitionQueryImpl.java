@@ -58,8 +58,9 @@ public class DecisionDefinitionQueryImpl extends BaseQuery<DecisionDefinitionQue
                 decisionRequirementsDefinitionId, decisionRequirementsDefinitionKey,
                 withoutDecisionRequirementsDefinition, tenantIdIn, withoutTenantId,
                 includeDecisionDefinitionsWithoutTenantId, versionTag, versionTagLike);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody().getCount();
+        CountResultDto countResultDto = response.getBody();
+        if (response.getStatusCode().is2xxSuccessful() && countResultDto != null) {
+            return countResultDto.getCount();
         }
         log.error("Error on loading decisions count, status code {}", response.getStatusCode());
         return -1;
@@ -79,8 +80,9 @@ public class DecisionDefinitionQueryImpl extends BaseQuery<DecisionDefinitionQue
                 decisionRequirementsDefinitionId, decisionRequirementsDefinitionKey,
                 withoutDecisionRequirementsDefinition, tenantIdIn, withoutTenantId,
                 includeDecisionDefinitionsWithoutTenantId, versionTag, versionTagLike);
-        if (response.getStatusCode().is2xxSuccessful() && response.hasBody()) {
-            return response.getBody()
+        List<DecisionDefinitionDto> decisionDefinitionDtoList = response.getBody();
+        if (response.getStatusCode().is2xxSuccessful() && decisionDefinitionDtoList != null) {
+            return decisionDefinitionDtoList
                     .stream()
                     .map(e -> (DecisionDefinition) new DecisionDefinitionImpl(
                             e.getId(), e.getCategory(), e.getName(), e.getKey(), e.getVersion(), e.getResource(),

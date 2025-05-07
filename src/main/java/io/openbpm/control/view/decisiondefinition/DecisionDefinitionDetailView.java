@@ -147,6 +147,9 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
     @Subscribe(id = "decisionDefinitionDc", target = Target.DATA_CONTAINER)
     protected void onDecisionDefinitionDcItemChange(InstanceContainer.ItemChangeEvent<DecisionDefinitionData> event) {
         DecisionDefinitionData decisionDefinition = event.getItem();
+        if (decisionDefinition == null) {
+            return;
+        }
 
         String dmnXml = decisionDefinitionService.getDmnXml(decisionDefinition.getDecisionDefinitionId());
         viewerFragment.initViewer();

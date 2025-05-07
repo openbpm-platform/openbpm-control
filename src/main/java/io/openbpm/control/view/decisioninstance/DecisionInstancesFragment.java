@@ -148,12 +148,12 @@ public class DecisionInstancesFragment extends Fragment<VerticalLayout> {
 
     @Subscribe("decisionInstancesGrid.edit")
     public void onDecisionDefinitionsGridViewDetails(ActionPerformedEvent event) {
-        if (decisionInstancesGrid.getSingleSelectedItem() == null) {
+        HistoricDecisionInstanceShortData selectedItem = decisionInstancesGrid.getSingleSelectedItem();
+        if (selectedItem == null) {
             return;
         }
         viewNavigators.detailView(getCurrentView(), HistoricDecisionInstanceShortData.class)
-                .withRouteParameters(new RouteParameters("id",
-                        decisionInstancesGrid.getSingleSelectedItem().getDecisionInstanceId()))
+                .withRouteParameters(new RouteParameters("id", selectedItem.getDecisionInstanceId()))
                 .withBackwardNavigation(true)
                 .navigate();
     }
