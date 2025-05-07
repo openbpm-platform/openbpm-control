@@ -7,7 +7,7 @@
 <view xmlns="http://jmix.io/schema/flowui/view"
       title="msg://processDefinitionDiagramView.title">
     <actions>
-        <action id="close" icon="BAN" text="msg:///actions.Close" type="view_close"/>
+        <action id="close" icon="vaadin:close" text="msg:///actions.Close" type="view_close"/>
     </actions>
     <data>
         <instance id="processDefinitionDc" class="io.openbpm.control.entity.processdefinition.ProcessDefinitionData"/>
