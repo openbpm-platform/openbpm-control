@@ -4,6 +4,7 @@ package io.openbpm.control.view.about;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
@@ -15,13 +16,10 @@ import io.jmix.core.Resources;
 import io.jmix.core.security.CurrentAuthentication;
 import io.jmix.flowui.Fragments;
 import io.jmix.flowui.Notifications;
+import io.jmix.flowui.UiComponents;
 import io.jmix.flowui.component.UiComponentUtils;
 import io.jmix.flowui.kit.component.button.JmixButton;
-import io.jmix.flowui.view.StandardView;
-import io.jmix.flowui.view.Subscribe;
-import io.jmix.flowui.view.ViewComponent;
-import io.jmix.flowui.view.ViewController;
-import io.jmix.flowui.view.ViewDescriptor;
+import io.jmix.flowui.view.*;
 import io.openbpm.control.action.CopyComponentValueToClipboardAction;
 import io.openbpm.control.view.main.MainView;
 import lombok.extern.slf4j.Slf4j;
@@ -70,6 +68,8 @@ public class AboutProductView extends StandardView {
     protected VerticalLayout externalLinksBox;
     @ViewComponent
     protected VerticalLayout productsBox;
+    @Autowired
+    private UiComponents uiComponents;
 
     @Subscribe
     protected void onBeforeShow(final BeforeShowEvent event) {
@@ -79,12 +79,18 @@ public class AboutProductView extends StandardView {
 
         AboutProductMetadata contentMetadata = loadContentMetadata();
         if (contentMetadata != null) {
-            addExternalLinks(contentMetadata.getExternalLinks());
-            addProducts(contentMetadata.getProducts());
+            initExternalLinks(contentMetadata.getExternalLinks());
+            initProducts(contentMetadata.getProducts());
         }
     }
 
-    protected void addProducts(List<AboutProductMetadata.Product> products) {
+    protected void initProducts(List<AboutProductMetadata.Product> products) {
+        productsBox.removeAll();
+
+        H3 productsHeader = uiComponents.create(H3.class);
+        productsHeader.setText(messages.getMessage(getClass(), "ourProductsHeader.text"));
+        productsBox.add(productsHeader);
+
         if (CollectionUtils.isNotEmpty(products)) {
             for (int i = 0; i < products.size(); i++) {
                 AboutProductMetadata.Product product = products.get(i);
@@ -99,7 +105,13 @@ public class AboutProductView extends StandardView {
         }
     }
 
-    protected void addExternalLinks(List<AboutProductMetadata.ExternalLink> externalLinksList) {
+    protected void initExternalLinks(List<AboutProductMetadata.ExternalLink> externalLinksList) {
+        externalLinksBox.removeAll();
+
+        H3 externalLinkHeader = uiComponents.create(H3.class);
+        externalLinkHeader.setText(messages.getMessage(getClass(), "externalLinksHeader.text"));
+        externalLinksBox.add(externalLinkHeader);
+
         if (CollectionUtils.isNotEmpty(externalLinksList)) {
             externalLinksList.forEach(externalLink -> {
                 ExternalLinkFragment externalLinkFragment = fragments.create(this, ExternalLinkFragment.class);
