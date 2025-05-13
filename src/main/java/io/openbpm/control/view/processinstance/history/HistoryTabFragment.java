@@ -226,10 +226,12 @@ public class HistoryTabFragment extends Fragment<JmixTabSheet> {
 
     @Nullable
     protected Component getTabContent(Tab tab) {
-        return historyTabsheet.getContentByTab(tab)
-                .getChildren()
-                .findFirst()
-                .orElse(null);
+        Component contentByTab = historyTabsheet.getContentByTab(tab);
+        return contentByTab != null
+                ? contentByTab.getChildren()
+                        .findFirst()
+                        .orElse(null)
+                : null;
     }
 
 }
