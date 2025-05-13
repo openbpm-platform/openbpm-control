@@ -59,4 +59,16 @@
         <Class name="io.openbpm.control.test_support.camunda7.OperatonContainer"/>
     </Match>
 
+    <Match>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
+        <Class name="io.openbpm.control.view.processinstance.runtime.RuntimeTabFragment" />
+        <Method name="onRuntimeActivityInstancesDcItemChange" />
+    </Match>
+
+    <Match>
+        <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
+        <Class name="io.openbpm.control.view.processinstance.history.HistoryTabFragment" />
+        <Method name="onHistoryTabsheetSelectedChange" />
+    </Match>
+
 </FindBugsFilter>

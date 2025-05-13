@@ -149,7 +149,7 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
     @Subscribe("runtimeTabsheet")
     public void onRuntimeTabsheetSelectedChange(final JmixTabSheet.SelectedChangeEvent event) {
         Tab selectedTab = event.getSelectedTab();
-        String tabId = selectedTab.getId().orElse(null);
+        String tabId = selectedTab != null ? selectedTab.getId().orElse(null) : null;
         if (StringUtils.equals(tabId, USER_TASKS_TAB_ID)) {
             Component tabContent = getTabContent(selectedTab);
             if (tabContent instanceof RuntimeUserTasksTabFragment userTasksFragment) {
@@ -445,10 +445,12 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
 
     @Nullable
     protected Component getTabContent(Tab tab) {
-        return runtimeTabsheet.getContentByTab(tab)
-                .getChildren()
-                .findFirst()
-                .orElse(null);
+        Component contentByTab = runtimeTabsheet.getContentByTab(tab);
+        return contentByTab != null
+                ? contentByTab.getChildren()
+                        .findFirst()
+                        .orElse(null)
+                : null;
     }
 
 }

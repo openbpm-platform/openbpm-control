@@ -130,10 +130,12 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
             relatedEntitiesTabSheet.setSelectedTab(historyTab);
             //force init a tab content because attach event is not triggered
             LazyTabContent contentByTab = (LazyTabContent) relatedEntitiesTabSheet.getContentByTab(historyTab);
-            contentByTab.init();
-            Component tabContent = contentByTab.getChildren().findFirst().orElse(null);
-            if (tabContent instanceof HistoryTabFragment historyTabFragment) {
-                historyTabFragment.refresh();
+            if (contentByTab != null) {
+                contentByTab.init();
+                Component tabContent = contentByTab.getChildren().findFirst().orElse(null);
+                if (tabContent instanceof HistoryTabFragment historyTabFragment) {
+                    historyTabFragment.refresh();
+                }
             }
         }
         initBpmnViewerFragment();
@@ -147,7 +149,7 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
     @Subscribe("relatedEntitiesTabSheet")
     public void onRelatedEntitiesTabSheetSelectedChange(final JmixTabSheet.SelectedChangeEvent event) {
         Tab selectedTab = event.getSelectedTab();
-        String selectedTabId = selectedTab.getId().orElse(null);
+        String selectedTabId = selectedTab != null ? selectedTab.getId().orElse(null) : null;
         if (StringUtils.equals(selectedTabId, HISTORY_TAB_ID)) {
             Component tabContent = getTabContent(selectedTab);
             if (tabContent instanceof HistoryTabFragment historyTabFragment) {
@@ -293,10 +295,13 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
 
     @Nullable
     protected Component getTabContent(Tab tab) {
-        return relatedEntitiesTabSheet.getContentByTab(tab)
-                .getChildren()
-                .findFirst()
-                .orElse(null);
+        Component contentByTab = relatedEntitiesTabSheet.getContentByTab(tab);
+        return contentByTab != null
+                ? contentByTab
+                        .getChildren()
+                        .findFirst()
+                        .orElse(null)
+                : null;
     }
 
     private void handleDecisionInstanceLinkOverlayClicked(String decisionInstanceId) {
