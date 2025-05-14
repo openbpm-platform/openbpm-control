@@ -11,7 +11,8 @@ import org.springframework.lang.Nullable;
 
 public enum EngineType implements EnumClass<String> {
 
-    CAMUNDA_7("Camunda 7");
+    CAMUNDA_7("Camunda 7"),
+    OPERATON("OPERATON");
 
     private final String id;
 
