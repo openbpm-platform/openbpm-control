@@ -54,7 +54,7 @@
                     </items>
                 </dropdownButton>
             </hbox>
-            <button id="closeBtn" icon="BAN" text="msg:///actions.Cancel"/>
+            <button id="closeBtn" icon="BAN" text="msg:///actions.Close"/>
         </hbox>
     </content>
 </fragment>

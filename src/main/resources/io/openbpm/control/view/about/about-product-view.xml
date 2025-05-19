@@ -2,7 +2,7 @@
 <view xmlns="http://jmix.io/schema/flowui/view"
       title="msg://aboutProductView.title">
     <actions>
-        <action id="close" type="view_close" icon="vaadin:close" text="msg:///actions.Close"/>
+        <action id="close" type="view_close" text="msg:///actions.Close"/>
     </actions>
     <layout expand="root">
         <div id="root" width="100%" height="100%">

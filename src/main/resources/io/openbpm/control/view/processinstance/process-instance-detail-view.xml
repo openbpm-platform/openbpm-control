@@ -41,7 +41,7 @@
             </split>
             <fragment class="io.openbpm.control.view.processinstance.generalpanel.GeneralPanelFragment"/>
         </hbox>
-        <hbox id="windowActions" width="100%" classNames="sticky-buttons-bottom-panel pl-s pr-s">
+        <hbox id="windowActions" width="100%" classNames="sticky-buttons-bottom-panel pl-s pr-s pb-s">
             <button id="closeAction" action="closeAction"/>
         </hbox>
     </layout>

@@ -12,7 +12,7 @@
         <dataLoadCoordinator auto="true"/>
     </facets>
     <actions>
-        <action id="closeAction" type="detail_close"/>
+        <action id="closeAction" type="detail_close" text="msg:///actions.Close"/>
         <action id="copyToClipboardAction" type="control_copyComponentValueToClipboard"/>
     </actions>
     <layout spacing="false">

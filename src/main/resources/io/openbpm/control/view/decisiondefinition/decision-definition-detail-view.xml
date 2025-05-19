@@ -12,7 +12,7 @@
         <dataLoadCoordinator auto="true"/>
     </facets>
     <actions>
-        <action id="closeAction" type="view_close" icon="vaadin:close" text="msg:///actions.Close"/>
+        <action id="closeAction" type="view_close" text="msg:///actions.Close"/>
     </actions>
     <layout spacing="false">
         <tabSheet id="tabSheet" width="100%" height="100%">

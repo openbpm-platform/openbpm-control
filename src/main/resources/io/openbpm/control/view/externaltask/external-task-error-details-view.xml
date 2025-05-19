@@ -8,7 +8,7 @@
       title="msg://externalTaskStacktraceView.title">
     <actions>
         <action id="copy" type="control_copyComponentValueToClipboard"/>
-        <action id="close" type="view_close" icon="vaadin:close" text="msg:///actions.Close"/>
+        <action id="close" type="view_close" text="msg:///actions.Close"/>
     </actions>
     <layout>
         <codeEditor id="errorDetailsCodeEditor" readOnly="true"

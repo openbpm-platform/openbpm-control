@@ -13,7 +13,7 @@
         <dataLoadCoordinator auto="true"/>
     </facets>
     <actions>
-        <action id="closeAction" type="view_close" icon="vaadin:close" text="msg:///actions.Close"/>
+        <action id="closeAction" type="view_close" text="msg:///actions.Close"/>
         <action id="copyToClipboardAction" type="control_copyComponentValueToClipboard"/>
     </actions>
     <layout spacing="false">

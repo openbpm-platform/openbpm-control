@@ -138,6 +138,8 @@ public class DeploymentDetailView extends StandardDetailView<DeploymentData> {
 
         deploymentResourcesLabel.addClassNames(LumoUtility.TextColor.SECONDARY);
         deploymentResourcesLabel.addClassNames(LumoUtility.FontWeight.SEMIBOLD);
+
+        addClassName(LumoUtility.Padding.Bottom.SMALL);
     }
 
     @Subscribe(id = "copyDeploymentId", subject = "clickListener")

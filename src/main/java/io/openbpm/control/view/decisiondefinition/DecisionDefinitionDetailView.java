@@ -6,6 +6,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.theme.lumo.LumoUtility;
@@ -85,6 +86,8 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
     private JmixFormLayout decisionDefinitionForm;
     @ViewComponent
     private JmixTabSheet tabSheet;
+    @ViewComponent
+    private HorizontalLayout detailActions;
 
     private String title = "";
 
@@ -93,6 +96,8 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
         addClassNames(LumoUtility.Padding.NONE);
         initTabIcons();
         decisionDefinitionForm.addClassName(LumoUtility.Padding.Right.XSMALL);
+        detailActions.addClassNames(LumoUtility.Padding.Bottom.SMALL, LumoUtility.Padding.Right.MEDIUM,
+                LumoUtility.Padding.Top.XSMALL);
     }
 
     @Subscribe(id = "viewDeployment", subject = "clickListener")
