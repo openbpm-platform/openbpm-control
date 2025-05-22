@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Haulmont 2024. All Rights Reserved.
+ * Copyright (c) Haulmont 2025. All Rights Reserved.
  * Use is subject to license terms.
  */
 
@@ -15,14 +15,17 @@ import feign.codec.ErrorDecoder;
 import io.openbpm.control.restsupport.DynamicEngineUrlRequestInterceptor;
 import io.openbpm.control.restsupport.FeignClientProvider;
 import io.openbpm.control.restsupport.ObjectToStringConverter;
+import io.openbpm.control.restsupport.camunda.CamundaFeignErrorDecoder;
 import io.openbpm.control.service.engine.EngineService;
 import org.camunda.community.rest.EnableCamundaRestClient;
 import org.camunda.community.rest.client.FeignClientConfiguration;
+import org.camunda.community.rest.config.CamundaRestClientProperties;
 import org.springframework.cloud.openfeign.FeignClientProperties;
 import org.springframework.cloud.openfeign.FeignClientsConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
 
 import java.util.Optional;
 
@@ -50,5 +53,12 @@ public class CamundaFeignConfiguration {
     @Bean("control_ObjectToStringConverter")
     public ObjectToStringConverter objectToStringConverter() {
         return new ObjectToStringConverter();
+    }
+
+
+    @Bean("control_CamundaFeignErrorDecoder")
+    @Primary
+    public ErrorDecoder errorDecoder(CamundaRestClientProperties restClientProperties) {
+        return new CamundaFeignErrorDecoder(restClientProperties);
     }
 }

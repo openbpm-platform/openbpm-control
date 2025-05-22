@@ -55,3 +55,12 @@ vaadin-grid::part(multiline-text-cell) {
 vaadin-grid::part(error-cell) {
     background-color: var(--lumo-error-color-10pct);
 }
+
+vaadin-button[theme~='badge'][theme~='has-icon'] {
+    padding-block: 0.2em;
+}
+
+vaadin-button[theme~='badge'][theme~='has-icon'] vaadin-icon {
+    margin-left: 0;
+    margin-block: 0;
+}

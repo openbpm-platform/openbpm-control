@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2025. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<fragment xmlns="http://jmix.io/schema/flowui/fragment">
+    <data>
+        <instance id="validationErrorDc" class="io.openbpm.control.entity.deployment.ResourceValidationError"/>
+    </data>
+    <content>
+        <hbox id="root" padding="false">
+            <span id="errorType" themeNames="badge pill"
+                  dataContainer="validationErrorDc" property="type"/>
+        </hbox>
+    </content>
+</fragment>

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Haulmont 2024. All Rights Reserved.
+ * Copyright (c) Haulmont 2025. All Rights Reserved.
  * Use is subject to license terms.
  */
 
@@ -22,12 +22,12 @@ import io.jmix.flowui.view.ViewComponent;
 import io.jmix.flowui.view.ViewController;
 import io.jmix.flowui.view.ViewDescriptor;
 import io.openbpm.control.entity.deployment.DeploymentData;
+import io.openbpm.control.exception.RemoteProcessEngineException;
 import io.openbpm.control.service.deployment.DeploymentService;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
@@ -38,7 +38,6 @@ import java.util.Collection;
 @DialogMode(width = "35em")
 @Slf4j
 public class BulkDeleteDeploymentView extends StandardView {
-    private static final String CAMUNDA_EXCEPTION_WITH_REASON_MESSAGE = "REST-CLIENT-002 Error during remote Camunda engine invocation with";
 
     @Autowired
     protected Notifications notifications;
@@ -110,16 +109,18 @@ public class BulkDeleteDeploymentView extends StandardView {
                     .withType(Notifications.Type.SUCCESS)
                     .show();
         } catch (Exception e) {
-            if (e instanceof RemoteProcessEngineException) {
+            if (e instanceof RemoteProcessEngineException processEngineException) {
                 log.error("Unable to delete deployments", e);
-                String exceptionMessage = e.getMessage();
-                String errorReason = null;
-                if (exceptionMessage.startsWith(CAMUNDA_EXCEPTION_WITH_REASON_MESSAGE)) {
-                    String[] split = exceptionMessage.split(":", 2);
-                    errorReason = split[1].replaceAll("\\.", ".\n");
+
+                String errorReason;
+                String responseMessage = processEngineException.getResponseMessage();
+                if (StringUtils.isNotEmpty(responseMessage)) {
+                    errorReason = responseMessage.replaceAll("\\.", ".\n");
+                } else {
+                    errorReason = e.getMessage();
                 }
 
-                notifications.create(StringUtils.defaultIfEmpty(errorReason, exceptionMessage))
+                notifications.create(errorReason)
                         .withType(Notifications.Type.ERROR)
                         .withDuration(10000)
                         .show();

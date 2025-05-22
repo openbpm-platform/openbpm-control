@@ -7,6 +7,7 @@ package io.openbpm.control.service.usertask;
 
 import io.jmix.core.DataManager;
 import io.openbpm.control.entity.variable.VariableInstanceData;
+import io.openbpm.control.exception.RemoteProcessEngineException;
 import io.openbpm.control.test_support.AuthenticatedAsAdmin;
 import io.openbpm.control.test_support.RunningEngine;
 import io.openbpm.control.test_support.WithRunningEngine;
@@ -18,7 +19,6 @@ import io.openbpm.control.test_support.camunda7.dto.response.HistoricUserTaskDto
 import io.openbpm.control.test_support.camunda7.dto.response.RuntimeProcessInstanceDto;
 import io.openbpm.control.test_support.camunda7.dto.response.RuntimeUserTaskDto;
 import io.openbpm.control.test_support.camunda7.dto.response.VariableInstanceDto;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
