@@ -6,7 +6,8 @@
 package io.openbpm.control.service.deployment;
 
 import io.jmix.core.Resources;
-import io.openbpm.control.entity.DeploymentData;
+import io.openbpm.control.entity.deployment.DeploymentData;
+import io.openbpm.control.exception.RemoteEngineParseException;
 import io.openbpm.control.test_support.AuthenticatedAsAdmin;
 import io.openbpm.control.test_support.RunningEngine;
 import io.openbpm.control.test_support.WithRunningEngine;
@@ -17,7 +18,6 @@ import io.openbpm.control.test_support.camunda7.dto.response.DeploymentDto;
 import io.openbpm.control.test_support.camunda7.dto.response.DeploymentResultDto;
 import io.openbpm.control.test_support.camunda7.dto.response.ProcessDefinitionDto;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -85,7 +85,7 @@ public class Camunda7DeploymentServiceTest extends AbstractCamunda7IntegrationTe
     }
 
     @Test
-    @DisplayName("RemoteProcessEngineException occurs if deploy invalid BPMN 2.0 XML")
+    @DisplayName("RemoteEngineParseException occurs if deploy invalid BPMN 2.0 XML")
     void givenResourceNameAndInvalidBpmnXml_whenDeployWithContext_thenExceptionThrown() {
         //given
         String resourceName = "testDeployInvalidBpmnXml.bpmn";
@@ -94,7 +94,17 @@ public class Camunda7DeploymentServiceTest extends AbstractCamunda7IntegrationTe
 
         //when and then
         assertThatThrownBy(() -> deploymentService.createDeployment(deploymentContext))
-                .isInstanceOf(RemoteProcessEngineException.class);
+                .isInstanceOf(RemoteEngineParseException.class)
+                .satisfies(exception -> {
+                    RemoteEngineParseException parseException = (RemoteEngineParseException) exception;
+                    assertThat(parseException.getDetails())
+                            .hasSize(1)
+                            .containsKey(resourceName)
+                            .extractingByKey(resourceName)
+                            .satisfies(resourceReport -> {
+                                assertThat(resourceReport.getErrors()).hasSize(1);
+                            });
+                });
 
     }
 

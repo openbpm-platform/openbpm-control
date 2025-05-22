@@ -6,6 +6,9 @@
 
 <view xmlns="http://jmix.io/schema/flowui/view"
       title="msg://newProcessDeploymentView.title">
+    <data>
+        <instance id="deploymentReportDc" class="io.openbpm.control.entity.deployment.ResourceDeploymentReport"/>
+    </data>
     <layout expand="uploadVBox">
         <vbox id="uploadVBox" width="100%" expand="previewVBox" padding="false">
             <hbox alignItems="BASELINE" width="100%" expand="processInfoHBox">
@@ -18,6 +21,14 @@
                                  uploadText="msg://uploadBpmnXml"
                                  acceptedFileTypes=".bpmn,.bpmn20.xml"
                                  uploadIcon="UPLOAD"/>
+
+                <button id="errorsBtn" visible="false"
+                        themeNames="badge error pill tertiary-inline has-icon">
+                    <prefix>
+                        <icon id="deploymentErrorsIcon" icon="WARNING"/>
+                    </prefix>
+                </button>
+
                 <hbox id="processInfoHBox" alignItems="BASELINE" visible="false" themeNames="spacing-s" padding="false" justifyContent="END">
                     <icon id="processCountInfoIcon" icon="INFO_CIRCLE" size="1em" alignSelf="CENTER">
                         <tooltip text="msg://noImportedProcesses" position="BOTTOM_END" hideDelay="0" manual="false"

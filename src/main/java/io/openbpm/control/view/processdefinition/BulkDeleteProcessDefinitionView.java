@@ -12,12 +12,12 @@ import io.jmix.flowui.Notifications;
 import io.jmix.flowui.component.checkbox.JmixCheckbox;
 import io.jmix.flowui.view.*;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
+import io.openbpm.control.exception.RemoteProcessEngineException;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Set;
@@ -28,7 +28,6 @@ import java.util.Set;
 @DialogMode(width = "35em")
 @Slf4j
 public class BulkDeleteProcessDefinitionView extends ProcessDefinitionBulkOperationView {
-    private static final String CAMUNDA_EXCEPTION_WITH_REASON_MESSAGE = "REST-CLIENT-002 Error during remote Camunda engine invocation with";
 
     @ViewComponent
     protected MessageBundle messageBundle;
@@ -87,16 +86,17 @@ public class BulkDeleteProcessDefinitionView extends ProcessDefinitionBulkOperat
                     .withType(Notifications.Type.SUCCESS)
                     .show();
         } catch (Exception e) {
-            if (e instanceof RemoteProcessEngineException) {
+            if (e instanceof RemoteProcessEngineException processEngineException) {
                 log.error("Unable to delete process definitions", e);
-                String exceptionMessage = e.getMessage();
-                String errorReason = null;
-                if (exceptionMessage.startsWith(CAMUNDA_EXCEPTION_WITH_REASON_MESSAGE)) {
-                    String[] split = exceptionMessage.split(":", 2);
-                    errorReason = split[1].replaceAll("\\.", ".\n");
+                String errorReason;
+                String responseMessage = processEngineException.getResponseMessage();
+                if (StringUtils.isNotEmpty(responseMessage)) {
+                    errorReason = responseMessage.replaceAll("\\.", ".\n"); //add new lines for long messages
+                } else {
+                    errorReason = e.getMessage();
                 }
 
-                notifications.create(StringUtils.defaultIfEmpty(errorReason, exceptionMessage))
+                notifications.create(errorReason)
                         .withType(Notifications.Type.ERROR)
                         .withDuration(10000)
                         .show();

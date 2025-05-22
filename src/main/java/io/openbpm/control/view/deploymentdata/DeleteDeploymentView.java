@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Haulmont 2024. All Rights Reserved.
+ * Copyright (c) Haulmont 2025. All Rights Reserved.
  * Use is subject to license terms.
  */
 
@@ -21,12 +21,12 @@ import io.jmix.flowui.view.Subscribe;
 import io.jmix.flowui.view.ViewComponent;
 import io.jmix.flowui.view.ViewController;
 import io.jmix.flowui.view.ViewDescriptor;
+import io.openbpm.control.exception.RemoteProcessEngineException;
 import io.openbpm.control.service.deployment.DeploymentService;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @Route(value = "bpm/deletedeployment", layout = DefaultMainViewParent.class)
@@ -35,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 @DialogMode(width = "35em")
 @Slf4j
 public class DeleteDeploymentView extends StandardView {
-    protected static final String CAMUNDA_EXCEPTION_WITH_REASON = "REST-CLIENT-002 Error during remote Camunda engine invocation with";
 
     @Autowired
     protected Notifications notifications;
@@ -88,16 +87,10 @@ public class DeleteDeploymentView extends StandardView {
         try {
             deploymentService.deleteById(deploymentId, deleteAllRelatedInstances, skipCustomListeners, skipIOMappings);
         } catch (Exception e) {
-            if (e instanceof RemoteProcessEngineException) {
+            if (e instanceof RemoteProcessEngineException processEngineException) {
                 log.error("Unable to delete deployment", e);
-                String exceptionMessage = e.getMessage();
-                String errorReason = null;
-                if (exceptionMessage.startsWith(CAMUNDA_EXCEPTION_WITH_REASON)) {
-                    String[] split = exceptionMessage.split(":", 2);
-                    errorReason = split[1];
-                }
 
-                notifications.create(StringUtils.defaultIfEmpty(errorReason, exceptionMessage))
+                notifications.create(StringUtils.defaultIfEmpty(processEngineException.getResponseMessage(), e.getMessage()))
                         .withType(Notifications.Type.ERROR)
                         .withDuration(10000)
                         .show();

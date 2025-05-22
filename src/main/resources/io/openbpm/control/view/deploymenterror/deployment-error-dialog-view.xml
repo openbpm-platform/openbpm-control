@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2025. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://deploymentErrorDialogView.title">
+    <data>
+        <instance id="deploymentReportDc"
+                  class="io.openbpm.control.entity.deployment.ResourceDeploymentReport"/>
+        <collection id="validationErrorsDc" class="io.openbpm.control.entity.deployment.ResourceValidationError">
+            <loader id="validationErrorsDl"/>
+        </collection>
+    </data>
+    <actions>
+        <action id="close" type="view_close" text="msg:///actions.Close"/>
+    </actions>
+    <layout>
+        <hbox width="100%" alignItems="AUTO" justifyContent="START" themeNames="spacing-s"
+              classNames="border rounded-l border-error-50 bg-error-10 text-error-contrast p-m">
+            <icon id="warningIcon" icon="WARNING" size="1.25em" classNames="text-error"/>
+            <vbox padding="false" themeNames="spacing-xs">
+                <h5 id="warningHeader" text="msg://resourceNotDeployed.text"/>
+                <span id="warningMessage" classNames="text-secondary"
+                      text="msg://resourceNotDeployed.description.text"/>
+            </vbox>
+        </hbox>
+        <h4 text="msg://errorsAndWarningsHeader.text"/>
+        <dataGrid id="resourceValidationErrorsDataGrid" dataContainer="validationErrorsDc" minWidth="100px"
+                  width="100%">
+            <actions showInContextMenuEnabled="false">
+                <action id="excelExport" type="grdexp_excelExport" text="msg:///actions.Download" icon="DOWNLOAD"/>
+            </actions>
+            <columns resizable="true">
+                <column property="message" flexGrow="2">
+                    <fragmentRenderer
+                            class="io.openbpm.control.view.deploymenterror.ValidationErrorMessageColumnFragment"/>
+                </column>
+                <column property="line" autoWidth="true" flexGrow="0"/>
+                <column property="column" autoWidth="true" flexGrow="0"/>
+                <column property="mainElementId" autoWidth="true" flexGrow="1">
+                    <fragmentRenderer
+                            class="io.openbpm.control.view.deploymenterror.MainElementIdColumnFragment"/>
+                </column>
+                <column property="type" autoWidth="true" flexGrow="0">
+                    <fragmentRenderer
+                            class="io.openbpm.control.view.deploymenterror.ValidationErrorTypeColumnFragment"/>
+                </column>
+            </columns>
+        </dataGrid>
+        <hbox padding="false" width="100%" justifyContent="END">
+            <button action="resourceValidationErrorsDataGrid.excelExport"/>
+            <button action="close"/>
+        </hbox>
+    </layout>
+</view>

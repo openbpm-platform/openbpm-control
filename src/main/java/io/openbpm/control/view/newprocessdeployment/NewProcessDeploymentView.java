@@ -28,23 +28,32 @@ import io.jmix.flowui.kit.action.ActionVariant;
 import io.jmix.flowui.kit.component.ComponentUtils;
 import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.kit.component.upload.event.FileUploadSucceededEvent;
-import io.jmix.flowui.view.*;
+import io.jmix.flowui.view.MessageBundle;
+import io.jmix.flowui.view.StandardOutcome;
+import io.jmix.flowui.view.Subscribe;
+import io.jmix.flowui.view.ViewComponent;
+import io.jmix.flowui.view.ViewController;
+import io.jmix.flowui.view.ViewDescriptor;
+import io.openbpm.control.dto.BpmProcessDefinition;
 import io.openbpm.control.entity.filter.ProcessDefinitionFilter;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
+import io.openbpm.control.exception.RemoteEngineParseException;
+import io.openbpm.control.exception.RemoteProcessEngineException;
+import io.openbpm.control.restsupport.camunda.ResourceReport;
 import io.openbpm.control.service.deployment.DeploymentContext;
 import io.openbpm.control.service.deployment.DeploymentService;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionLoadContext;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
-import io.openbpm.control.dto.BpmProcessDefinition;
+import io.openbpm.control.view.AbstractResourceDeploymentView;
 import io.openbpm.control.view.main.MainView;
 import io.openbpm.uikit.component.bpmnviewer.event.XmlImportCompleteEvent;
 import io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -62,7 +71,7 @@ import static io.openbpm.control.util.BpmParseUtil.parseProcessDefinitionsJson;
 @ViewController("bpm_NewProcessDeploymentView")
 @ViewDescriptor("new-process-deployment-view.xml")
 @Slf4j
-public class NewProcessDeploymentView extends StandardView {
+public class NewProcessDeploymentView extends AbstractResourceDeploymentView {
 
     @ViewComponent
     protected FileUploadField bpmnXmlUploadField;
@@ -74,7 +83,7 @@ public class NewProcessDeploymentView extends StandardView {
 
     @Autowired
     protected Metadata metadata;
-    @Autowired
+    @ViewComponent
     protected MessageBundle messageBundle;
     @Autowired
     protected Notifications notifications;
@@ -118,6 +127,7 @@ public class NewProcessDeploymentView extends StandardView {
         bpmnXmlUploadField.addClassNames(LumoUtility.Padding.Top.NONE);
         initEmptyPreviewStyles();
         initProcessInfoHBoxStyles();
+        initDeploymentErrorsButton();
     }
 
     @Subscribe(id = "okBtn", subject = "clickListener")
@@ -161,6 +171,8 @@ public class NewProcessDeploymentView extends StandardView {
             this.processDefinitions = new ArrayList<>();
             processInfoHBox.setVisible(false);
         }
+
+        errorsBtn.setVisible(false);
     }
 
     @Subscribe("bpmnXmlUploadField")
@@ -174,6 +186,8 @@ public class NewProcessDeploymentView extends StandardView {
 
             emptyPreviewHBox.setVisible(false);
         }
+
+        errorsBtn.setVisible(false);
     }
 
     @Subscribe(id = "cancelBtn", subject = "clickListener")
@@ -197,6 +211,8 @@ public class NewProcessDeploymentView extends StandardView {
     }
 
     protected void deployBpmnXml(byte[] uploadedXml) {
+        deploymentReportDc.setItem(null);
+
         String uploadedFileName = bpmnXmlUploadField.getUploadedFileName();
 
         try (InputStream inputStream = new ByteArrayInputStream(uploadedXml)) {
@@ -217,12 +233,21 @@ public class NewProcessDeploymentView extends StandardView {
                     .withType(Notifications.Type.ERROR)
                     .withDuration(2000)
                     .show();
-        } catch (RemoteProcessEngineException ex) {
+        } catch (Exception ex) {
             log.error("Error on process deployment", ex);
-            notifications.create(messageBundle.getMessage("processesNotDeployed"))
-                    .withType(Notifications.Type.ERROR)
-                    .withDuration(2000)
-                    .show();
+
+            Throwable rootCause = ExceptionUtils.getRootCause(ex);
+            if (rootCause instanceof RemoteEngineParseException parseException) {
+                ResourceReport resourceReport = parseException.getDetails().get(uploadedFileName);
+                handleResourceReport(resourceReport, uploadedFileName);
+            } else if (ex instanceof RemoteProcessEngineException) {
+                notifications.create(messageBundle.getMessage("processesNotDeployed"), ex.getMessage())
+                        .withType(Notifications.Type.ERROR)
+                        .withDuration(2000)
+                        .show();
+            } else {
+                throw ex;
+            }
         }
     }
 

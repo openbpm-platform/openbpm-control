@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2025. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<fragment xmlns="http://jmix.io/schema/flowui/fragment">
+    <content>
+        <hbox id="root" themeNames="spacing-s" alignItems="START">
+            <span id="errorMessage" classNames="whitespace-pre-wrap block" width="40em"/>
+            <button id="closeBtn" icon="CLOSE_SMALL" themeNames="contrast tertiary-inline small icon"/>
+        </hbox>
+    </content>
+</fragment>
