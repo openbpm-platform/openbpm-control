@@ -20,7 +20,7 @@
     <facets>
         <dataLoadCoordinator auto="true"/>
     </facets>
-    <layout expand="box" padding="false">
+    <layout expand="box" padding="false" spacing="false">
         <hbox id="box" width="100%" spacing="false">
             <split id="rootBox" orientation="VERTICAL" splitterPosition="50" themeNames="splitter-spacing" width="100%">
                 <hbox id="diagramBox" height="auto" classNames="process-instance-details-diagram-box">
@@ -41,8 +41,9 @@
             </split>
             <fragment class="io.openbpm.control.view.processinstance.generalpanel.GeneralPanelFragment"/>
         </hbox>
-        <hbox id="windowActions" width="100%" classNames="sticky-buttons-bottom-panel pl-s pr-s pb-s">
-            <button id="closeAction" action="closeAction"/>
+        <hbox id="windowActions" width="100%" justifyContent="END"
+              classNames="sticky-buttons-bottom-panel pl-s pr-s pb-s pt-s">
+            <button id="closeAction" action="closeAction" alignSelf="END"/>
         </hbox>
     </layout>
 </view>
