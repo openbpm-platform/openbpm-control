@@ -3,7 +3,7 @@
 **Key Features**
 - **Connection Management:** Easily set up connections to various BPM engines and switch between them as needed.
 - **Process Browsing:** Navigate through the processes deployed to the engine.
-- **Process Deployement:** Deploy a new version of a business process with a convenient diagram preview.
+- **Process Deployment:** Deploy a new version of a business process with a convenient diagram preview.
 - **Instance Management:** Manage process instances currently running on the BPM engine.
 - **User Task Management:** View user tasks with the ability to reassign them.
 
