@@ -8,6 +8,7 @@ package io.openbpm.control.service.processinstance;
 import io.jmix.core.DataManager;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
 import io.openbpm.control.entity.variable.VariableInstanceData;
+import io.openbpm.control.exception.RemoteProcessEngineException;
 import io.openbpm.control.test_support.AuthenticatedAsAdmin;
 import io.openbpm.control.test_support.RunningEngine;
 import io.openbpm.control.test_support.WithRunningEngine;
@@ -18,7 +19,6 @@ import io.openbpm.control.test_support.camunda7.dto.response.DeploymentResultDto
 import io.openbpm.control.test_support.camunda7.dto.response.ProcessVariablesMapDto;
 import io.openbpm.control.test_support.camunda7.dto.response.RuntimeProcessInstanceDto;
 import io.openbpm.control.test_support.camunda7.dto.response.VariableInstanceDto;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -96,7 +96,7 @@ public class Camunda7ProcessInstanceStartTest extends AbstractCamunda7Integratio
     }
 
     @Test
-    @DisplayName("RemoteEngineException thrown if start process by non-existing process id")
+    @DisplayName("RemoteProcessEngineException thrown if start process by non-existing process id")
     void givenNonExistingProcessId_whenStartByProcessId_thenRemoteEngineExceptionThrown() {
         //given
         String processId = UUID.randomUUID().toString();

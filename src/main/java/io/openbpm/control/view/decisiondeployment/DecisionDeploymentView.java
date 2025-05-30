@@ -1,5 +1,5 @@
 /*
- * Copyright (c) Haulmont 2024. All Rights Reserved.
+ * Copyright (c) Haulmont 2025. All Rights Reserved.
  * Use is subject to license terms.
  */
 
@@ -30,7 +30,6 @@ import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.kit.component.upload.event.FileUploadSucceededEvent;
 import io.jmix.flowui.view.MessageBundle;
 import io.jmix.flowui.view.StandardOutcome;
-import io.jmix.flowui.view.StandardView;
 import io.jmix.flowui.view.Subscribe;
 import io.jmix.flowui.view.ViewComponent;
 import io.jmix.flowui.view.ViewController;
@@ -38,10 +37,13 @@ import io.jmix.flowui.view.ViewDescriptor;
 import io.openbpm.control.dto.DmnDecisionDefinition;
 import io.openbpm.control.entity.decisiondefinition.DecisionDefinitionData;
 import io.openbpm.control.entity.filter.DecisionDefinitionFilter;
+import io.openbpm.control.exception.RemoteProcessEngineException;
+import io.openbpm.control.restsupport.camunda.ResourceReport;
 import io.openbpm.control.service.decisiondefinition.DecisionDefinitionLoadContext;
 import io.openbpm.control.service.decisiondefinition.DecisionDefinitionService;
 import io.openbpm.control.service.deployment.DeploymentContext;
 import io.openbpm.control.service.deployment.DeploymentService;
+import io.openbpm.control.view.AbstractResourceDeploymentView;
 import io.openbpm.control.view.main.MainView;
 import io.openbpm.uikit.component.dmnviewer.event.DmnXmlImportCompleteEvent;
 import io.openbpm.uikit.fragment.dmnviewer.DmnViewerFragment;
@@ -50,7 +52,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.repository.DecisionDefinition;
 import org.camunda.bpm.engine.repository.DeploymentWithDefinitions;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -69,7 +70,7 @@ import static io.openbpm.control.util.BpmParseUtil.parseDecisionsDefinitionsJson
 @ViewController("bpm_DecisionDeploymentView")
 @ViewDescriptor("decision-deployment-view.xml")
 @Slf4j
-public class DecisionDeploymentView extends StandardView {
+public class DecisionDeploymentView extends AbstractResourceDeploymentView {
 
     @Autowired
     protected DeploymentService deploymentService;
@@ -120,6 +121,7 @@ public class DecisionDeploymentView extends StandardView {
         resourceUploadField.addClassNames(LumoUtility.Padding.Top.NONE);
         initEmptyPreviewStyles();
         initDecisionInfoHBoxStyles();
+        initDeploymentErrorsButton();
     }
 
     @Subscribe(id = "okBtn", subject = "clickListener")
@@ -160,6 +162,8 @@ public class DecisionDeploymentView extends StandardView {
             this.decisionDefinitions = new ArrayList<>();
             decisionInfoHBox.setVisible(false);
         }
+
+        errorsBtn.setVisible(false);
     }
 
     @Subscribe("resourceUploadField")
@@ -174,6 +178,8 @@ public class DecisionDeploymentView extends StandardView {
 
             emptyPreviewHBox.setVisible(false);
         }
+
+        errorsBtn.setVisible(false);
     }
 
     @Subscribe(id = "cancelBtn", subject = "clickListener")
@@ -200,6 +206,8 @@ public class DecisionDeploymentView extends StandardView {
     }
 
     protected void deployBpmnXml(byte[] uploadedXml) {
+        deploymentReportDc.setItem(null);
+
         String uploadedFileName = resourceUploadField.getUploadedFileName();
         try (InputStream inputStream = new ByteArrayInputStream(uploadedXml)) {
             DeploymentWithDefinitions result = deploymentService.createDeployment(new DeploymentContext()
@@ -219,10 +227,23 @@ public class DecisionDeploymentView extends StandardView {
                     .show();
         } catch (RemoteProcessEngineException ex) {
             log.error("Error on decision deployment", ex);
-            notifications.create(messageBundle.getMessage("decisionsNotDeployed"))
-                    .withType(Notifications.Type.ERROR)
-                    .withDuration(2000)
-                    .show();
+
+            if (ex.isProcessEngineException()) {
+                ResourceReport.ProblemDetails problemDetails = new ResourceReport.ProblemDetails();
+                problemDetails.setMessage(ex.getResponseMessage());
+
+                ResourceReport resourceReport = new ResourceReport();
+                resourceReport.setErrors(List.of(problemDetails));
+
+                handleResourceReport(resourceReport, uploadedFileName);
+
+            } else {
+                notifications.create(messageBundle.getMessage("decisionsNotDeployed"), ex.getMessage())
+                        .withType(Notifications.Type.ERROR)
+                        .withDuration(2000)
+                        .show();
+            }
+
         }
     }
 
@@ -290,19 +311,19 @@ public class DecisionDeploymentView extends StandardView {
         //workaround to update a CSS class name for tooltip
         decisionCountInfoIcon.getElement().executeJs(
                 """
-                    if ($0.getElementsByTagName('vaadin-tooltip').length == 1) {
-                       $0.getElementsByTagName('vaadin-tooltip')[0]._overlayElement.setAttribute(
-                           'class','decision-tooltip');
-                    } else {
-                       const tooltips = document.getElementsByTagName('vaadin-tooltip');
-                       for (let i=0; i<tooltips.length; i++ ) {
-                           const tooltip = tooltips[i];
-                           if (tooltip._overlayElement.id === $0.getAttribute('aria-describedBy')) {
-                               tooltip._overlayElement.setAttribute('class','decision-tooltip')
-                           }
-                       }
-                    }
-                """, decisionCountInfoIcon);
+                            if ($0.getElementsByTagName('vaadin-tooltip').length == 1) {
+                               $0.getElementsByTagName('vaadin-tooltip')[0]._overlayElement.setAttribute(
+                                   'class','decision-tooltip');
+                            } else {
+                               const tooltips = document.getElementsByTagName('vaadin-tooltip');
+                               for (let i=0; i<tooltips.length; i++ ) {
+                                   const tooltip = tooltips[i];
+                                   if (tooltip._overlayElement.id === $0.getAttribute('aria-describedBy')) {
+                                       tooltip._overlayElement.setAttribute('class','decision-tooltip')
+                                   }
+                               }
+                            }
+                        """, decisionCountInfoIcon);
     }
 
     protected VerticalLayout createConfirmDialogContent(List<DecisionDefinitionData> existingDecisions) {

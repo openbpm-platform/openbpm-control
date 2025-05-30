@@ -5,6 +5,7 @@
 
 package io.openbpm.control.service.processdefinition;
 
+import io.openbpm.control.exception.RemoteProcessEngineException;
 import io.openbpm.control.test_support.AuthenticatedAsAdmin;
 import io.openbpm.control.test_support.RunningEngine;
 import io.openbpm.control.test_support.WithRunningEngine;
@@ -14,7 +15,6 @@ import io.openbpm.control.test_support.camunda7.CamundaRestTestHelper;
 import io.openbpm.control.test_support.camunda7.CamundaSampleDataManager;
 import io.openbpm.control.test_support.camunda7.dto.response.HistoricProcessInstanceDto;
 import org.camunda.community.rest.client.model.ProcessInstanceDto;
-import org.camunda.community.rest.exception.RemoteProcessEngineException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
