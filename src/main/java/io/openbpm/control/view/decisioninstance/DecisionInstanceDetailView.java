@@ -12,18 +12,7 @@ import io.jmix.flowui.ViewNavigators;
 import io.jmix.flowui.component.textfield.TypedTextField;
 import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.model.InstanceContainer;
-import io.jmix.flowui.view.DefaultMainViewParent;
-import io.jmix.flowui.view.DialogMode;
-import io.jmix.flowui.view.EditedEntityContainer;
-import io.jmix.flowui.view.Install;
-import io.jmix.flowui.view.PrimaryDetailView;
-import io.jmix.flowui.view.StandardDetailView;
-import io.jmix.flowui.view.Subscribe;
-import io.jmix.flowui.view.Supply;
-import io.jmix.flowui.view.Target;
-import io.jmix.flowui.view.ViewComponent;
-import io.jmix.flowui.view.ViewController;
-import io.jmix.flowui.view.ViewDescriptor;
+import io.jmix.flowui.view.*;
 import io.openbpm.control.action.CopyComponentValueToClipboardAction;
 import io.openbpm.control.entity.activity.HistoricActivityInstanceData;
 import io.openbpm.control.entity.decisioninstance.HistoricDecisionInputInstanceShortData;
@@ -88,9 +77,9 @@ public class DecisionInstanceDetailView extends StandardDetailView<HistoricDecis
         dmnViewerFragment.initViewer();
         String dmnXml = decisionDefinitionService.getDmnXml(decisionInstanceDc.getItem().getDecisionDefinitionId());
         dmnViewerFragment.setDmnXml(dmnXml, setDmnXmlJson ->
-            dmnViewerFragment.showDecisionDefinition(decisionInstanceDc.getItem().getDecisionDefinitionKey(),
-                    showDecisionDefinitionJson -> dmnViewerFragment.showDecisionInstance(
-                            createDecisionInstanceClientData(decisionInstanceDc.getItem())))
+                dmnViewerFragment.showDecisionDefinition(decisionInstanceDc.getItem().getDecisionDefinitionKey(),
+                        showDecisionDefinitionJson -> dmnViewerFragment.showDecisionInstance(
+                                createDecisionInstanceClientData(decisionInstanceDc.getItem())))
         );
         initAdditionalFields();
     }
@@ -151,15 +140,20 @@ public class DecisionInstanceDetailView extends StandardDetailView<HistoricDecis
     }
 
     private void initAdditionalFields() {
-        HistoricActivityInstanceData activityInstanceData = activityService.findById(
-                decisionInstanceDc.getItem().getActivityInstanceId());
-        if (activityInstanceData != null) {
-            activityNameTextField.setTypedValue(activityInstanceData.getActivityName());
+        HistoricDecisionInstanceShortData decisionInstanceDcItem = decisionInstanceDc.getItem();
+        if (decisionInstanceDcItem.getActivityInstanceId() != null) {
+            HistoricActivityInstanceData activityInstanceData = activityService.findById(
+                    decisionInstanceDcItem.getActivityInstanceId());
+            if (activityInstanceData != null) {
+                activityNameTextField.setTypedValue(activityInstanceData.getActivityName());
+            }
         }
-        ProcessInstanceData processInstanceData = processInstanceService.getProcessInstanceById(
-                decisionInstanceDc.getItem().getProcessInstanceId());
-        if (processInstanceData != null) {
-            processBusinessKeyTextField.setTypedValue(processInstanceData.getBusinessKey());
+        if (decisionInstanceDcItem.getProcessInstanceId() != null) {
+            ProcessInstanceData processInstanceData = processInstanceService.getProcessInstanceById(
+                    decisionInstanceDcItem.getProcessInstanceId());
+            if (processInstanceData != null) {
+                processBusinessKeyTextField.setTypedValue(processInstanceData.getBusinessKey());
+            }
         }
     }
 }
