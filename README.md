@@ -14,6 +14,7 @@ OpenBPM Control is built using the open-source [Jmix](https://www.jmix.io) frame
 
 ## Table of Contents
 
+- [Keycloak configuration](#keycloak-configuration)
 - [Running the Application](#running-the-application)
    - [Docker Image](#docker-image)
    - [Using Sources](#using-sources)
@@ -29,6 +30,30 @@ OpenBPM Control is built using the open-source [Jmix](https://www.jmix.io) frame
 - [Running the Tests](#running-the-tests)  
 - [License](#license) 
 
+## Keycloak configuration
+
+Перед началом использования OpenBPM Control необходимо настроить подключение к Keycloak.
+
+Для этого установите следующие переменные в application.properties:
+
+
+```properties
+# Keycloak
+spring.security.oauth2.client.registration.keycloak.client-id=<client_id>
+spring.security.oauth2.client.registration.keycloak.client-secret=<client_secret>
+spring.security.oauth2.client.registration.keycloak.scope=openid, profile, roles
+spring.security.oauth2.client.provider.keycloak.issuer-uri=<keycloak_issuer_uri>
+
+spring.security.oauth2.resourceserver.jwt.issuer-uri=<keycloak_issuer_uri>
+
+spring.security.oauth2.client.provider.keycloak.user-name-attribute=preferred_username
+
+jmix.oidc.jwt-authentication-converter.username-claim=preferred_username
+
+jmix.oidc.default-claims-roles-mapper.roles-claim-name=roles
+```
+
+Или 
 
 ## Running the Application <a name="running-the-application"></a>
 

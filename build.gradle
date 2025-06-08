@@ -121,6 +121,7 @@ dependencies {
 
     testImplementation 'org.testcontainers:junit-jupiter'
     testImplementation 'org.testcontainers:postgresql'
+    implementation 'io.jmix.oidc:jmix-oidc-starter'
 }
 
 configurations.implementation {

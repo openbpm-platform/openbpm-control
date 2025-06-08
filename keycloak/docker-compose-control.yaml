@@ -8,8 +8,7 @@
 
 services:
   openbpm-control-app: # OpenBPM Сontrol web application exposed on the configured port (by default 8081)
-    network_mode: host
-    image: openbpm/openbpm-control:latest
+    image: cr.yandex/crpocf4svpfi98epv13s/openbpm-control:1.0.0-beta-3-keycloak
     container_name: openbpm-control-app
     build: ..
     restart: "no"
@@ -39,6 +38,8 @@ services:
       timeout: 5s
       start_period: 30s
       retries: 5
+    networks:
+      - openbpm-control-net
 
   openbpm-control-database: # PostgresQL database used by OpenBPM Сontrol web application
     image: postgres:16.3
@@ -58,6 +59,12 @@ services:
       timeout: 5s
       start_period: 10s
       retries: 5
+    networks:
+      - openbpm-control-net
 
 volumes:
   openbpm-control-database_data:
+
+networks:
+  openbpm-control-net:
+    driver: bridge

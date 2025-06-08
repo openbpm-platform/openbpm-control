@@ -66,6 +66,13 @@ services:
       CAMUNDA_BPM_RUN_AUTH_ENABLED: "true"
       CAMUNDA_BPM_ADMIN_USER_ID: "${CAMUNDA7_UI_ADMIN_USERNAME}"
       CAMUNDA_BPM_ADMIN_USER_PASSWORD: "${CAMUNDA7_UI_ADMIN_PASSWORD}"
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENTID: "${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENTID}"
+      SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENTSECRET: "${SPRING_SECURITY_OAUTH2_CLIENT_REGISTRATION_KEYCLOAK_CLIENTSECRET}"
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUERURI: "${SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_ISSUERURI}"
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUERURI: "${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUERURI}"
+      SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_USERNAMEATTRIBUTE: "${SPRING_SECURITY_OAUTH2_CLIENT_PROVIDER_KEYCLOAK_USERNAMEATTRIBUTE}"
+      JMIX_OIDC_JWTAUTHENTICATIONCONVERTER_USERNAMECLAIM: "${JMIX_OIDC_JWTAUTHENTICATIONCONVERTER_USERNAMECLAIM}"
+      JMIX_OIDC_DEFAULTCLAIMSROLESMAPPER_ROLESCLAIMNAME: "${JMIX_OIDC_DEFAULTCLAIMSROLESMAPPER_ROLESCLAIMNAME}"
     ports:
       - "${CAMUNDA7_SERVER_PORT}:${CAMUNDA7_SERVER_PORT}"
     depends_on:
@@ -101,9 +108,51 @@ services:
       networks:
         - openbpm-control-platform-net
 
+  keycloak:
+    container_name: keycloak
+    image: quay.io/keycloak/keycloak:26.2
+    restart: always
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: keycloak-database
+      KC_DB_URL_HOST: postgres
+      KC_DB_SCHEMA: public
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_USERNAME: keycloak
+      KC_DB_PASSWORD: keycloak
+    healthcheck:
+      test: curl --head -fsS http://localhost:$$SERVER_PORT/health/ready || exit 1
+      interval: 10s
+      timeout: 5s
+      start_period: 60s
+      retries: 5
+    depends_on:
+      - keycloak-database
+    ports:
+      - "8082:8080"
+    command:
+      - "start-dev"
+
+  keycloak-database:
+    container_name: keycloak-database
+    image: postgres:15.4
+    restart: always
+    environment:
+      POSTGRES_DB: keycloak-database
+      POSTGRES_USER: keycloak
+      POSTGRES_PASSWORD: keycloak
+    volumes:
+      - keycloak-database_data:/var/lib/postgresql/data
+    ports:
+      - "5434:5432"
+    networks:
+      - openbpm-control-platform-net
+
 volumes:
   openbpm-control-database_data:
   camunda7-bpm-platform-database_data:
+  keycloak-database_data:
 
 networks:
   openbpm-control-platform-net:

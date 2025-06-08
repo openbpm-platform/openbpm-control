@@ -22,7 +22,7 @@
     <item view="bpm_Deployment.list" title="msg://io.openbpm.control.view.deploymentdata/deploymentListView.title" icon="vaadin:file-process"/>
     <item view="BpmEngine.list" title="msg://io.openbpm.control.view.bpmengine/bpmEngineListView.title" icon="CLOUD"/>
     <menu id="security">
-        <item view="User.list" title="msg://io.openbpm.control.view.user/UserListView.title" icon="USERS"/>
+<!--        <item view="User.list" title="msg://io.openbpm.control.view.user/UserListView.title" icon="USERS"/>-->
         <item view="sec_ResourceRoleModel.list"
               title="msg://io.jmix.securityflowui.view.resourcerole/resourceRoleModelListView.menu" icon="SHIELD"/>
         <item view="sec_RowLevelRoleModel.list"  icon="LOCK"
