@@ -1,0 +1,8 @@
+{
+  "type": "default",
+  "id": "test",
+  "components": [],
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.23.0",
+  "schemaVersion": 16
+}

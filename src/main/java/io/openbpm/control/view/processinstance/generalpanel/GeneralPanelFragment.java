@@ -27,10 +27,13 @@ import io.jmix.flowui.component.formlayout.JmixFormLayout;
 import io.jmix.flowui.component.textarea.JmixTextArea;
 import io.jmix.flowui.fragment.Fragment;
 import io.jmix.flowui.fragment.FragmentDescriptor;
+import io.jmix.flowui.kit.action.ActionPerformedEvent;
 import io.jmix.flowui.kit.action.ActionVariant;
+import io.jmix.flowui.kit.action.BaseAction;
 import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.model.InstanceContainer;
 import io.jmix.flowui.view.*;
+import io.openbpm.control.action.MigrateProcessInstanceAction;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceState;
@@ -38,6 +41,7 @@ import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import io.openbpm.control.view.processinstance.ProcessInstanceDetailView;
 import io.openbpm.control.view.processinstancemigration.ProcessInstanceMigrationView;
+import io.openbpm.control.view.processinstanceterminate.ProcessInstanceTerminateView;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.jmix.flowui.component.UiComponentUtils.getCurrentView;
@@ -89,13 +93,14 @@ public class GeneralPanelFragment extends Fragment<FlexLayout> {
     protected VerticalLayout runtimeInstanceActions;
     @ViewComponent
     protected JmixCheckbox externallyTerminatedField;
+    @ViewComponent
+    protected MigrateProcessInstanceAction migrateAction;
 
 
     @Subscribe
     public void onReady(ReadyEvent event) {
         processInstanceInfoGroupBox.getComponents().forEach(component -> component.addClassNames(LumoUtility.Padding.Top.SMALL));
     }
-
 
     @Subscribe(target = Target.HOST_CONTROLLER)
     public void onHostBeforeShow(View.BeforeShowEvent event) {
@@ -109,6 +114,8 @@ public class GeneralPanelFragment extends Fragment<FlexLayout> {
         externallyTerminatedField.setVisible(hasEndTime);
 
         initActionButtons();
+
+        migrateAction.setProcessInstanceData(processInstanceDataDc.getItem());
     }
 
     protected void initProcessDefinitionField(ProcessInstanceData processInstanceData) {
@@ -202,56 +209,48 @@ public class GeneralPanelFragment extends Fragment<FlexLayout> {
                 .open();
     }
 
-    @Subscribe("terminateBtn")
-    public void terminateProcessInstance(ClickEvent<Button> event) {
-        dialogs.createOptionDialog()
-                .withHeader(messageBundle.getMessage("terminateProcessInstanceView.title"))
-                .withText(messageBundle.getMessage("terminateProcessInstanceMsg"))
-                .withActions(
-                        new DialogAction(DialogAction.Type.YES)
-                                .withIcon(VaadinIcon.DOT_CIRCLE)
-                                .withText(messages.getMessage("actions.Terminate"))
-                                .withVariant(ActionVariant.PRIMARY)
-                                .withHandler(e -> {
-                                    String processInstanceId = processInstanceDataDc.getItem().getId();
-                                    processInstanceService.terminateById(processInstanceId);
+    @Subscribe("terminateAction")
+    public void onTerminateAction(final ActionPerformedEvent event) {
+        DialogWindow<ProcessInstanceTerminateView> dialog = dialogWindows.view(getCurrentView(), ProcessInstanceTerminateView.class)
+                .withAfterCloseListener(afterCloseEvent -> {
+                    if (afterCloseEvent.closedWith(StandardOutcome.SAVE)) {
+                        notifications.create(messageBundle.getMessage("processInstanceTerminated"))
+                                .withType(Notifications.Type.SUCCESS)
+                                .show();
+                        reopenProcessInstanceDetailsView();
+                    }
+                })
+                .build();
 
-                                    notifications.create(messageBundle.getMessage("processInstanceTerminated"))
-                                            .withType(Notifications.Type.SUCCESS)
-                                            .show();
-                                    reopenProcessInstanceDetailsView();
-                                }),
-                        new DialogAction(DialogAction.Type.CANCEL)
-                )
-                .open();
-    }
-
-    @Subscribe("migrateBtn")
-    protected void onMigrateBtnClick(ClickEvent<Button> event) {
-        ProcessDefinitionData processDefinitionData = metadata.create(ProcessDefinitionData.class);
-        ProcessInstanceData processInstanceData = processInstanceDataDc.getItem();
-        processDefinitionData.setId(processInstanceData.getProcessDefinitionId());
-        processDefinitionData.setKey(processInstanceData.getProcessDefinitionKey());
-        processDefinitionData.setVersion(processInstanceData.getProcessDefinitionVersion());
-
-        DialogWindow<ProcessInstanceMigrationView> dialog =
-                dialogWindows.view(getCurrentView(), ProcessInstanceMigrationView.class)
-                        .withAfterCloseListener(afterCloseEvent -> {
-                            if (afterCloseEvent.closedWith(StandardOutcome.SAVE)) {
-                                notifications.create(messageBundle.getMessage("processInstanceMigrated"))
-                                        .withType(Notifications.Type.SUCCESS)
-                                        .show();
-
-                                reopenProcessInstanceDetailsView();
-                            }
-                        })
-                        .build();
-
-        dialog.getView().setProcessDefinitionData(processDefinitionData);
-        dialog.getView().setProcessInstanceData(processInstanceData);
+        dialog.getView().setProcessInstanceData(processInstanceDataDc.getItem());
         dialog.open();
-
     }
+
+//    @Subscribe("migrateAction")
+//    public void onMigrateAction(final ActionPerformedEvent event) {
+//        ProcessDefinitionData processDefinitionData = metadata.create(ProcessDefinitionData.class);
+//        ProcessInstanceData processInstanceData = processInstanceDataDc.getItem();
+//        processDefinitionData.setId(processInstanceData.getProcessDefinitionId());
+//        processDefinitionData.setKey(processInstanceData.getProcessDefinitionKey());
+//        processDefinitionData.setVersion(processInstanceData.getProcessDefinitionVersion());
+//
+//        DialogWindow<ProcessInstanceMigrationView> dialog =
+//                dialogWindows.view(getCurrentView(), ProcessInstanceMigrationView.class)
+//                        .withAfterCloseListener(afterCloseEvent -> {
+//                            if (afterCloseEvent.closedWith(StandardOutcome.SAVE)) {
+//                                notifications.create(messageBundle.getMessage("processInstanceMigrated"))
+//                                        .withType(Notifications.Type.SUCCESS)
+//                                        .show();
+//
+//                                reopenProcessInstanceDetailsView();
+//                            }
+//                        })
+//                        .build();
+//
+//        dialog.getView().setProcessDefinitionData(processDefinitionData);
+//        dialog.getView().setProcessInstanceData(processInstanceData);
+//        dialog.open();
+//    }
 
 
     @Subscribe("infoBtn")

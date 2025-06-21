@@ -8,6 +8,23 @@
         <instance id="processInstanceDataDc"
                   class="io.openbpm.control.entity.processinstance.ProcessInstanceData" provided="true"/>
     </data>
+
+    <actions>
+        <action id="terminateAction"
+                icon="DOT_CIRCLE"
+                description="msg://terminateProcessInstance"/>
+        <action id="migrateAction"
+                icon="FORWARD"
+                type="control_migrateProcessInstanceAction"
+                description="msg://migrateProcessInstance"/>
+        <action id="refreshAction"
+                icon="REFRESH"
+                description="msg://reloadProcessInstanceDetails"/>
+        <action id="activateAction"
+                icon="REFRESH"
+                description="msg://reloadProcessInstanceDetails"/>
+    </actions>
+
     <content>
         <flexLayout classNames="process-instance-slide-panel">
             <flexLayout id="instanceDetailsPanel" width="min-content" height="100%" classNames="bordered-container">
@@ -33,11 +50,11 @@
                 <vbox themeNames="spacing-xs" classNames="shadow-s p-s instance-details-actions-panel">
                     <button id="infoBtn" icon="INFO_CIRCLE" title="msg://viewProcessInstanceDetails" classNames="bordered-button"/>
                     <vbox themeNames="spacing-xs" id="runtimeInstanceActions" padding="false">
-                        <button id="refreshBtn" icon="REFRESH" title="msg://reloadProcessInstanceDetails" classNames="bordered-button"/>
-                        <button id="activateBtn" icon="PLAY" title="msg://activateProcessInstance" classNames="bordered-button"/>
+                        <button id="refreshBtn" classNames="bordered-button"/>
+                        <button id="activateBtn"  classNames="bordered-button"/>
                         <button id="suspendBtn" icon="PAUSE" title="msg://suspendProcessInstance" classNames="bordered-button"/>
-                        <button id="migrateBtn" icon="FORWARD" title="msg://migrateProcessInstance" classNames="bordered-button"/>
-                        <button id="terminateBtn" icon="DOT_CIRCLE" title="msg://terminateProcessInstance" classNames="bordered-button"/>
+                        <button id="migrateBtn" action="migrateAction" classNames="bordered-button"/>
+                        <button id="terminateBtn" action="terminateAction" classNames="bordered-button"/>
                     </vbox>
                 </vbox>
             </flexLayout>
