@@ -10,6 +10,13 @@ import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Push;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
+import io.jmix.core.MessageTools;
+import io.jmix.flowui.UiComponents;
+import io.jmix.flowui.menu.MenuConfig;
+import io.jmix.flowui.menu.MenuItemCommands;
+import io.jmix.flowui.sys.UiAccessChecker;
+import io.jmix.flowui.view.ViewRegistry;
+import io.openbpm.control.menu.CustomListMenuBuilder;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -51,6 +58,17 @@ public class OpenBpmControlApplication implements AppShellConfigurator {
     @ConfigurationProperties("main.datasource.hikari")
     DataSource dataSource(final DataSourceProperties dataSourceProperties) {
         return dataSourceProperties.initializeDataSourceBuilder().build();
+    }
+
+    @Bean
+    @Primary
+    CustomListMenuBuilder listMenuBuilder(MenuConfig menuConfig,
+                                          ViewRegistry viewRegistry,
+                                          UiComponents uiComponents,
+                                          MessageTools messageTools,
+                                          UiAccessChecker uiAccessChecker,
+                                          MenuItemCommands menuItemCommands) {
+        return new CustomListMenuBuilder(menuConfig, viewRegistry, uiComponents, messageTools, uiAccessChecker, menuItemCommands);
     }
 
     @EventListener
