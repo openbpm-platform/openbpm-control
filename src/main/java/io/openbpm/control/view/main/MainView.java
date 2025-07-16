@@ -23,7 +23,12 @@ import io.jmix.flowui.app.main.StandardMainView;
 import io.jmix.flowui.asynctask.UiAsyncTasks;
 import io.jmix.flowui.facet.Timer;
 import io.jmix.flowui.model.InstanceContainer;
-import io.jmix.flowui.view.*;
+import io.jmix.flowui.view.MessageBundle;
+import io.jmix.flowui.view.Subscribe;
+import io.jmix.flowui.view.View;
+import io.jmix.flowui.view.ViewComponent;
+import io.jmix.flowui.view.ViewController;
+import io.jmix.flowui.view.ViewDescriptor;
 import io.jmix.flowui.view.navigation.ViewNavigationSupport;
 import io.openbpm.control.entity.EngineConnectionCheckResult;
 import io.openbpm.control.entity.engine.BpmEngine;
@@ -31,6 +36,7 @@ import io.openbpm.control.event.UserEngineSelectEvent;
 import io.openbpm.control.property.EngineConnectionCheckProperties;
 import io.openbpm.control.service.engine.EngineService;
 import io.openbpm.control.service.engine.EngineUiService;
+import io.openbpm.control.uicomponent.menu.ControlListMenu;
 import io.openbpm.control.view.dashboard.DashboardFragment;
 import io.openbpm.control.view.event.TitleUpdateEvent;
 import lombok.extern.slf4j.Slf4j;
@@ -92,6 +98,9 @@ public class MainView extends StandardMainView {
     @ViewComponent
     protected Header header;
 
+    @ViewComponent
+    protected ControlListMenu menu;
+
     protected EngineStatusBadgeFragment engineStatusFragment;
 
     protected AtomicBoolean statusCheckRunning = new AtomicBoolean(false);
@@ -106,6 +115,7 @@ public class MainView extends StandardMainView {
         BpmEngine selectedEngine = engineService.getSelectedEngine();
         selectedEngineDc.setItem(selectedEngine);
 
+        initMenu();
         initBaseLink();
         initConnectionCheckTimer();
         initInitialLayout();
@@ -162,6 +172,21 @@ public class MainView extends StandardMainView {
                 dashboardFragment.updateDashboard();
             }
         }
+    }
+
+    protected void initMenu() {
+        menu.addMenuItemBefore(new ControlListMenu.GroupLabelMenuItem("mainLabel")
+                .withTitle(messageBundle.getMessage("menu.mainGroup.label")), "processDefinitions");
+
+        menu.addMenuItemBefore(new ControlListMenu.GroupLabelMenuItem("dmnLabel")
+                .withTitle(messageBundle.getMessage("menu.dmnGroup.label")), "decisions");
+
+        menu.addMenuItemBefore(new ControlListMenu.GroupLabelMenuItem("systemLabel")
+                .withTitle(messageBundle.getMessage("menu.systemGroup.label")), "deployments");
+
+        menu.addMenuItemBefore(new ControlListMenu.GroupLabelMenuItem("supportLabel")
+                        .withTitle(messageBundle.getMessage("menu.supportGroup.label")),
+                "about");
     }
 
     protected void initInitialLayout() {
