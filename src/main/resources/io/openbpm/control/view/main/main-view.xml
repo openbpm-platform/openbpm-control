@@ -10,9 +10,6 @@
         <instance id="engineConnectionStatusDc" class="io.openbpm.control.entity.EngineConnectionCheckResult"/>
         <instance id="selectedEngineDc" class="io.openbpm.control.entity.engine.BpmEngine"/>
     </data>
-    <actions>
-        <action id="logout" type="logout"/>
-    </actions>
     <facets>
         <timer id="connectionCheckTimer" delay="10000" repeating="true" autostart="false"/>
     </facets>
@@ -31,7 +28,7 @@
         </navigationBar>
         <drawerLayout>
             <section id="section" classNames="jmix-main-view-section">
-                <hbox padding="false" themeNames="spacing-s" width="100%" alignItems="CENTER" classNames="pr-s">
+                <hbox padding="false" themeNames="spacing-s" width="100%" alignItems="CENTER" classNames="pr-s border-b border-contrast-10">
                     <h2 id="applicationTitle"
                         classNames="jmix-main-view-application-title">
                         <anchor id="baseLink"
@@ -47,13 +44,10 @@
                 <nav id="navigation"
                      classNames="jmix-main-view-navigation"
                      ariaLabel="msg://navigation.ariaLabel">
-                    <listMenu id="menu"/>
+                    <listMenu id="menu" themeNames="toggle-reverse"/>
                 </nav>
                 <footer id="footer" classNames="jmix-main-view-footer">
-                    <userIndicator id="userIndicator"/>
-                    <button id="logoutButton"
-                            action="logout"
-                            classNames="jmix-logout-button"/>
+                    <fragment id="userIndicator" class="io.openbpm.control.view.main.UserIndicatorFragment"/>
                 </footer>
             </section>
         </drawerLayout>
