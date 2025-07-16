@@ -14,10 +14,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
 
+/**
+ * Side menu component.
+ */
 public class ControlListMenu extends JmixListMenu {
     public static final String MENU_GROUP_LABEL_CLASS = "menu-group-label";
     private static final Logger log = LoggerFactory.getLogger(ControlListMenu.class);
 
+    /**
+     * Adds a menu item to the menu before the existing menu item with the specified id.
+     *
+     * @param menuItem         the menu item to be added
+     * @param beforeMenuItemId the id of the menu item before which the new menu item should be inserted
+     */
     public void addMenuItemBefore(MenuItem menuItem, String beforeMenuItemId) {
         MenuItem existingMenuItem = getExistingMenu(beforeMenuItemId);
         if (existingMenuItem != null) {
@@ -30,6 +39,12 @@ public class ControlListMenu extends JmixListMenu {
         }
     }
 
+    /**
+     * Adds a menu item to the menu after the existing menu item with the specified id.
+     *
+     * @param menuItem        the menu item to be added
+     * @param afterMenuItemId the id of the menu item after which the new menu item should be inserted
+     */
     public void addMenuItemAfter(MenuItem menuItem, String afterMenuItemId) {
         MenuItem existingMenuItem = getExistingMenu(afterMenuItemId);
         if (existingMenuItem != null) {

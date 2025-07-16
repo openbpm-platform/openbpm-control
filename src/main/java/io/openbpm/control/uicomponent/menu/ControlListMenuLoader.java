@@ -8,6 +8,9 @@ package io.openbpm.control.uicomponent.menu;
 import io.jmix.flowui.component.main.JmixListMenu;
 import io.jmix.flowui.xml.layout.loader.component.ListMenuLoader;
 
+/**
+ * Loader of the {@link ControlListMenu} component.
+ */
 public class ControlListMenuLoader extends ListMenuLoader {
 
     @Override

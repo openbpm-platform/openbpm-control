@@ -31,6 +31,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Objects;
 
+/**
+ * Shows details about the logged-in user in the side menu.
+ */
 @FragmentDescriptor("user-indicator-fragment.xml")
 public class UserIndicatorFragment extends Fragment<HorizontalLayout> {
     private static final Logger log = LoggerFactory.getLogger(UserIndicatorFragment.class);
