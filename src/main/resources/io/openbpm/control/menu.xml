@@ -6,6 +6,7 @@
 
 <menu-config xmlns="http://jmix.io/schema/flowui/menu">
     <!-- Main group -->
+    <item id="dashboard" view="MainView" title="msg://io.openbpm.control/menu_config.dashboard.title"/>
     <item id="processDefinitions" view="bpm_ProcessDefinition.list"
           description="msg://io.openbpm.control/menu_config.bpm_ProcessDefinition.list.description"
           title="msg://io.openbpm.control/menu_config.bpm_ProcessDefinition.list.title" icon="SITEMAP"/>
