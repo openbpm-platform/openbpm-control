@@ -36,10 +36,6 @@
                                 text="msg://applicationTitle.text"
                                 classNames="jmix-main-view-application-title-base-link flex gap-xs items-center"/>
                     </h2>
-                    <anchor href="." classNames="jmix-main-view-application-title-base-link ml-auto flex"
-                            title="msg://openDashboard">
-                        <icon icon="BAR_CHART_H" classNames="text-xs text-secondary"/>
-                    </anchor>
                 </hbox>
                 <nav id="navigation"
                      classNames="jmix-main-view-navigation"
