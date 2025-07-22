@@ -54,7 +54,7 @@
                 </column>
                 <column property="startTime" autoWidth="true"/>
                 <column property="endTime" flexGrow="1" autoWidth="true"/>
-                <column key="actions" sortable="false" autoWidth="true" flexGrow="1"/>
+                <column key="actions" sortable="false" autoWidth="true" flexGrow="0"/>
             </columns>
         </dataGrid>
     </layout>

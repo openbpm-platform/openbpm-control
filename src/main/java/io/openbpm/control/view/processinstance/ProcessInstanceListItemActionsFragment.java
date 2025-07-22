@@ -23,6 +23,7 @@ import static io.jmix.flowui.component.UiComponentUtils.getCurrentView;
 
 @FragmentDescriptor("process-instance-list-item-actions-fragment.xml")
 public class ProcessInstanceListItemActionsFragment extends Fragment<HorizontalLayout> {
+
     @Autowired
     protected ViewNavigators viewNavigators;
 
