@@ -5,7 +5,9 @@
   -->
 
 <menu-config xmlns="http://jmix.io/schema/flowui/menu">
-    <item view="bpm_ProcessDefinition.list"
+    <!-- Main group -->
+    <item id="dashboard" view="MainView" title="msg://io.openbpm.control/menu_config.dashboard.title"/>
+    <item id="processDefinitions" view="bpm_ProcessDefinition.list"
           description="msg://io.openbpm.control/menu_config.bpm_ProcessDefinition.list.description"
           title="msg://io.openbpm.control/menu_config.bpm_ProcessDefinition.list.title" icon="SITEMAP"/>
     <item view="bpm_ProcessInstance.list"
@@ -15,22 +17,30 @@
             <parameter name="mode" value="active"/>
         </urlQueryParameters>
     </item>
+    <item view="IncidentData.list" title="msg://io.openbpm.control.view.incidentdata/incidentDataListView.title"
+          icon="WARNING"/>
     <item view="bpm_AllTasksView" title="msg://io.openbpm.control/allTasks" icon="USER_CARD"/>
-    <item view="bpm_DecisionDefinition.list" icon="vaadin:table"
-          title="msg://io.openbpm.control.view.decisiondefinition/decisionDefinitionListView.title"/>
-    <item view="IncidentData.list" title="msg://io.openbpm.control.view.incidentdata/incidentDataListView.title" icon="WARNING"/>
-    <item view="bpm_Deployment.list" title="msg://io.openbpm.control.view.deploymentdata/deploymentListView.title" icon="vaadin:file-process"/>
-    <item view="BpmEngine.list" title="msg://io.openbpm.control.view.bpmengine/bpmEngineListView.title" icon="CLOUD"/>
-    <menu id="security">
-        <item view="User.list" title="msg://io.openbpm.control.view.user/UserListView.title" icon="USERS"/>
+
+    <!-- DMN group -->
+    <item id="decisions" view="bpm_DecisionDefinition.list"
+          title="msg://io.openbpm.control.view.decisiondefinition/decisionDefinitionListView.title"
+          icon="vaadin:table"/>
+
+    <!-- System group -->
+    <item id="deployments" view="bpm_Deployment.list"
+          title="msg://io.openbpm.control.view.deploymentdata/deploymentListView.title" icon="vaadin:file-process"/>
+
+    <menu id="administration" description="msg://io.openbpm.control/menu_config.administration.description"
+          opened="true"
+          title="msg://io.openbpm.control/menu_config.administration.title" icon="vaadin:cog">
+        <item view="BpmEngine.list" title="msg://io.openbpm.control.view.bpmengine/bpmEngineListView.title"
+        />
+        <item view="User.list" title="msg://io.openbpm.control.view.user/UserListView.title"/>
         <item view="sec_ResourceRoleModel.list"
-              title="msg://io.jmix.securityflowui.view.resourcerole/resourceRoleModelListView.menu" icon="SHIELD"/>
-        <item view="sec_RowLevelRoleModel.list"  icon="LOCK"
-              title="msg://io.jmix.securityflowui.view.rowlevelrole/rowLevelRoleModelListView.menu"/>
+              title="msg://io.openbpm.control/menu_config.resourceRole.list.title"/>
     </menu>
-    <menu id="datatools">
-        <item view="datatl_entityInspectorListView" title="msg://io.jmix.datatoolsflowui.view.entityinspector/listTitle"
-              icon="TOOLS"/>
-    </menu>
-    <item view="AboutProductView" title="msg://io.openbpm.control.view.about/aboutProductView.title" icon="INFO_CIRCLE_O"/>
+
+    <!-- Support group -->
+    <item id="about" view="AboutProductView" title="msg://io.openbpm.control.view.about/aboutProductView.title"
+          icon="INFO_CIRCLE_O"/>
 </menu-config>
