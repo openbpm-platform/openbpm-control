@@ -3,12 +3,18 @@ package io.openbpm.control.view.decisiondefinition;
 import com.google.common.base.Strings;
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.ClickEvent;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.jmix.core.DataLoadContext;
 import io.jmix.core.LoadContext;
 import io.jmix.core.Metadata;
+import io.jmix.flowui.Fragments;
+import io.jmix.flowui.UiComponents;
 import io.jmix.flowui.ViewNavigators;
 import io.jmix.flowui.component.checkbox.JmixCheckbox;
 import io.jmix.flowui.component.formlayout.JmixFormLayout;
@@ -17,13 +23,7 @@ import io.jmix.flowui.kit.action.ActionPerformedEvent;
 import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.model.CollectionLoader;
 import io.jmix.flowui.model.InstanceContainer;
-import io.jmix.flowui.view.Install;
-import io.jmix.flowui.view.StandardListView;
-import io.jmix.flowui.view.Subscribe;
-import io.jmix.flowui.view.Target;
-import io.jmix.flowui.view.ViewComponent;
-import io.jmix.flowui.view.ViewController;
-import io.jmix.flowui.view.ViewDescriptor;
+import io.jmix.flowui.view.*;
 import io.openbpm.control.entity.decisiondefinition.DecisionDefinitionData;
 import io.openbpm.control.entity.filter.DecisionDefinitionFilter;
 import io.openbpm.control.service.decisiondefinition.DecisionDefinitionLoadContext;
@@ -45,6 +45,8 @@ public class DecisionDefinitionListView extends StandardListView<DecisionDefinit
     private DecisionDefinitionService decisionDefinitionService;
     @Autowired
     private ViewNavigators viewNavigators;
+    @Autowired
+    private Fragments fragments;
 
     @ViewComponent
     private InstanceContainer<DecisionDefinitionFilter> decisionDefinitionFilterDc;
@@ -135,5 +137,14 @@ public class DecisionDefinitionListView extends StandardListView<DecisionDefinit
                     .setSort(query.getSort());
         }
         return decisionDefinitionService.findAll(context);
+    }
+
+    @Supply(to = "decisionDefinitionsGrid.actions", subject = "renderer")
+    private Renderer<DecisionDefinitionData> decisionDefinitionsGridActionsRenderer() {
+        return new ComponentRenderer<>(decisiondefinitiondata -> {
+            DecisionDefinitionListItemActionsFragment fragment = fragments.create(this, DecisionDefinitionListItemActionsFragment.class);
+            fragment.setDecisionDefinition(decisiondefinitiondata);
+            return fragment;
+        });
     }
 }

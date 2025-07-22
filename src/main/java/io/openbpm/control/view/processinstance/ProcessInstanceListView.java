@@ -7,10 +7,7 @@ package io.openbpm.control.view.processinstance;
 
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.event.SortEvent;
 import com.vaadin.flow.data.provider.SortDirection;
@@ -42,7 +39,6 @@ import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceLoadContext;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import io.openbpm.control.view.processinstance.filter.*;
-import io.openbpm.control.view.util.ComponentHelper;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

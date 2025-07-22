@@ -69,8 +69,8 @@
                 <action id="view" type="list_edit" visible="false"/>
             </actions>
             <columns resizable="true">
-                <column property="deploymentId"/>
-                <column property="name"/>
+                <column property="deploymentId" flexGrow="1"/>
+                <column property="name" autoWidth="true" flexGrow="1"/>
                 <column property="deploymentTime"/>
                 <column property="source"/>
                 <column property="tenantId"/>
