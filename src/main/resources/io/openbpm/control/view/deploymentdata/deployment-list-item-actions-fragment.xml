@@ -9,7 +9,7 @@
     </data>
 
     <content>
-        <hbox minWidth="20em" themeNames="spacing-xs">
+        <hbox themeNames="spacing-xs" justifyContent="END">
             <button id="viewDetailsBtn" themeNames="tertiary-inline small" icon="EYE" text="msg://deploymentDataList.view" minWidth="10em"/>
         </hbox>
     </content>

@@ -9,7 +9,7 @@
     </data>
 
     <content>
-        <hbox minWidth="20em" themeNames="spacing-xs">
+        <hbox minWidth="20em" themeNames="spacing-xs" justifyContent="END">
             <button id="viewDetailsBtn" themeNames="tertiary-inline small" icon="EYE" text="msg://processDefinitionList.view"/>
             <button id="startProcessBtn" minWidth="10em" themeNames="tertiary-inline small" icon="PLAY_CIRCLE"
                     text="msg://processDefinitionList.start" visible="false"/>

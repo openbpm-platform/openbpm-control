@@ -5,6 +5,8 @@
 
 package io.openbpm.control.configuration;
 
+import io.openbpm.control.uicomponent.menu.ControlListMenu;
+import io.openbpm.control.uicomponent.menu.ControlListMenuLoader;
 import io.openbpm.control.uicomponent.spinner.SpinnerLoader;
 import io.openbpm.control.uicomponent.treedatagrid.NoClickTreeDataGridLoader;
 import io.openbpm.control.uicomponent.treedatagrid.NoClickTreeGrid;
@@ -30,4 +32,12 @@ public class UiComponentRegistrationConfiguration {
                 .withComponentLoader("spinner", SpinnerLoader.class)
                 .build();
     }
+
+    @Bean
+    public ComponentRegistration controlListMenu() {
+        return ComponentRegistrationBuilder.create(ControlListMenu.class)
+                .withComponentLoader("listMenu", ControlListMenuLoader.class)
+                .build();
+    }
+
 }

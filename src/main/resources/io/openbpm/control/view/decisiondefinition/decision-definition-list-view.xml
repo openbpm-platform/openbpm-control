@@ -67,9 +67,10 @@
                 <action id="view" type="list_edit" visible="false"/>
             </actions>
             <columns resizable="true">
-                <column property="name"/>
-                <column property="key"/>
+                <column property="name" autoWidth="true" flexGrow="1"/>
+                <column property="key" autoWidth="true" flexGrow="1"/>
                 <column property="version"/>
+                <column key="actions" sortable="false" autoWidth="true" flexGrow="0"/>
             </columns>
         </dataGrid>
     </layout>
