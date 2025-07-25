@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://retryExternalTask.header">
+
+    <actions>
+        <action id="retryAction"
+                text="msg:///actions.Retry"
+                icon="ROTATE_LEFT"
+                actionVariant="PRIMARY"/>
+        <action id="cancelAction"
+                text="msg:///actions.Cancel"
+                icon="BAN"/>
+    </actions>
+
+    <layout>
+        <span text="msg://retryExternalTask.text" width="100%"/>
+
+        <hbox justifyContent="END" width="100%">
+            <button id="retryBtn" action="retryAction"/>
+            <button id="cancelBtn" action="cancelAction"/>
+        </hbox>
+    </layout>
+</view>
