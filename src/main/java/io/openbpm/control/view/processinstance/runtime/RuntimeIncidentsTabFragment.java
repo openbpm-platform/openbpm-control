@@ -7,7 +7,6 @@ package io.openbpm.control.view.processinstance.runtime;
 
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.event.SortEvent;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
@@ -18,22 +17,20 @@ import io.jmix.core.LoadContext;
 import io.jmix.core.Messages;
 import io.jmix.core.Metadata;
 import io.jmix.flowui.*;
-import io.jmix.flowui.action.DialogAction;
 import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.fragment.Fragment;
 import io.jmix.flowui.fragment.FragmentDescriptor;
 import io.jmix.flowui.kit.action.ActionPerformedEvent;
-import io.jmix.flowui.kit.action.ActionVariant;
 import io.jmix.flowui.model.CollectionLoader;
 import io.jmix.flowui.model.InstanceContainer;
 import io.jmix.flowui.view.*;
 import io.openbpm.control.entity.filter.IncidentFilter;
 import io.openbpm.control.entity.incident.IncidentData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
-import io.openbpm.control.service.externaltask.ExternalTaskService;
 import io.openbpm.control.service.incident.IncidentLoadContext;
 import io.openbpm.control.service.incident.IncidentService;
-import io.openbpm.control.service.job.JobService;
+import io.openbpm.control.view.incidentdata.RetryExternalTaskView;
+import io.openbpm.control.view.incidentdata.RetryJobView;
 import io.openbpm.control.view.processinstance.event.IncidentCountUpdateEvent;
 import io.openbpm.control.view.processinstance.event.IncidentUpdateEvent;
 import io.openbpm.control.view.util.ComponentHelper;
@@ -63,20 +60,13 @@ public class RuntimeIncidentsTabFragment extends Fragment<VerticalLayout> {
     protected Notifications notifications;
     @Autowired
     protected ComponentHelper componentHelper;
-
     @Autowired
     protected IncidentService incidentService;
-    @Autowired
-    protected JobService jobService;
-    @Autowired
-    protected ExternalTaskService externalTaskService;
 
     @ViewComponent
     protected CollectionLoader<IncidentData> runtimeIncidentsDl;
-
     @ViewComponent
     protected InstanceContainer<ProcessInstanceData> processInstanceDataDc;
-
     @ViewComponent
     protected DataGrid<IncidentData> runtimeIncidentsGrid;
 
@@ -138,27 +128,31 @@ public class RuntimeIncidentsTabFragment extends Fragment<VerticalLayout> {
         }
 
         if (incident.isExternalTaskFailed()) {
-            dialogs.createOptionDialog()
-                    .withHeader(messages.getMessage("io.openbpm.control.view.incidentdata/retryExternalTask.header"))
-                    .withText(messages.getMessage("io.openbpm.control.view.incidentdata/retryExternalTask.text"))
-                    .withActions(new DialogAction(DialogAction.Type.YES)
-                                    .withText(messages.getMessage("actions.Retry"))
-                                    .withIcon(VaadinIcon.ROTATE_LEFT.create())
-                                    .withVariant(ActionVariant.PRIMARY)
-                                    .withHandler(actionPerformedEvent -> updateExternalTaskRetries(incident)),
-                            new DialogAction(DialogAction.Type.CANCEL))
-                    .open();
+            DialogWindow<RetryExternalTaskView> dialogWindow = dialogWindows.view(getCurrentView(), RetryExternalTaskView.class)
+                    .withAfterCloseListener(afterClose -> {
+                        if (afterClose.closedWith(StandardOutcome.SAVE)) {
+                            reloadIncidents();
+                        }
+                    })
+                    .build();
+
+            RetryExternalTaskView retryExternalTaskView = dialogWindow.getView();
+            retryExternalTaskView.setExternalTaskId(incident.getConfiguration());
+
+            dialogWindow.open();
         } else if (incident.isJobFailed()) {
-            dialogs.createOptionDialog()
-                    .withHeader(messages.getMessage("io.openbpm.control.view.incidentdata/retryJob.header"))
-                    .withText(messages.getMessage("io.openbpm.control.view.incidentdata/retryJob.text"))
-                    .withActions(new DialogAction(DialogAction.Type.YES)
-                                    .withText(messages.getMessage("actions.Retry"))
-                                    .withIcon(VaadinIcon.ROTATE_LEFT.create())
-                                    .withVariant(ActionVariant.PRIMARY)
-                                    .withHandler(actionPerformedEvent -> updateJobRetries(incident)),
-                            new DialogAction(DialogAction.Type.CANCEL))
-                    .open();
+            DialogWindow<RetryJobView> dialogWindow = dialogWindows.view(getCurrentView(), RetryJobView.class)
+                    .withAfterCloseListener(afterClose -> {
+                        if (afterClose.closedWith(StandardOutcome.SAVE)) {
+                            reloadIncidents();
+                        }
+                    })
+                    .build();
+
+            RetryJobView retryJobView = dialogWindow.getView();
+            retryJobView.setJobId(incident.getConfiguration());
+
+            dialogWindow.open();
         }
     }
 
@@ -204,27 +198,8 @@ public class RuntimeIncidentsTabFragment extends Fragment<VerticalLayout> {
         runtimeIncidentsDl.load();
     }
 
-    protected void updateJobRetries(IncidentData incident) {
-        jobService.setJobRetries(incident.getConfiguration(), 1);
-        notifications.create(messages.getMessage("io.openbpm.control.view.incidentdata/jobRetriesUpdated"))
-                .withType(Notifications.Type.SUCCESS)
-                .show();
-
-        reloadIncidents();
-    }
-
     protected void reloadIncidents() {
         runtimeIncidentsDl.load();
         uiEventPublisher.publishEventForCurrentUI(new IncidentUpdateEvent(this));
     }
-
-    protected void updateExternalTaskRetries(IncidentData incident) {
-        externalTaskService.setRetries(incident.getConfiguration(), 1);
-        notifications.create(messages.getMessage("io.openbpm.control.view.incidentdata/externalTaskRetriesUpdated"))
-                .withType(Notifications.Type.SUCCESS)
-                .show();
-
-        reloadIncidents();
-    }
-
 }

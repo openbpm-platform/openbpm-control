@@ -9,7 +9,6 @@ import com.google.common.base.Strings;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.H5;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -23,9 +22,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.jmix.core.LoadContext;
 import io.jmix.core.Messages;
 import io.jmix.flowui.*;
-import io.jmix.flowui.action.DialogAction;
 import io.jmix.flowui.component.textfield.TypedTextField;
-import io.jmix.flowui.kit.action.ActionVariant;
 import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.view.*;
 import io.openbpm.control.entity.incident.IncidentData;
@@ -229,30 +226,33 @@ public class IncidentDataDetailView extends StandardDetailView<IncidentData> {
 
     @Subscribe(id = "retryBtn", subject = "clickListener")
     public void onRetryBtnClick(final ClickEvent<JmixButton> event) {
-        dialogs.createOptionDialog()
-                .withHeader(messageBundle.getMessage("retryJob.header"))
-                .withText(messageBundle.getMessage("retryJob.text"))
-                .withActions(new DialogAction(DialogAction.Type.YES)
-                                .withText(messages.getMessage("actions.Retry"))
-                                .withIcon(VaadinIcon.ROTATE_LEFT.create())
-                                .withVariant(ActionVariant.PRIMARY)
-                                .withHandler(actionPerformedEvent -> {
-                                    if (getEditedEntity().isJobFailed()) {
-                                        jobService.setJobRetries(getEditedEntity().getConfiguration(), 1);
-                                        notifications.create(messageBundle.getMessage("jobRetriesUpdated"))
-                                                .withType(Notifications.Type.SUCCESS)
-                                                .show();
-                                    } else if (getEditedEntity().isExternalTaskFailed()) {
-                                        externalTaskService.setRetries(getEditedEntity().getConfiguration(), 1);
-                                        notifications.create(messageBundle.getMessage("externalTaskRetriesUpdated"))
-                                                .withType(Notifications.Type.SUCCESS)
-                                                .show();
+        if (getEditedEntity().isJobFailed()) {
+            DialogWindow<RetryJobView> dialogWindow = dialogWindows.view(this, RetryJobView.class)
+                    .withAfterCloseListener(afterClose -> {
+                        if (afterClose.closedWith(StandardOutcome.SAVE)) {
+                            close(StandardOutcome.SAVE);
+                        }
+                    })
+                    .build();
 
-                                    }
-                                    close(StandardOutcome.SAVE);
-                                }),
-                        new DialogAction(DialogAction.Type.CANCEL))
-                .open();
+            RetryJobView retryRuntimeJobView = dialogWindow.getView();
+            retryRuntimeJobView.setJobId(getEditedEntity().getConfiguration());
+
+            dialogWindow.open();
+        } else if (getEditedEntity().isExternalTaskFailed()) {
+            DialogWindow<RetryExternalTaskView> dialogWindow = dialogWindows.view(this, RetryExternalTaskView.class)
+                    .withAfterCloseListener(closeEvent -> {
+                        if (closeEvent.closedWith(StandardOutcome.SAVE)) {
+                            close(StandardOutcome.SAVE);
+                        }
+                    })
+                    .build();
+
+            RetryExternalTaskView retryExternalTaskView = dialogWindow.getView();
+            retryExternalTaskView.setExternalTaskId(getEditedEntity().getConfiguration());
+
+            dialogWindow.open();
+        }
     }
 
     protected void sendUpdateViewTitleEvent() {

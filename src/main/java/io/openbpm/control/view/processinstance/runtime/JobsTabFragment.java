@@ -6,7 +6,6 @@
 package io.openbpm.control.view.processinstance.runtime;
 
 import com.vaadin.flow.component.grid.GridSortOrder;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.event.SortEvent;
 import io.jmix.core.DataLoadContext;
@@ -17,12 +16,10 @@ import io.jmix.flowui.DialogWindows;
 import io.jmix.flowui.Dialogs;
 import io.jmix.flowui.UiEventPublisher;
 import io.jmix.flowui.ViewNavigators;
-import io.jmix.flowui.action.DialogAction;
 import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.fragment.Fragment;
 import io.jmix.flowui.fragment.FragmentDescriptor;
 import io.jmix.flowui.kit.action.ActionPerformedEvent;
-import io.jmix.flowui.kit.action.ActionVariant;
 import io.jmix.flowui.model.CollectionContainer;
 import io.jmix.flowui.model.CollectionLoader;
 import io.jmix.flowui.model.InstanceContainer;
@@ -32,6 +29,7 @@ import io.openbpm.control.entity.job.JobData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
 import io.openbpm.control.service.job.JobLoadContext;
 import io.openbpm.control.service.job.JobService;
+import io.openbpm.control.view.incidentdata.RetryJobView;
 import io.openbpm.control.view.processinstance.event.JobCountUpdateEvent;
 import io.openbpm.control.view.processinstance.event.JobRetriesUpdateEvent;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -147,20 +145,18 @@ public class JobsTabFragment extends Fragment<VerticalLayout> {
             return;
         }
 
-        dialogs.createOptionDialog()
-                .withHeader(messageBundle.getMessage("retryFailedJob.header"))
-                .withText(messageBundle.getMessage("retryFailedJob.text"))
-                .withActions(new DialogAction(DialogAction.Type.OK)
-                                .withIcon(VaadinIcon.ROTATE_LEFT.create())
-                                .withVariant(ActionVariant.PRIMARY)
-                                .withText(messages.getMessage("actions.Retry"))
-                                .withHandler(actionPerformedEvent -> {
-                                    jobService.setJobRetries(selectedJob.getJobId(), 1);
-                                    reloadJobs();
-                                }),
-                        new DialogAction(DialogAction.Type.CANCEL))
-                .open();
+        DialogWindow<RetryJobView> dialogWindow = dialogWindows.view(getCurrentView(), RetryJobView.class)
+                .withAfterCloseListener(afterClose -> {
+                    if (afterClose.closedWith(StandardOutcome.SAVE)) {
+                        reloadJobs();
+                    }
+                })
+                .build();
 
+        RetryJobView retryJobView = dialogWindow.getView();
+        retryJobView.setJobId(selectedJob.getJobId());
+
+        dialogWindow.open();
     }
 
     protected void reloadJobs() {

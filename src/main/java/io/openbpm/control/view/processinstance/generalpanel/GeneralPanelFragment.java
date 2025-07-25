@@ -27,6 +27,7 @@ import io.jmix.flowui.component.formlayout.JmixFormLayout;
 import io.jmix.flowui.component.textarea.JmixTextArea;
 import io.jmix.flowui.fragment.Fragment;
 import io.jmix.flowui.fragment.FragmentDescriptor;
+import io.jmix.flowui.kit.action.ActionPerformedEvent;
 import io.jmix.flowui.kit.action.ActionVariant;
 import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.model.InstanceContainer;
@@ -36,8 +37,11 @@ import io.openbpm.control.entity.processinstance.ProcessInstanceData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceState;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
+import io.openbpm.control.view.processinstance.ActivateProcessInstanceView;
 import io.openbpm.control.view.processinstance.ProcessInstanceDetailView;
+import io.openbpm.control.view.processinstance.SuspendProcessInstanceView;
 import io.openbpm.control.view.processinstancemigration.ProcessInstanceMigrationView;
+import io.openbpm.control.view.processinstanceterminate.ProcessInstanceTerminateView;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.jmix.flowui.component.UiComponentUtils.getCurrentView;
@@ -96,7 +100,6 @@ public class GeneralPanelFragment extends Fragment<FlexLayout> {
         processInstanceInfoGroupBox.getComponents().forEach(component -> component.addClassNames(LumoUtility.Padding.Top.SMALL));
     }
 
-
     @Subscribe(target = Target.HOST_CONTROLLER)
     public void onHostBeforeShow(View.BeforeShowEvent event) {
         ProcessInstanceData processInstanceData = processInstanceDataDc.getItem();
@@ -133,34 +136,27 @@ public class GeneralPanelFragment extends Fragment<FlexLayout> {
         }
     }
 
-    @Subscribe("refreshBtn")
-    public void reloadProcessInstance(ClickEvent<Button> event) {
+    @Subscribe("refreshAction")
+    public void onRefreshAction(final ActionPerformedEvent event) {
         reopenProcessInstanceDetailsView();
     }
 
-    @Subscribe("activateBtn")
-    public void activateProcessInstance(ClickEvent<Button> event) {
-        dialogs.createOptionDialog()
-                .withHeader(messageBundle.getMessage("activateDialog.header"))
-                .withText(messageBundle.getMessage("activateDialog.text"))
-                .withActions(
-                        new DialogAction(DialogAction.Type.YES)
-                                .withIcon(VaadinIcon.PLAY)
-                                .withText(messageBundle.getMessage("activate"))
-                                .withVariant(ActionVariant.PRIMARY)
-                                .withHandler(e -> {
-                                    String processInstanceId = processInstanceDataDc.getItem().getId();
-                                    processInstanceService.activateById(processInstanceId);
+    @Subscribe("activateAction")
+    public void onActivateAction(final ActionPerformedEvent event) {
+        ProcessInstanceData processInstanceData = processInstanceDataDc.getItem();
 
-                                    notifications.create(messageBundle.getMessage("processInstanceActivated"))
-                                            .withType(Notifications.Type.SUCCESS)
-                                            .show();
+        DialogWindow<ActivateProcessInstanceView> dialogWindow = dialogWindows.view(getCurrentView(), ActivateProcessInstanceView.class)
+                .withAfterCloseListener(closeEvent -> {
+                    if (closeEvent.closedWith(StandardOutcome.SAVE)) {
+                        reopenProcessInstanceDetailsView();
+                    }
+                })
+                .build();
 
-                                    reopenProcessInstanceDetailsView();
-                                }),
-                        new DialogAction(DialogAction.Type.CANCEL)
-                )
-                .open();
+        ActivateProcessInstanceView activateProcessInstanceView = dialogWindow.getView();
+        activateProcessInstanceView.setProcessInstanceData(processInstanceData);
+
+        dialogWindow.open();
     }
 
     @Subscribe("openProcessDefinitionEditorBtn")
@@ -178,56 +174,43 @@ public class GeneralPanelFragment extends Fragment<FlexLayout> {
         }
     }
 
-    @Subscribe("suspendBtn")
-    public void suspendProcessInstance(ClickEvent<Button> event) {
-        dialogs.createOptionDialog()
-                .withHeader(messageBundle.getMessage("suspendDialog.header"))
-                .withText(messageBundle.getMessage("suspendDialog.text"))
-                .withActions(
-                        new DialogAction(DialogAction.Type.YES)
-                                .withIcon(VaadinIcon.PAUSE)
-                                .withText(messageBundle.getMessage("suspend"))
-                                .withVariant(ActionVariant.PRIMARY)
-                                .withHandler(e -> {
-                                    String processInstanceId = processInstanceDataDc.getItem().getId();
-                                    processInstanceService.suspendById(processInstanceId);
+    @Subscribe("suspendAction")
+    public void onSuspendAction(final ActionPerformedEvent event) {
+        ProcessInstanceData processInstanceData = processInstanceDataDc.getItem();
 
-                                    notifications.create(messageBundle.getMessage("processInstanceSuspended"))
-                                            .withType(Notifications.Type.SUCCESS)
-                                            .show();
-                                    reopenProcessInstanceDetailsView();
-                                }),
-                        new DialogAction(DialogAction.Type.CANCEL)
-                )
-                .open();
+        DialogWindow<SuspendProcessInstanceView> dialogWindow = dialogWindows.view(getCurrentView(), SuspendProcessInstanceView.class)
+                .withAfterCloseListener(closeEvent -> {
+                    if (closeEvent.closedWith(StandardOutcome.SAVE)) {
+                        reopenProcessInstanceDetailsView();
+                    }
+                })
+                .build();
+
+        SuspendProcessInstanceView suspendProcessInstanceView = dialogWindow.getView();
+        suspendProcessInstanceView.setProcessInstanceData(processInstanceDataDc.getItem());
+
+        dialogWindow.open();
     }
 
-    @Subscribe("terminateBtn")
-    public void terminateProcessInstance(ClickEvent<Button> event) {
-        dialogs.createOptionDialog()
-                .withHeader(messageBundle.getMessage("terminateProcessInstanceView.title"))
-                .withText(messageBundle.getMessage("terminateProcessInstanceMsg"))
-                .withActions(
-                        new DialogAction(DialogAction.Type.YES)
-                                .withIcon(VaadinIcon.DOT_CIRCLE)
-                                .withText(messages.getMessage("actions.Terminate"))
-                                .withVariant(ActionVariant.PRIMARY)
-                                .withHandler(e -> {
-                                    String processInstanceId = processInstanceDataDc.getItem().getId();
-                                    processInstanceService.terminateById(processInstanceId);
+    @Subscribe("terminateAction")
+    public void onTerminateAction(final ActionPerformedEvent event) {
+        DialogWindow<ProcessInstanceTerminateView> dialog = dialogWindows.view(getCurrentView(), ProcessInstanceTerminateView.class)
+                .withAfterCloseListener(afterCloseEvent -> {
+                    if (afterCloseEvent.closedWith(StandardOutcome.SAVE)) {
+                        notifications.create(messageBundle.getMessage("processInstanceTerminated"))
+                                .withType(Notifications.Type.SUCCESS)
+                                .show();
+                        reopenProcessInstanceDetailsView();
+                    }
+                })
+                .build();
 
-                                    notifications.create(messageBundle.getMessage("processInstanceTerminated"))
-                                            .withType(Notifications.Type.SUCCESS)
-                                            .show();
-                                    reopenProcessInstanceDetailsView();
-                                }),
-                        new DialogAction(DialogAction.Type.CANCEL)
-                )
-                .open();
+        dialog.getView().setProcessInstanceData(processInstanceDataDc.getItem());
+        dialog.open();
     }
 
-    @Subscribe("migrateBtn")
-    protected void onMigrateBtnClick(ClickEvent<Button> event) {
+    @Subscribe("migrateAction")
+    public void onMigrateAction(final ActionPerformedEvent event) {
         ProcessDefinitionData processDefinitionData = metadata.create(ProcessDefinitionData.class);
         ProcessInstanceData processInstanceData = processInstanceDataDc.getItem();
         processDefinitionData.setId(processInstanceData.getProcessDefinitionId());
@@ -250,7 +233,6 @@ public class GeneralPanelFragment extends Fragment<FlexLayout> {
         dialog.getView().setProcessDefinitionData(processDefinitionData);
         dialog.getView().setProcessInstanceData(processInstanceData);
         dialog.open();
-
     }
 
 

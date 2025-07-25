@@ -28,24 +28,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 
 @Route(value = "bpm/processinstancemigration", layout = DefaultMainViewParent.class)
-@ViewController("bpm_ProcessInstanceMigration")
+@ViewController(ProcessInstanceMigrationView.ID)
 @ViewDescriptor("process-instance-migration-view.xml")
 public class ProcessInstanceMigrationView extends StandardView {
+
+    public static final String ID = "bpm_ProcessInstanceMigration";
+
+    @Autowired
+    protected ProcessDefinitionService processDefinitionService;
+    @Autowired
+    private ProcessInstanceService processInstanceService;
+    @Autowired
+    protected MigrationService migrationService;
     @Autowired
     protected Dialogs dialogs;
+
     @ViewComponent
     protected MessageBundle messageBundle;
     @ViewComponent
     protected ComboBox<ProcessDefinitionData> processDefinitionVersionComboBox;
     @ViewComponent
     protected ComboBox<String> processDefinitionKeyComboBox;
-
-    protected ProcessDefinitionData processDefinitionData;
-    protected ProcessInstanceData processInstanceData;
-    @Autowired
-    protected ProcessDefinitionService processDefinitionService;
-    @Autowired
-    protected MigrationService migrationService;
     @ViewComponent
     protected HorizontalLayout rootHBox;
     @ViewComponent
@@ -54,12 +57,13 @@ public class ProcessInstanceMigrationView extends StandardView {
     protected TypedTextField<Object> sourceDefinitionKeyField;
     @ViewComponent
     protected TypedTextField<Integer> sourceDefinitionVersionField;
-    @Autowired
-    private ProcessInstanceService processInstanceService;
     @ViewComponent
     private JmixButton migrateBtn;
     @ViewComponent
     private HorizontalLayout migrationWarningPanel;
+
+    protected ProcessInstanceData processInstanceData;
+    protected ProcessDefinitionData processDefinitionData;
 
     @SuppressWarnings("LombokSetterMayBeUsed")
     public void setProcessDefinitionData(ProcessDefinitionData processDefinitionData) {

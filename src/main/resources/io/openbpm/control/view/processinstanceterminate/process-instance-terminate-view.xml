@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://processInstanceTerminateView.title">
+
+    <actions>
+        <action id="terminateAction"
+                icon="DOT_CIRCLE"
+                actionVariant="PRIMARY"
+                text="msg:///actions.Terminate"/>
+        <action id="cancelAction"
+                icon="BAN"
+                text="msg:///actions.Cancel"/>
+    </actions>
+
+    <layout>
+        <span text="msg://terminateProcessInstanceMsg"
+              width="100%"/>
+        <hbox id="actionsPanel" justifyContent="END" width="100%">
+            <button id="terminateBtn" action="terminateAction"/>
+            <button id="cancelBtn" action="cancelAction"/>
+        </hbox>
+    </layout>
+</view>
