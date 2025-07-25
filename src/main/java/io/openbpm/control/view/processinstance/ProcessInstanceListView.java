@@ -7,7 +7,6 @@ package io.openbpm.control.view.processinstance;
 
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.event.SortEvent;
 import com.vaadin.flow.data.provider.SortDirection;
@@ -22,12 +21,10 @@ import io.jmix.core.LoadContext;
 import io.jmix.core.Messages;
 import io.jmix.core.Metadata;
 import io.jmix.flowui.*;
-import io.jmix.flowui.action.DialogAction;
 import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.component.grid.DataGridColumn;
 import io.jmix.flowui.facet.UrlQueryParametersFacet;
 import io.jmix.flowui.kit.action.ActionPerformedEvent;
-import io.jmix.flowui.kit.action.ActionVariant;
 import io.jmix.flowui.model.CollectionContainer;
 import io.jmix.flowui.model.CollectionLoader;
 import io.jmix.flowui.model.InstanceContainer;
@@ -170,41 +167,37 @@ public class ProcessInstanceListView extends StandardListView<ProcessInstanceDat
     @Subscribe("processInstancesGrid.bulkActivate")
     public void onProcessInstancesGridBulkActivate(final ActionPerformedEvent event) {
         List<String> instancesIds = processInstancesGrid.getSelectedItems().stream().map(ProcessInstanceData::getInstanceId).toList();
-        dialogs.createOptionDialog()
-                .withHeader(messageBundle.getMessage("bulkActivateProcessInstances.title"))
-                .withText(messageBundle.getMessage("bulkActivateProcessInstances.text"))
-                .withActions(new DialogAction(DialogAction.Type.YES)
-                                .withIcon(VaadinIcon.PLAY)
-                                .withVariant(ActionVariant.PRIMARY)
-                                .withText(messages.getMessage("actions.Activate"))
-                                .withHandler(actionPerformedEvent -> {
-                                    processInstanceService.activateByIdsAsync(instancesIds);
-                                    notifications.create(messageBundle.getMessage("bulkActivateProcessInstancesStarted"))
-                                            .withType(Notifications.Type.SUCCESS)
-                                            .show();
-                                }),
-                        new DialogAction(DialogAction.Type.CANCEL))
-                .open();
+
+        DialogWindow<BulkActivateProcessInstanceView> dialogWindow = dialogWindows.view(this, BulkActivateProcessInstanceView.class)
+                .withAfterCloseListener(closeEvent -> {
+                    if (closeEvent.closedWith(StandardOutcome.SAVE)) {
+                        processInstancesDl.load();
+                    }
+                })
+                .build();
+
+        BulkActivateProcessInstanceView bulkActivateProcessInstanceView = dialogWindow.getView();
+        bulkActivateProcessInstanceView.setInstancesIds(instancesIds);
+
+        dialogWindow.open();
     }
 
     @Subscribe("processInstancesGrid.bulkSuspend")
     public void onProcessInstancesGridBulkSuspend(final ActionPerformedEvent event) {
         List<String> instancesIds = processInstancesGrid.getSelectedItems().stream().map(ProcessInstanceData::getInstanceId).toList();
-        dialogs.createOptionDialog()
-                .withHeader(messageBundle.getMessage("bulkSuspendProcessInstances.title"))
-                .withText(messageBundle.getMessage("bulkSuspendProcessInstances.text"))
-                .withActions(new DialogAction(DialogAction.Type.YES)
-                                .withIcon(VaadinIcon.PAUSE)
-                                .withVariant(ActionVariant.PRIMARY)
-                                .withText(messages.getMessage("actions.Suspend"))
-                                .withHandler(actionPerformedEvent -> {
-                                    processInstanceService.suspendByIdsAsync(instancesIds);
-                                    notifications.create(messageBundle.getMessage("bulkSuspendProcessInstancesStarted"))
-                                            .withType(Notifications.Type.SUCCESS)
-                                            .show();
-                                }),
-                        new DialogAction(DialogAction.Type.CANCEL))
-                .open();
+
+        DialogWindow<BulkSuspendProcessInstanceView> dialogWindow = dialogWindows.view(this, BulkSuspendProcessInstanceView.class)
+                .withAfterCloseListener(closeEvent -> {
+                    if (closeEvent.closedWith(StandardOutcome.SAVE)) {
+                        processInstancesDl.load();
+                    }
+                })
+                .build();
+
+        BulkSuspendProcessInstanceView bulkSuspendProcessInstanceView = dialogWindow.getView();
+        bulkSuspendProcessInstanceView.setInstancesIds(instancesIds);
+
+        dialogWindow.open();
     }
 
 

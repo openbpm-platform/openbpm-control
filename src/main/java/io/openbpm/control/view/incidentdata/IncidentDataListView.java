@@ -10,7 +10,6 @@ import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.event.SortEvent;
 import com.vaadin.flow.data.provider.SortDirection;
@@ -26,15 +25,10 @@ import io.jmix.core.DataLoadContext;
 import io.jmix.core.LoadContext;
 import io.jmix.core.Messages;
 import io.jmix.core.Metadata;
-import io.jmix.flowui.Dialogs;
-import io.jmix.flowui.Notifications;
-import io.jmix.flowui.UiComponents;
-import io.jmix.flowui.ViewNavigators;
-import io.jmix.flowui.action.DialogAction;
+import io.jmix.flowui.*;
 import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.component.grid.DataGridColumn;
 import io.jmix.flowui.kit.action.ActionPerformedEvent;
-import io.jmix.flowui.kit.action.ActionVariant;
 import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.model.CollectionLoader;
 import io.jmix.flowui.model.InstanceContainer;
@@ -54,15 +48,15 @@ import io.openbpm.control.view.incidentdata.filter.*;
 import io.openbpm.control.view.main.MainView;
 import io.openbpm.control.view.util.ComponentHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.camunda.bpm.engine.runtime.Incident;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.lang.Nullable;
 
 import java.util.*;
 import java.util.function.Function;
+
+import static io.jmix.flowui.component.UiComponentUtils.getCurrentView;
 
 @Slf4j
 @Route(value = "bpm/incidents", layout = MainView.class)
@@ -109,6 +103,8 @@ public class IncidentDataListView extends StandardListView<IncidentData> {
 
 
     protected Map<String, ProcessDefinitionData> processDefinitionsMap = new HashMap<>();
+    @Autowired
+    private DialogWindows dialogWindows;
 
     @Subscribe
     public void onInit(final InitEvent event) {
@@ -192,16 +188,17 @@ public class IncidentDataListView extends StandardListView<IncidentData> {
             return;
         }
 
-        dialogs.createOptionDialog()
-                .withHeader(messageBundle.getMessage("bulkRetry.header"))
-                .withText(messageBundle.getMessage("bulkRetry.text"))
-                .withActions(new DialogAction(DialogAction.Type.YES)
-                                .withText(messages.getMessage("actions.Retry"))
-                                .withIcon(VaadinIcon.ROTATE_LEFT.create())
-                                .withVariant(ActionVariant.PRIMARY)
-                                .withHandler(actionPerformedEvent -> updateRetriesAsync(selectedItems)),
-                        new DialogAction(DialogAction.Type.CANCEL))
-                .open();
+        DialogWindow<BulkRetryIncidentView> dialogWindow = dialogWindows.view(this, BulkRetryIncidentView.class)
+                .withAfterCloseListener(closeEvent -> {
+                    if (closeEvent.closedWith(StandardOutcome.SAVE)) {
+                        incidentsDl.load();
+                    }
+                })
+                .build();
+
+        BulkRetryIncidentView bulkRetryIncidentView = dialogWindow.getView();
+        bulkRetryIncidentView.setIncidentDataSet(selectedItems);
+        dialogWindow.open();
     }
 
     @Install(to = "incidentsDataGrid.message", subject = "tooltipGenerator")
@@ -268,33 +265,6 @@ public class IncidentDataListView extends StandardListView<IncidentData> {
         return messages.formatMessage("", "common.processDefinitionKeyAndVersion", processDefinitionData.getKey(), processDefinitionData.getVersion());
     }
 
-
-    protected void updateRetriesAsync(Set<IncidentData> selectedItems) {
-        List<String> externalTaskIds = getIncidentsByType(selectedItems, Incident.EXTERNAL_TASK_HANDLER_TYPE);
-        if (CollectionUtils.isNotEmpty(externalTaskIds)) {
-            externalTaskService.setRetriesAsync(externalTaskIds, 1);
-        }
-
-
-        List<String> jobIds = getIncidentsByType(selectedItems, Incident.FAILED_JOB_HANDLER_TYPE);
-        if (CollectionUtils.isNotEmpty(jobIds)) {
-            jobService.setJobRetriesAsync(jobIds, 1);
-        }
-
-        notifications.create(messageBundle.getMessage("retriesBulkUpdateStarted"))
-                .withThemeVariant(NotificationVariant.LUMO_PRIMARY)
-                .show();
-
-        incidentsDl.load();
-    }
-
-    protected List<String> getIncidentsByType(Set<IncidentData> selectedItems, String incidentType) {
-        return selectedItems.stream()
-                .filter(incidentData -> incidentData.getType().equals(incidentType) && incidentData.getConfiguration() != null)
-                .map(IncidentData::getConfiguration)
-                .toList();
-    }
-
     protected void initDataGridHeaderRow() {
         HeaderRow headerRow = incidentsDataGrid.getHeaderRows().getFirst();
 
@@ -355,23 +325,18 @@ public class IncidentDataListView extends StandardListView<IncidentData> {
         retryJobBtn.setText(messages.getMessage("actions.Retry"));
         retryJobBtn.setIcon(VaadinIcon.ROTATE_LEFT.create());
         retryJobBtn.addClickListener(buttonClickEvent -> {
-            dialogs.createOptionDialog()
-                    .withHeader(messageBundle.getMessage("retryJob.header"))
-                    .withText(messageBundle.getMessage("retryJob.text"))
-                    .withActions(new DialogAction(DialogAction.Type.YES)
-                                    .withText(messages.getMessage("actions.Retry"))
-                                    .withIcon(VaadinIcon.ROTATE_LEFT.create())
-                                    .withVariant(ActionVariant.PRIMARY)
-                                    .withHandler(actionPerformedEvent -> {
-                                        jobService.setJobRetries(incidentData.getConfiguration(), 1);
-                                        notifications.create(messageBundle.getMessage("jobRetriesUpdated"))
-                                                .withType(Notifications.Type.SUCCESS)
-                                                .show();
+            DialogWindow<RetryJobView> dialogWindow = dialogWindows.view(getCurrentView(), RetryJobView.class)
+                    .withAfterCloseListener(afterClose -> {
+                        if (afterClose.closedWith(StandardOutcome.SAVE)) {
+                            incidentsDl.load();
+                        }
+                    })
+                    .build();
 
-                                        incidentsDl.load();
-                                    }),
-                            new DialogAction(DialogAction.Type.CANCEL))
-                    .open();
+            RetryJobView retryJobView = dialogWindow.getView();
+            retryJobView.setJobId(incidentData.getConfiguration());
+
+            dialogWindow.open();
         });
         return retryJobBtn;
     }
@@ -382,24 +347,17 @@ public class IncidentDataListView extends StandardListView<IncidentData> {
         retryExternalTaskBtn.setText(messages.getMessage("actions.Retry"));
         retryExternalTaskBtn.setIcon(VaadinIcon.ROTATE_LEFT.create());
         retryExternalTaskBtn.addClickListener(buttonClickEvent -> {
-            dialogs.createOptionDialog()
-                    .withHeader(messageBundle.getMessage("retryExternalTask.header"))
-                    .withText(messageBundle.getMessage("retryExternalTask.text"))
-                    .withActions(new DialogAction(DialogAction.Type.YES)
-                                    .withText(messages.getMessage("actions.Retry"))
-                                    .withIcon(VaadinIcon.ROTATE_LEFT.create())
-                                    .withVariant(ActionVariant.PRIMARY)
-                                    .withHandler(actionPerformedEvent -> {
-                                        externalTaskService.setRetries(incidentData.getConfiguration(), 1);
-                                        notifications.create(messageBundle.getMessage("externalTaskRetriesUpdated"))
-                                                .withType(Notifications.Type.SUCCESS)
-                                                .show();
+            DialogWindow<RetryExternalTaskView> dialogWindow = dialogWindows.view(this, RetryExternalTaskView.class)
+                    .withAfterCloseListener(closeEvent -> {
+                        if (closeEvent.closedWith(StandardOutcome.SAVE)) {
+                            incidentsDl.load();
+                        }
+                    })
+                    .build();
 
-                                        incidentsDl.load();
-                                    }),
-                            new DialogAction(DialogAction.Type.CANCEL))
-                    .open();
-
+            RetryExternalTaskView retryExternalTaskView = dialogWindow.getView();
+            retryExternalTaskView.setExternalTaskId(incidentData.getConfiguration());
+            dialogWindow.open();
         });
         return retryExternalTaskBtn;
     }

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://activateDialog.header">
+    <actions>
+        <action id="activateAction"
+                text="msg:///actions.Activate"
+                icon="PLAY"
+                actionVariant="PRIMARY"/>
+        <action id="cancelAction"
+                text="msg:///actions.Cancel"
+                icon="BAN"/>
+    </actions>
+
+    <layout>
+        <span text="msg://activateDialog.text" width="100%"/>
+
+        <hbox justifyContent="END" width="100%">
+            <button id="activateBtn" action="activateAction"/>
+            <button id="cancelBtn" action="cancelAction"/>
+        </hbox>
+    </layout>
+</view>

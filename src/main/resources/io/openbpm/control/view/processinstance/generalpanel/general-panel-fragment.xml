@@ -15,7 +15,6 @@
                 description="msg://terminateProcessInstance"/>
         <action id="migrateAction"
                 icon="FORWARD"
-                type="control_migrateProcessInstanceAction"
                 description="msg://migrateProcessInstance"/>
         <action id="refreshAction"
                 icon="REFRESH"
@@ -23,6 +22,9 @@
         <action id="activateAction"
                 icon="REFRESH"
                 description="msg://reloadProcessInstanceDetails"/>
+        <action id="suspendAction"
+                icon="PAUSE"
+                description="msg://suspendProcessInstance"/>
     </actions>
 
     <content>
@@ -50,9 +52,9 @@
                 <vbox themeNames="spacing-xs" classNames="shadow-s p-s instance-details-actions-panel">
                     <button id="infoBtn" icon="INFO_CIRCLE" title="msg://viewProcessInstanceDetails" classNames="bordered-button"/>
                     <vbox themeNames="spacing-xs" id="runtimeInstanceActions" padding="false">
-                        <button id="refreshBtn" classNames="bordered-button"/>
-                        <button id="activateBtn"  classNames="bordered-button"/>
-                        <button id="suspendBtn" icon="PAUSE" title="msg://suspendProcessInstance" classNames="bordered-button"/>
+                        <button id="refreshBtn" action="refreshAction" classNames="bordered-button"/>
+                        <button id="activateBtn" action="activateAction" classNames="bordered-button"/>
+                        <button id="suspendBtn" action="suspendAction" classNames="bordered-button"/>
                         <button id="migrateBtn" action="migrateAction" classNames="bordered-button"/>
                         <button id="terminateBtn" action="terminateAction" classNames="bordered-button"/>
                     </vbox>

@@ -40,8 +40,8 @@ import io.openbpm.control.entity.variable.VariableValueInfo;
 public interface ViewerAccessRole {
     String CODE = "viewer-access-role";
 
-    @MenuPolicy(menuIds = {"AboutProductView", "bpm_ProcessDefinition.list", "bpm_ProcessInstance.list", "bpm_AllTasksView", "bpm_DecisionDefinition.list", "IncidentData.list"})
-    @ViewPolicy(viewIds = {"AboutProductView", "bpm_ProcessDefinition.list", "bpm_ProcessInstance.list", "bpm_AllTasksView", "bpm_DecisionDefinition.list", "IncidentData.list", "MainView", "EngineConnectionSettingsView", "bpm_ProcessDefinition.detail", "ProcessDefinitionDiagramView", "bpm_DecisionInstance.detail", "bpm_VariableInstanceData.detail", "JobData.detail", "bpm_DecisionDefinition.detail", "HistoricActivityInstanceData.detail", "HistoricIncidentData.detail", "HistoricVariableInstanceData.detail", "IncidentData.detail", "JobErrorDetailsView", "LoginView", "bpm_ProcessInstanceData.detail"})
+    @MenuPolicy(menuIds = {"AboutProductView", "bpm_ProcessDefinition.list", "bpm_ProcessInstance.list", "bpm_AllTasksView", "bpm_DecisionDefinition.list", "IncidentData.list", "dashboard", "processDefinitions", "decisions", "deployments", "BpmEngine.list", "User.list", "sec_ResourceRoleModel.list", "about"})
+    @ViewPolicy(viewIds = {"AboutProductView", "bpm_ProcessDefinition.list", "bpm_ProcessInstance.list", "bpm_AllTasksView", "bpm_DecisionDefinition.list", "IncidentData.list", "MainView", "EngineConnectionSettingsView", "bpm_ProcessDefinition.detail", "ProcessDefinitionDiagramView", "bpm_DecisionInstance.detail", "bpm_VariableInstanceData.detail", "JobData.detail", "bpm_DecisionDefinition.detail", "HistoricActivityInstanceData.detail", "HistoricIncidentData.detail", "HistoricVariableInstanceData.detail", "IncidentData.detail", "JobErrorDetailsView", "LoginView", "bpm_ProcessInstanceData.detail", "bpm_Deployment.list", "BpmEngine.list", "User.list", "sec_ResourceRoleModel.list"})
     void screens();
 
     @SpecificPolicy(resources = {"ui.loginToUi", "ui.genericfilter.modifyConfiguration", "ui.genericfilter.modifyGlobalConfiguration", "ui.genericfilter.modifyJpqlCondition", "ui.showExceptionDetails"})

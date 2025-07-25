@@ -5,7 +5,6 @@
 
 package io.openbpm.control.view.processinstance.runtime;
 
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import io.jmix.core.DataLoadContext;
 import io.jmix.core.LoadContext;
@@ -15,12 +14,10 @@ import io.jmix.flowui.DialogWindows;
 import io.jmix.flowui.Dialogs;
 import io.jmix.flowui.UiEventPublisher;
 import io.jmix.flowui.ViewNavigators;
-import io.jmix.flowui.action.DialogAction;
 import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.fragment.Fragment;
 import io.jmix.flowui.fragment.FragmentDescriptor;
 import io.jmix.flowui.kit.action.ActionPerformedEvent;
-import io.jmix.flowui.kit.action.ActionVariant;
 import io.jmix.flowui.model.CollectionContainer;
 import io.jmix.flowui.model.CollectionLoader;
 import io.jmix.flowui.model.InstanceContainer;
@@ -30,6 +27,7 @@ import io.openbpm.control.entity.filter.ExternalTaskFilter;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
 import io.openbpm.control.service.externaltask.ExternalTaskLoadContext;
 import io.openbpm.control.service.externaltask.ExternalTaskService;
+import io.openbpm.control.view.incidentdata.RetryExternalTaskView;
 import io.openbpm.control.view.processinstance.event.ExternalTaskCountUpdateEvent;
 import io.openbpm.control.view.processinstance.event.ExternalTaskRetriesUpdateEvent;
 import org.apache.commons.lang3.StringUtils;
@@ -151,19 +149,18 @@ public class ExternalTasksTabFragment extends Fragment<VerticalLayout> {
             return;
         }
 
-        dialogs.createOptionDialog()
-                .withHeader(messageBundle.getMessage("retryExternalTask.header"))
-                .withText(messageBundle.getMessage("retryExternalTask.text"))
-                .withActions(new DialogAction(DialogAction.Type.OK)
-                                .withIcon(VaadinIcon.ROTATE_LEFT.create())
-                                .withVariant(ActionVariant.PRIMARY)
-                                .withText(messages.getMessage("actions.Retry"))
-                                .withHandler(actionPerformedEvent -> {
-                                    externalTaskService.setRetries(selectedTask.getExternalTaskId(), 1);
-                                    reloadExternalTasks();
-                                }),
-                        new DialogAction(DialogAction.Type.CANCEL))
-                .open();
+        DialogWindow<RetryExternalTaskView> dialogWindow = dialogWindows.view(getCurrentView(), RetryExternalTaskView.class)
+                .withAfterCloseListener(afterClose -> {
+                    if (afterClose.closedWith(StandardOutcome.SAVE)) {
+                        reloadExternalTasks();
+                    }
+                })
+                .build();
+
+        RetryExternalTaskView retryExternalTaskView = dialogWindow.getView();
+        retryExternalTaskView.setExternalTaskId(selectedTask.getExternalTaskId());
+
+        dialogWindow.open();
     }
 
     protected void reloadExternalTasks() {
