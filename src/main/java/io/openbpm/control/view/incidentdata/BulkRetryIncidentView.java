@@ -55,6 +55,8 @@ public class BulkRetryIncidentView extends StandardView {
         notifications.create(messageBundle.getMessage("retriesBulkUpdateStarted"))
                 .withThemeVariant(NotificationVariant.LUMO_PRIMARY)
                 .show();
+
+        close(StandardOutcome.SAVE);
     }
 
     @Subscribe("cancelAction")

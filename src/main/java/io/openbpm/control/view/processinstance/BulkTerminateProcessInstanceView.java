@@ -60,6 +60,7 @@ public class BulkTerminateProcessInstanceView extends StandardView {
         notifications.create(messageBundle.getMessage("bulkTerminateProcessesStarted"))
                 .withThemeVariant(NotificationVariant.LUMO_PRIMARY)
                 .show();
+
         close(StandardOutcome.SAVE);
     }
 

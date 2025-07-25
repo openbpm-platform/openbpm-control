@@ -36,6 +36,8 @@ public class BulkActivateProcessInstanceView extends StandardView {
         notifications.create(messageBundle.getMessage("bulkActivateProcessInstancesStarted"))
                 .withType(Notifications.Type.SUCCESS)
                 .show();
+
+        close(StandardOutcome.SAVE);
     }
 
     @Subscribe("cancelAction")

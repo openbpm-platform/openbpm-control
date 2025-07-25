@@ -36,6 +36,8 @@ public class ActivateProcessInstanceView extends StandardView {
         notifications.create(messageBundle.getMessage("processInstanceActivated"))
                 .withType(Notifications.Type.SUCCESS)
                 .show();
+
+        close(StandardOutcome.SAVE);
     }
 
     @Subscribe("cancelAction")

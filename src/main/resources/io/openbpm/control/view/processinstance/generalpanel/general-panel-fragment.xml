@@ -21,7 +21,7 @@
                 description="msg://reloadProcessInstanceDetails"/>
         <action id="activateAction"
                 icon="REFRESH"
-                description="msg://reloadProcessInstanceDetails"/>
+                description="msg://activateProcessInstance"/>
         <action id="suspendAction"
                 icon="PAUSE"
                 description="msg://suspendProcessInstance"/>

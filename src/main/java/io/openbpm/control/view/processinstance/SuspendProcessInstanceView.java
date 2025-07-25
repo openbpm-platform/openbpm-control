@@ -36,6 +36,8 @@ public class SuspendProcessInstanceView extends StandardView {
         notifications.create(messageBundle.getMessage("processInstanceSuspended"))
                 .withType(Notifications.Type.SUCCESS)
                 .show();
+
+        close(StandardOutcome.SAVE);
     }
 
     @Subscribe("cancelAction")

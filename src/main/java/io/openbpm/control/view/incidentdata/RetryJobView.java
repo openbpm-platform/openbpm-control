@@ -35,6 +35,8 @@ public class RetryJobView extends StandardView {
         notifications.create(messageBundle.getMessage("jobRetriesUpdated"))
                 .withType(Notifications.Type.SUCCESS)
                 .show();
+
+        close(StandardOutcome.SAVE);
     }
 
     @Subscribe("cancelAction")
