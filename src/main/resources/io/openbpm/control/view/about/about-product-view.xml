@@ -42,7 +42,7 @@
         </div>
 
         <hbox padding="false" classNames="sticky-buttons-bottom-panel">
-            <button action="close" shortcutCombination="SHIFT-ENTER"/>
+            <button action="close"/>
         </hbox>
     </layout>
 </view>
