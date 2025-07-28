@@ -5,24 +5,21 @@
 
 package io.openbpm.control.view.processdefinition;
 
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
-import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.router.RouteParameters;
-import com.vaadin.flow.theme.lumo.LumoUtility;
+import io.jmix.core.AccessManager;
 import io.jmix.core.DataLoadContext;
 import io.jmix.core.Messages;
+import io.jmix.core.Metadata;
 import io.jmix.flowui.Fragments;
 import io.jmix.flowui.Notifications;
+import io.jmix.flowui.UiComponents;
 import io.jmix.flowui.ViewNavigators;
+import io.jmix.flowui.accesscontext.UiEntityContext;
 import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.component.pagination.SimplePagination;
 import io.jmix.flowui.data.pagination.PaginationDataLoader;
@@ -30,11 +27,16 @@ import io.jmix.flowui.data.pagination.PaginationDataLoaderImpl;
 import io.jmix.flowui.fragment.Fragment;
 import io.jmix.flowui.fragment.FragmentDescriptor;
 import io.jmix.flowui.kit.action.ActionPerformedEvent;
+import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.model.BaseCollectionLoader;
 import io.jmix.flowui.model.CollectionContainer;
 import io.jmix.flowui.model.HasLoader;
 import io.jmix.flowui.model.InstanceContainer;
-import io.jmix.flowui.view.*;
+import io.jmix.flowui.view.Install;
+import io.jmix.flowui.view.MessageBundle;
+import io.jmix.flowui.view.Subscribe;
+import io.jmix.flowui.view.Supply;
+import io.jmix.flowui.view.ViewComponent;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
@@ -43,7 +45,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
 import static io.jmix.flowui.component.UiComponentUtils.getCurrentView;
-import static io.openbpm.control.view.util.JsUtils.COPY_SCRIPT_TEXT;
 
 @FragmentDescriptor("process-instances-fragment.xml")
 public class ProcessInstancesFragment extends Fragment<VerticalLayout> {
@@ -69,10 +70,7 @@ public class ProcessInstancesFragment extends Fragment<VerticalLayout> {
 
     @ViewComponent
     protected VerticalLayout processInstanceVBox;
-    @ViewComponent
-    protected Span currentVersionsInstancesCountSpan;
-    @ViewComponent
-    protected Span allVersionsInstancesCountSpan;
+
     @ViewComponent
     protected DataGrid<ProcessInstanceData> processInstancesGrid;
 
@@ -80,20 +78,21 @@ public class ProcessInstancesFragment extends Fragment<VerticalLayout> {
     protected SimplePagination processInstancesPagination;
     @Autowired
     protected Fragments fragments;
+    @Autowired
+    protected AccessManager accessManager;
+    @Autowired
+    protected Metadata metadata;
+
+    @Autowired
+    protected UiComponents uiComponents;
 
     @Subscribe
     public void onReady(ReadyEvent event) {
-        initProcessInstanceGroupStyles();
         if (processInstanceDataDc instanceof HasLoader container && container.getLoader() instanceof BaseCollectionLoader) {
             PaginationDataLoader paginationLoader =
                     applicationContext.getBean(PaginationDataLoaderImpl.class, container.getLoader());
             processInstancesPagination.setPaginationLoader(paginationLoader);
         }
-    }
-
-    @Subscribe(target = Target.HOST_CONTROLLER)
-    public void onHostBeforeShow(View.BeforeShowEvent event) {
-        initInstancesCountLabels();
     }
 
     @Install(to = "processInstancesPagination", subject = "totalCountDelegate")
@@ -108,15 +107,7 @@ public class ProcessInstancesFragment extends Fragment<VerticalLayout> {
         if (selectedInstance == null) {
             return;
         }
-        viewNavigators.detailView(getCurrentView(), ProcessInstanceData.class)
-                .withRouteParameters(new RouteParameters("id", selectedInstance.getId()))
-                .withBackwardNavigation(true)
-                .navigate();
-    }
-
-    @Supply(to = "processInstancesGrid.id", subject = "renderer")
-    protected Renderer<ProcessInstanceData> processInstancesGridIdRenderer() {
-        return new ComponentRenderer<>(this::createProcessInstanceIdComponent);
+        openProcessInstanceDetailView(selectedInstance);
     }
 
     @Install(to = "processInstancesGrid.id", subject = "tooltipGenerator")
@@ -133,56 +124,30 @@ public class ProcessInstancesFragment extends Fragment<VerticalLayout> {
         });
     }
 
-    public void initInstancesCountLabels() {
-        ProcessDefinitionData item = processDefinitionDataDc.getItem();
-        long currentVersionInstancesCount = processInstanceService.getCountByProcessDefinitionId(item.getProcessDefinitionId());
+    @Supply(to = "processInstancesGrid.actions", subject = "renderer")
+    protected Renderer<ProcessInstanceData> processInstancesGridActionsRenderer() {
+        return new ComponentRenderer<>(processInstance -> {
+            UiEntityContext context = new UiEntityContext(metadata.getClass(processInstance));
+            accessManager.applyRegisteredConstraints(context);
 
-        long allVersionsInstancesCount = processInstanceService.getCountByProcessDefinitionKey(item.getKey());
-        currentVersionsInstancesCountSpan.setText(": " + currentVersionInstancesCount);
-        allVersionsInstancesCountSpan.setText(": " + allVersionsInstancesCount);
-    }
+            if (!context.isViewPermitted()) {
+                return null;
+            }
 
-    protected void initProcessInstanceGroupStyles() {
-        processInstanceVBox.addClassNames(LumoUtility.Padding.Top.SMALL, LumoUtility.Padding.Left.XSMALL);
-        allVersionsInstancesCountSpan.addClassNames(LumoUtility.FontWeight.BOLD);
-        currentVersionsInstancesCountSpan.addClassNames(LumoUtility.FontWeight.BOLD);
-    }
-
-    protected HorizontalLayout createProcessInstanceIdComponent(ProcessInstanceData processInstanceData) {
-        HorizontalLayout layout = uiComponents.create(HorizontalLayout.class);
-        layout.setSpacing(false);
-        Span span = uiComponents.create(Span.class);
-        span.addClassNames(LumoUtility.TextOverflow.ELLIPSIS, LumoUtility.Overflow.HIDDEN, LumoUtility.Width.FULL);
-        span.setText(processInstanceData.getInstanceId());
-        layout.addClassNames(LumoUtility.Overflow.HIDDEN);
-
-        Button button = createCopyProcessInstanceIdButton(processInstanceData);
-
-
-        layout.addAndExpand(span);
-        layout.add(button);
-        return layout;
-    }
-
-    protected Button createCopyProcessInstanceIdButton(ProcessInstanceData processInstanceData) {
-        Button button = uiComponents.create(Button.class);
-        button.setIcon(VaadinIcon.COPY_O.create());
-        button.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-        button.addClassNames(LumoUtility.TextColor.SECONDARY);
-        button.addClickListener(event -> {
-            Element buttonElement = event.getSource().getElement();
-            String valueToCopy = processInstanceData.getInstanceId();
-            buttonElement.executeJs(COPY_SCRIPT_TEXT, valueToCopy)
-                    .then(successResult -> notifications.create(messageBundle.getMessage("processInstanceIdCopied"))
-                                    .withPosition(Notification.Position.TOP_END)
-                                    .withThemeVariant(NotificationVariant.LUMO_SUCCESS)
-                                    .show(),
-                            errorResult -> notifications.create(messageBundle.getMessage("processInstanceIdCopyFailed"))
-                                    .withPosition(Notification.Position.TOP_END)
-                                    .withThemeVariant(NotificationVariant.LUMO_ERROR)
-                                    .show());
+            JmixButton viewButton = uiComponents.create(JmixButton.class);
+            viewButton.setIcon(VaadinIcon.EYE.create());
+            viewButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_SMALL);
+            viewButton.setText(messages.getMessage("actions.View"));
+            viewButton.addClickListener(event -> openProcessInstanceDetailView(processInstance));
+            return viewButton;
         });
-        return button;
+    }
+
+    protected void openProcessInstanceDetailView(ProcessInstanceData selectedInstance) {
+        viewNavigators.detailView(getCurrentView(), ProcessInstanceData.class)
+                .withRouteParameters(new RouteParameters("id", selectedInstance.getId()))
+                .withBackwardNavigation(true)
+                .navigate();
     }
 
 }

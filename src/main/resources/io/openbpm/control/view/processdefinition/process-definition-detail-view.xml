@@ -21,70 +21,52 @@
     <actions>
         <action id="closeAction" type="detail_close" text="msg:///actions.Close"/>
     </actions>
-    <layout spacing="false" padding="false">
-        <tabSheet id="tabsheet" width="100%" height="100%">
-            <tab id="generalTab" label="msg://generalTab">
-                <split orientation="HORIZONTAL" height="100%" width="100%" splitterPosition="35"
-                       themeNames="splitter-spacing">
-                    <formLayout id="processDefinitionForm" dataContainer="processDefinitionDataDc" width="100%" height="100%">
-                        <responsiveSteps>
-                            <responsiveStep minWidth="0" columns="1"/>
-                            <responsiveStep minWidth="60em" columns="2"/>
-                            <responsiveStep minWidth="80em" columns="3"/>
-                        </responsiveSteps>
-                        <textArea property="name" readOnly="true"/>
-                        <hbox id="keyAndVersionHBox" expand="keyField" alignItems="BASELINE" padding="false">
-                            <textField id="keyField" property="key" readOnly="true" label="msg://key">
-                                <suffix>
-                                    <button id="copyKeyButton" icon="COPY_O" themeNames="tertiary-inline"/>
-                                </suffix>
-                            </textField>
-                            <comboBox id="versionComboBox" required="true" width="8em"
-                                      label="msg://version"/>
-                        </hbox>
-                        <textField id="idField" property="id" readOnly="true">
-                            <suffix>
-                                <button id="copyIdButton" icon="COPY_O" themeNames="tertiary-inline"/>
-                            </suffix>
-                        </textField>
-                        <textField id="versionTagField" property="versionTag" readOnly="true"/>
-                        <checkbox id="startableInTaskListField" property="startableInTaskList" readOnly="true"/>
-                        <textArea id="descriptionField" property="description" readOnly="true"/>
-                        <details opened="true" themeNames="reverse small" summaryText="msg://deploymentGroup" width="100%"
-                                 classNames="pt-s">
-                            <vbox padding="false" width="100%" themeNames="spacing-xs">
-                                <textField id="deploymentIdField" readOnly="true" width="100%" classNames="pt-xs"
-                                           label="msg://deploymentId">
-                                    <suffix>
-                                        <button id="viewDeployment" icon="SEARCH" themeNames="tertiary-inline"/>
-                                    </suffix>
-                                </textField>
-
-                                <dateTimePicker id="deploymentTimeField" readOnly="true" width="100%" classNames="pt-xs"
-                                                label="msg://deploymentTime"/>
-                                <textField id="deploymentSourceField" readOnly="true" width="100%" classNames="pt-xs"
-                                           label="msg://deploymentSource"/>
-                            </vbox>
-                        </details>
-                    </formLayout>
-                    <div height="100%">
-                        <fragment class="io.openbpm.control.view.processdefinition.ProcessInstancesFragment"
-                                  id="processInstancesFragment"/>
-                    </div>
-                </split>
-            </tab>
-            <tab id="bpmnViewerTab" label="msg://bpmnViewerTab" enabled="true">
-                <div width="100%" height="100%">
-                    <fragment class="io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment" id="viewerFragment"/>
+    <layout padding="false" spacing="false" expand="box" height="100%">
+        <hbox id="box" width="100%" spacing="false" classNames="overflow-hidden">
+            <split id="rootBox" orientation="VERTICAL" splitterPosition="50" themeNames="splitter-spacing" width="100%"
+                   height="100%">
+                <vbox width="100%" height="100%" themeNames="spacing-s" padding="false" classNames="pt-s pb-s relative">
+                    <hbox padding="false" themeNames="spacing-l" width="100%" alignItems="CENTER"
+                          classNames="pl-s pr-s">
+                        <comboBox id="versionComboBox" required="true" width="8em" label="msg://io.openbpm.control.entity.processdefinition/ProcessDefinitionData.version"
+                                  classNames="pt-0"/>
+                        <textField id="versionTagField" property="versionTag" dataContainer="processDefinitionDataDc" readOnly="true" label="msg://io.openbpm.control.entity.processdefinition/ProcessDefinitionData.versionTag"
+                                   classNames="pt-0"/>
+                        <vbox themeNames="spacing-xs" padding="false" width="auto" classNames="ml-auto p-xs">
+                            <hbox padding="false" classNames="text-s" alignItems="CENTER"
+                                  themeNames="spacing-xs">
+                                <icon icon="BOLT" classNames="text-s text-secondary icon-s" size="1em"/>
+                                <span text="msg://spanText" classNames="text-s text-secondary font-semibold whitespace-nowrap"/>
+                            </hbox>
+                            <span id="allVersionsInstancesCountSpan" classNames="font-bold text-m"/>
+                        </vbox>
+                    </hbox>
+                    <hbox id="diagramBox" height="100%" classNames="process-details-diagram-box" width="100%">
+                        <fragment id="viewerFragment" class="io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment"/>
+                    </hbox>
+                </vbox>
+                <div classNames="p-s">
+                    <tabSheet id="tabsheet" width="100%" height="100%" themeNames="hide-scroll-buttons bordered"
+                              classNames="box-border flex-grow">
+                        <tab id="processInstancesTab" label="msg://processInstancesTab.defaultLabel">
+                            <div height="100%" width="100%">
+                                <fragment class="io.openbpm.control.view.processdefinition.ProcessInstancesFragment"
+                                          id="processInstancesFragment"/>
+                            </div>
+                        </tab>
+                        <tab id="bpmnXmlTab" label="msg://bpmnXmlTab" enabled="true">
+                            <codeEditor mode="XML" readOnly="true" id="bpmnXmlEditor" width="100%" height="100%"
+                                        css="padding:0"/>
+                        </tab>
+                    </tabSheet>
                 </div>
-            </tab>
-            <tab id="bpmnXmlTab" label="msg://bpmnXmlTab" enabled="true">
-                <codeEditor mode="XML" readOnly="true" id="bpmnXmlEditor" width="100%" height="100%" css="padding:0"/>
-            </tab>
-        </tabSheet>
-        <hbox width="100%" classNames="sticky-buttons-bottom-panel">
-            <fragment class="io.openbpm.control.view.processdefinition.ProcessDefinitionActionsFragment"
-                      id="actionsFragment"/>
+            </split>
+            <fragment id="generalPanel" class="io.openbpm.control.view.processdefinition.GeneralPanelFragment"/>
+        </hbox>
+
+        <hbox id="windowActions" width="100%" justifyContent="START"
+              classNames="sticky-buttons-bottom-panel pl-s pr-s pb-s pt-s">
+            <button id="closeAction" action="closeAction" alignSelf="START"/>
         </hbox>
     </layout>
 </view>
