@@ -10,42 +10,28 @@
                     class="io.openbpm.control.entity.processinstance.ProcessInstanceData" provided="true"/>
     </data>
     <content>
-        <vbox id="processInstanceVBox" width="100%" height="100%" themeNames="spacing-xs">
-            <hbox width="100%">
-                <h4 text="msg://processInstances"/>
-                <hbox classNames="ml-auto">
-                    <hbox spacing="false" alignItems="END">
-                        <label text="msg://instancesRunningCurrentVersion"
-                               setFor="currentVersionsInstancesCountSpan"/>
-                        <span id="currentVersionsInstancesCountSpan"/>
-                    </hbox>
-                    <hbox spacing="false">
-                        <label text="msg://instancesRunningAllVersions"
-                               setFor="allVersionsInstancesCountSpan"/>
-                        <span id="allVersionsInstancesCountSpan"/>
-                    </hbox>
-                </hbox>
-            </hbox>
+        <vbox id="processInstanceVBox" width="100%" height="100%" themeNames="spacing-xs" padding="false">
             <hbox id="processInstancesButtons" classNames="buttons-panel" alignItems="BASELINE">
                 <button id="refreshProcessInstanceBtn" action="processInstancesGrid.refresh"
                         themeNames="small success primary"/>
-                <button id="editProcessInstanceBtn" action="processInstancesGrid.edit" themeNames="small"/>
-
                 <simplePagination id="processInstancesPagination" />
             </hbox>
-            <dataGrid id="processInstancesGrid" dataContainer="processInstanceDataDc" width="100%"
-                      minHeight="20em" minWidth="30em" height="100%">
+            <dataGrid id="processInstancesGrid" dataContainer="processInstanceDataDc" themeNames="compact"
+                      width="100%" height="100%">
                 <actions>
                     <action id="edit" type="list_edit"
                             text="msg://viewProcessInstance" icon="EYE"/>
                     <action id="refresh" type="list_refresh"/>
                 </actions>
                 <columns resizable="true">
-                    <column property="id"/>
-                    <column property="startTime" autoWidth="true" sortable="false"/>
-                    <column property="businessKey" autoWidth="true"/>
-                    <column key="state" header="msg://processInstance.state" autoWidth="true"
+                    <column property="id" autoWidth="true" flexGrow="1">
+                        <fragmentRenderer class="io.openbpm.control.view.processinstance.column.instanceid.InstanceIdColumnFragment"/>
+                    </column>
+                    <column property="startTime" autoWidth="true" flexGrow="0"/>
+                    <column property="businessKey" autoWidth="true" flexGrow="2"/>
+                    <column key="state" header="msg://processInstance.state" autoWidth="true" flexGrow="1"
                             sortable="false"/>
+                    <column key="actions" sortable="false" flexGrow="0" autoWidth="true"/>
                 </columns>
             </dataGrid>
         </vbox>
