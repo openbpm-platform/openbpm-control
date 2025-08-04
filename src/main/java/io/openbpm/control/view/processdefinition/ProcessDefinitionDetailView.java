@@ -29,21 +29,35 @@ import io.jmix.flowui.model.CollectionLoader;
 import io.jmix.flowui.model.DataLoader;
 import io.jmix.flowui.model.InstanceContainer;
 import io.jmix.flowui.view.*;
+import io.openbpm.control.entity.activity.ProcessActivityStatistics;
+import io.openbpm.control.entity.dashboard.IncidentStatistics;
 import io.openbpm.control.entity.filter.ProcessDefinitionFilter;
 import io.openbpm.control.entity.filter.ProcessInstanceFilter;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
-import io.openbpm.control.entity.processinstance.ProcessInstanceData;
+import io.openbpm.control.entity.processinstance.RuntimeProcessInstanceData;
+import io.openbpm.control.service.activity.ActivityService;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionLoadContext;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceLoadContext;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import io.openbpm.control.view.event.TitleUpdateEvent;
+import io.openbpm.control.view.processdefinition.event.ResetActivityEvent;
+import io.openbpm.uikit.component.bpmnviewer.ViewerMode;
+import io.openbpm.uikit.component.bpmnviewer.command.AddMarkerCmd;
+import io.openbpm.uikit.component.bpmnviewer.command.ElementMarkerType;
+import io.openbpm.uikit.component.bpmnviewer.command.RemoveMarkerCmd;
+import io.openbpm.uikit.component.bpmnviewer.command.SetActivityStatisticsCmd;
+import io.openbpm.uikit.component.bpmnviewer.event.ElementClickEvent;
 import io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Route(value = "bpm/process-definitions/:id", layout = DefaultMainViewParent.class)
 @ViewController("bpm_ProcessDefinition.detail")
@@ -81,10 +95,11 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
     protected DataLoader processDefinitionDataDl;
 
     @ViewComponent
-    protected CollectionContainer<ProcessInstanceData> processInstanceDataDc;
+    protected CollectionContainer<RuntimeProcessInstanceData> processInstanceDataDc;
     @ViewComponent
-    protected CollectionLoader<ProcessInstanceData> processInstanceDataDl;
-
+    protected CollectionLoader<RuntimeProcessInstanceData> processInstanceDataDl;
+    @ViewComponent
+    protected InstanceContainer<ProcessInstanceFilter> processInstanceFilterDc;
 
     @ViewComponent
     protected ComboBox<ProcessDefinitionData> versionComboBox;
@@ -93,6 +108,8 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
     protected ProcessInstanceService processInstanceService;
     @Autowired
     protected ProcessDefinitionService processDefinitionService;
+    @Autowired
+    protected ActivityService activityService;
 
     @ViewComponent
     protected ProcessInstancesFragment processInstancesFragment;
@@ -119,6 +136,10 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
     public void onInit(final InitEvent event) {
         addClassNames(LumoUtility.Padding.Top.NONE);
         initTabIcons();
+
+        ProcessInstanceFilter processInstanceFilter = metadata.create(ProcessInstanceFilter.class);
+        processInstanceFilter.setUnfinished(true);
+        processInstanceFilterDc.setItem(processInstanceFilter);
     }
 
     @Subscribe
@@ -128,7 +149,8 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
         updateInstancesCount();
         String processDefinitionBpmnXml = processDefinitionService.getBpmnXml(getEditedEntity().getProcessDefinitionId());
 
-        viewerFragment.initViewer(processDefinitionBpmnXml);
+        viewerFragment.showStatisticsButton(true);
+        initViewer(processDefinitionBpmnXml);
         generalPanel.refresh();
     }
 
@@ -138,7 +160,7 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
     }
 
     @Subscribe(id = "processInstanceDataDc", target = Target.DATA_CONTAINER)
-    public void onProcessInstanceDataDcCollectionChange(final CollectionContainer.CollectionChangeEvent<ProcessInstanceData> event) {
+    public void onProcessInstanceDataDcCollectionChange(final CollectionContainer.CollectionChangeEvent<RuntimeProcessInstanceData> event) {
         updateInstancesCount();
     }
 
@@ -193,21 +215,23 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
             bpmnXml = processDefinitionService.getBpmnXml(processDefinition.getProcessDefinitionId());
         }
 
-        viewerFragment.initViewer(bpmnXml);
+        initViewer(bpmnXml);
         bpmnXmlEditor.setValue(bpmnXml);
 
-        processInstanceDataDl.load();
+        if (processDefinition != null) {
+            processInstanceFilterDc.getItem().setProcessDefinitionId(processDefinition.getProcessDefinitionId());
+            processInstanceDataDl.load();
+        }
 
         sendUpdateViewTitleEvent();
     }
 
     @Install(to = "processInstanceDataDl", target = Target.DATA_LOADER)
-    protected List<ProcessInstanceData> processInstanceDataDlLoadDelegate(final LoadContext<ProcessInstanceData> loadContext) {
-        ProcessInstanceFilter filter = metadata.create(ProcessInstanceFilter.class);
-        filter.setProcessDefinitionId(processDefinitionDataDc.getItem().getId());
-        filter.setUnfinished(true);
+    protected List<RuntimeProcessInstanceData> processInstanceDataDlLoadDelegate(final LoadContext<RuntimeProcessInstanceData> loadContext) {
+        ProcessInstanceFilter filter = processInstanceFilterDc.getItem();
 
-        ProcessInstanceLoadContext context = new ProcessInstanceLoadContext().setFilter(filter);
+        ProcessInstanceLoadContext context = new ProcessInstanceLoadContext().setFilter(filter)
+                .setLoadIncidents(true);
 
         LoadContext.Query query = loadContext.getQuery();
         if (query != null) {
@@ -216,7 +240,7 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
                     .setSort(query.getSort());
         }
 
-        return processInstanceService.findAllHistoricInstances(context);
+        return processInstanceService.findAllRuntimeInstances(context);
     }
 
     @Install(to = "processDefinitionDataDl", target = Target.DATA_LOADER)
@@ -226,14 +250,86 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
         return processDefinitionService.getById(id);
     }
 
+    @Subscribe(id = "processInstanceFilterDc", target = Target.DATA_CONTAINER)
+    protected void onProcessInstanceFilterDcItemPropertyChange(final InstanceContainer.ItemPropertyChangeEvent<ProcessInstanceFilter> event) {
+        if (event.getProperty().equals("activeActivityIdIn")) {
+            updateCurrentVersionCount();
+            processInstanceDataDl.load();
+        }
+    }
+
+    @EventListener
+    public void handleResetActivity(ResetActivityEvent resetActivityEvent) {
+        String activityId = resetActivityEvent.getActivityId();
+        viewerFragment.removeMarker(new RemoveMarkerCmd(activityId, ElementMarkerType.PRIMARY_COLOR_ACTIVITY));
+
+        processInstanceFilterDc.getItem().setActiveActivityIdIn(null);
+    }
+
+    protected void initViewer(String bpmnXml) {
+        viewerFragment.initViewer(bpmnXml);
+        showStatistics();
+    }
+
+    protected void showStatistics() {
+        List<ProcessActivityStatistics> processStatistics = activityService.getStatisticsByProcessId(getEditedEntity().getProcessDefinitionId());
+
+        List<String> activeElements = new ArrayList<>();
+        processStatistics.forEach(activityStatistics -> {
+            Optional<Integer> totalIncidentCount = CollectionUtils.emptyIfNull(activityStatistics.getIncidents())
+                    .stream()
+                    .map(IncidentStatistics::getIncidentCount)
+                    .filter(Objects::nonNull)
+                    .reduce(Integer::sum);
+
+            SetActivityStatisticsCmd cmd = new SetActivityStatisticsCmd(activityStatistics.getActivityId());
+            cmd.setIncidentCount(totalIncidentCount.orElse(null));
+            cmd.setInstanceCount(activityStatistics.getInstanceCount());
+
+            viewerFragment.setActivityStatistics(cmd);
+            activeElements.add(activityStatistics.getActivityId());
+        });
+
+        viewerFragment.setMode(ViewerMode.INTERACTIVE);
+        viewerFragment.setActiveElements(activeElements);
+        viewerFragment.addElementClickListener(this::handleDiagramElementClick);
+    }
+
+    protected void handleDiagramElementClick(ElementClickEvent elementClickEvent) {
+        ProcessInstanceFilter instanceFilter = processInstanceFilterDc.getItem();
+
+        List<String> activityIdIn = instanceFilter.getActiveActivityIdIn();
+        String clickedElementId = elementClickEvent.getElementId();
+        boolean sameElementClicked = false;
+
+        if (CollectionUtils.isNotEmpty(activityIdIn)) {
+            activityIdIn.forEach(activityId -> viewerFragment.removeMarker(new RemoveMarkerCmd(activityId, ElementMarkerType.PRIMARY_COLOR_ACTIVITY)));
+            sameElementClicked = activityIdIn.contains(clickedElementId);
+        }
+
+        if (sameElementClicked) {
+            instanceFilter.setActiveActivityIdIn(null);
+            processInstancesFragment.clearActivity();
+        } else {
+            instanceFilter.setActiveActivityIdIn(List.of(clickedElementId));
+            viewerFragment.addMarker(new AddMarkerCmd(clickedElementId, ElementMarkerType.PRIMARY_COLOR_ACTIVITY));
+            processInstancesFragment.showActivity(clickedElementId, elementClickEvent.getElementType(),
+                    elementClickEvent.getElementName());
+        }
+    }
+
     protected void updateInstancesCount() {
         ProcessDefinitionData item = processDefinitionDataDc.getItem();
 
-        long currentVersionInstancesCount = processInstanceService.getCountByProcessDefinitionId(item.getProcessDefinitionId());
-        updateTabCaption(currentVersionInstancesCount);
+        updateCurrentVersionCount();
 
         long allVersionsInstancesCount = processInstanceService.getCountByProcessDefinitionKey(item.getKey());
         allVersionsInstancesCountSpan.setText(String.valueOf(allVersionsInstancesCount));
+    }
+
+    protected void updateCurrentVersionCount() {
+        long currentVersionInstancesCount = processInstanceService.getRuntimeInstancesCount(processInstanceFilterDc.getItem());
+        updateTabCaption(currentVersionInstancesCount);
     }
 
     protected void updateTabCaption(long count) {
@@ -247,8 +343,8 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
         filter.setKey(processDefinition.getKey());
 
         List<ProcessDefinitionData> optionsList = processDefinitionService.findAll(new ProcessDefinitionLoadContext()
-                        .setFilter(filter)
-                        .setSort(Sort.by(Sort.Direction.DESC, "version")));
+                .setFilter(filter)
+                .setSort(Sort.by(Sort.Direction.DESC, "version")));
         versionComboBox.setItems(optionsList);
         versionComboBox.setItemLabelGenerator(item -> item.getVersion() != null ? String.valueOf(item.getVersion()) : null);
         versionComboBox.setValue(processDefinition);

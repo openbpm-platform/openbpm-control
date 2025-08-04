@@ -6,7 +6,7 @@
 
 <fragment xmlns="http://jmix.io/schema/flowui/fragment">
     <data>
-        <instance id="processInstanceDc" class="io.openbpm.control.entity.processinstance.ProcessInstanceData">
+        <instance id="processInstanceDc" class="io.openbpm.control.entity.processinstance.RuntimeProcessInstanceData">
             <loader id="processInstanceDl"/>
         </instance>
     </data>

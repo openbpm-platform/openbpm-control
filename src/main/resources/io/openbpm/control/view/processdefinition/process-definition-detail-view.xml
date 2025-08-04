@@ -11,9 +11,13 @@
             <loader id="processDefinitionDataDl"/>
         </instance>
         <collection id="processInstanceDataDc"
-                    class="io.openbpm.control.entity.processinstance.ProcessInstanceData">
+                    class="io.openbpm.control.entity.processinstance.RuntimeProcessInstanceData">
             <loader id="processInstanceDataDl"/>
         </collection>
+        <instance id="processInstanceFilterDc" class="io.openbpm.control.entity.filter.ProcessInstanceFilter">
+            <loader id="processInstanceFilterDl"/>
+            <fetchPlan extends="_base"/>
+        </instance>
     </data>
     <facets>
         <dataLoadCoordinator auto="true"/>

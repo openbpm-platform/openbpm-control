@@ -40,3 +40,8 @@
     float: right;
     position: absolute;
 }
+
+.process-details-diagram-box .bpmn-viewer-left-side-actions {
+    float: left;
+    position: absolute;
+}

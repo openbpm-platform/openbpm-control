@@ -7,6 +7,7 @@ package io.openbpm.control.service.processinstance;
 
 import io.openbpm.control.entity.filter.ProcessInstanceFilter;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
+import io.openbpm.control.entity.processinstance.RuntimeProcessInstanceData;
 import io.openbpm.control.entity.variable.VariableInstanceData;
 import org.springframework.lang.Nullable;
 
@@ -26,6 +27,15 @@ public interface ProcessInstanceService {
      */
     List<ProcessInstanceData> findAllHistoricInstances(ProcessInstanceLoadContext loadContext);
 
+
+    /**
+     * Loads process instances from the engine runtime data using the specified context.
+     *
+     * @param loadContext a context to load process instances
+     * @return a list of process instances
+     */
+    List<RuntimeProcessInstanceData> findAllRuntimeInstances(ProcessInstanceLoadContext loadContext);
+
     /**
      * Loads from the engine history the total count of process instances that match the specified filter.
      *
@@ -33,6 +43,15 @@ public interface ProcessInstanceService {
      * @return count of process instances
      */
     long getHistoricInstancesCount(ProcessInstanceFilter filter);
+
+    /**
+     * Loads from the engine history the total count of process instances that match the specified filter.
+     *
+     * @param filter a process instance filter
+     * @return count of process instances
+     */
+    long getRuntimeInstancesCount(ProcessInstanceFilter filter);
+
 
     /**
      * Loads a process instance with the specified identifier.
