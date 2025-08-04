@@ -8,8 +8,12 @@ package io.openbpm.control.mapper;
 import io.openbpm.control.entity.activity.ActivityShortData;
 import io.openbpm.control.entity.activity.ActivityInstanceTreeItem;
 import io.jmix.core.Metadata;
+import io.openbpm.control.entity.activity.ProcessActivityStatistics;
+import io.openbpm.control.entity.dashboard.IncidentStatistics;
 import org.camunda.community.rest.client.model.ActivityInstanceDto;
+import org.camunda.community.rest.client.model.ActivityStatisticsResultDto;
 import org.camunda.community.rest.client.model.HistoricActivityInstanceDto;
+import org.camunda.community.rest.client.model.IncidentStatisticsResultDto;
 import org.camunda.community.rest.client.model.TransitionInstanceDto;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -55,5 +59,22 @@ public abstract class ActivityMapper {
         }
         Instant instant = value.toInstant();
         return Date.from(instant);
+    }
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "instanceCount", source = "instances")
+    @Mapping(target = "failedJobCount", source = "failedJobs")
+    @Mapping(target = "activityId", source = "id")
+    public abstract ProcessActivityStatistics fromActivityStatisticsResult(ActivityStatisticsResultDto source);
+
+    ProcessActivityStatistics activityStatisticsClassFactory() {
+        return metadata.create(ProcessActivityStatistics.class);
+    }
+
+    @Mapping(target = "id", ignore = true)
+    public abstract IncidentStatistics fromStatisticsResultDto(IncidentStatisticsResultDto resultDto);
+
+    IncidentStatistics incidentStatisticsClassFactory() {
+        return metadata.create(IncidentStatistics.class);
     }
 }

@@ -8,6 +8,7 @@ package io.openbpm.control.service.activity;
 import io.openbpm.control.entity.activity.ActivityInstanceTreeItem;
 import io.openbpm.control.entity.activity.ActivityShortData;
 import io.openbpm.control.entity.activity.HistoricActivityInstanceData;
+import io.openbpm.control.entity.activity.ProcessActivityStatistics;
 import io.openbpm.control.entity.filter.ActivityFilter;
 import org.springframework.lang.Nullable;
 
@@ -66,4 +67,12 @@ public interface ActivityService {
      */
     @Nullable
     HistoricActivityInstanceData findById(String activityInstanceId);
+
+    /**
+     * Loads the statistics (count of running instances, incidents) for the specified process definition.
+     *
+     * @param processDefinitionId an id of the process definition for which the statistics should be loaded
+     * @return found process statistics
+     */
+    List<ProcessActivityStatistics> getStatisticsByProcessId(String processDefinitionId);
 }

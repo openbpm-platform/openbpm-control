@@ -1,4 +1,9 @@
-package io.openbpm.control.view.processinstance;
+/*
+ * Copyright (c) Haulmont 2025. All Rights Reserved.
+ * Use is subject to license terms.
+ */
+
+package io.openbpm.control.view.processinstance.column.state;
 
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
@@ -7,14 +12,14 @@ import io.jmix.flowui.fragment.FragmentDescriptor;
 import io.jmix.flowui.fragmentrenderer.FragmentRenderer;
 import io.jmix.flowui.fragmentrenderer.RendererItemContainer;
 import io.jmix.flowui.view.ViewComponent;
-import io.openbpm.control.entity.processinstance.ProcessInstanceData;
+import io.openbpm.control.entity.processinstance.RuntimeProcessInstanceData;
 import io.openbpm.control.view.util.ComponentHelper;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @FragmentDescriptor("process-instance-state-column-fragment.xml")
 @RendererItemContainer("processInstanceDataDc")
-public class ProcessInstanceStateColumnFragment extends FragmentRenderer<HorizontalLayout, ProcessInstanceData> {
+public class ProcessInstanceStateColumnFragment extends FragmentRenderer<HorizontalLayout, RuntimeProcessInstanceData> {
 
     @Autowired
     protected ComponentHelper componentHelper;
@@ -22,7 +27,7 @@ public class ProcessInstanceStateColumnFragment extends FragmentRenderer<Horizon
     protected Icon incidentIcon;
 
     @Override
-    public void setItem(ProcessInstanceData item) {
+    public void setItem(RuntimeProcessInstanceData item) {
         super.setItem(item);
 
         Span processInstanceStateBadge = componentHelper.createProcessInstanceStateBadge(item.getState());

@@ -15,23 +15,11 @@ import io.jmix.core.metamodel.annotation.JmixProperty;
 import java.util.Date;
 
 @JmixEntity(name = "bpm_ProcessInstanceData")
-public class ProcessInstanceData {
-
-    @JmixId
-    @JmixProperty(mandatory = true)
-    protected String id;
+public class ProcessInstanceData  extends RuntimeProcessInstanceData {
 
     protected String deleteReason;
 
-    protected String instanceId;
-
-    protected Boolean suspended = false;
-
-    protected String businessKey;
-
     protected String tenantId;
-
-    protected String processDefinitionId;
 
     protected String processDefinitionKey;
 
@@ -51,16 +39,6 @@ public class ProcessInstanceData {
 
     protected Boolean externallyTerminated = false;
 
-    protected Boolean hasIncidents = false;
-
-    public Boolean getHasIncidents() {
-        return hasIncidents;
-    }
-
-    public void setHasIncidents(Boolean hasIncidents) {
-        this.hasIncidents = hasIncidents;
-    }
-
     public String getDeleteReason() {
         return deleteReason;
     }
@@ -69,52 +47,12 @@ public class ProcessInstanceData {
         this.deleteReason = deleteReason;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getInstanceId() {
-        return instanceId;
-    }
-
-    public void setInstanceId(String instanceId) {
-        this.instanceId = instanceId;
-    }
-
-    public Boolean getSuspended() {
-        return suspended;
-    }
-
-    public void setSuspended(Boolean suspended) {
-        this.suspended = suspended;
-    }
-
-    public String getBusinessKey() {
-        return businessKey;
-    }
-
-    public void setBusinessKey(String businessKey) {
-        this.businessKey = businessKey;
-    }
-
     public String getTenantId() {
         return tenantId;
     }
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
-    }
-
-    public String getProcessDefinitionId() {
-        return processDefinitionId;
-    }
-
-    public void setProcessDefinitionId(String processDefinitionId) {
-        this.processDefinitionId = processDefinitionId;
     }
 
     public String getProcessDefinitionKey() {

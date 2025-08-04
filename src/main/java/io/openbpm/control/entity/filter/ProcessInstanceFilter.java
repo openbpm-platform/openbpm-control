@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @JmixEntity
@@ -44,6 +45,8 @@ public class ProcessInstanceFilter {
     protected Boolean withIncidents;
 
     protected Boolean unfinished;
+
+    protected List<String> activeActivityIdIn;
 
     public Boolean getUnfinished() {
         return unfinished;

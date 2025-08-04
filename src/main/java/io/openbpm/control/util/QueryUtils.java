@@ -53,6 +53,7 @@ public class QueryUtils {
         addIfTrue(filter.getSuspended(), processInstanceQuery::suspended);
         addIfTrue(filter.getWithIncidents(), processInstanceQuery::withIncident);
 
+        addIfNotNull(filter.getActiveActivityIdIn(), activityList -> processInstanceQuery.activityIdIn(activityList.toArray(new String[0])));
     }
 
     public static void addRuntimeSort(ProcessInstanceQuery processInstanceQuery, @Nullable Sort sort) {
@@ -96,6 +97,7 @@ public class QueryUtils {
         addIfNotNull(filter.getStartTimeBefore(), queryDto::startedBefore);
         addIfNotNull(filter.getEndTimeAfter(), queryDto::finishedAfter);
         addIfNotNull(filter.getEndTimeBefore(), queryDto::finishedBefore);
+        addIfNotNull(filter.getActiveActivityIdIn(), queryDto::activeActivityIdIn);
     }
 
     public static void addHistorySort(HistoricProcessInstanceQueryDto queryDto, @Nullable Sort sort) {

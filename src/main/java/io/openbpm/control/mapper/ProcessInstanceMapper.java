@@ -7,12 +7,14 @@ package io.openbpm.control.mapper;
 
 import io.jmix.core.Metadata;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
+import io.openbpm.control.entity.processinstance.RuntimeProcessInstanceData;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.community.rest.client.model.HistoricProcessInstanceDto;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.TargetType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 
@@ -37,10 +39,6 @@ public abstract class ProcessInstanceMapper {
     @Mapping(target = "processDefinitionVersion", ignore = true)
     @Mapping(target = "deleteReason", ignore = true)
     public abstract ProcessInstanceData fromProcessInstanceModel(ProcessInstance source);
-
-    ProcessInstanceData targetClassFactory() {
-        return metadata.create(ProcessInstanceData.class);
-    }
 
     @Mapping(target = "hasIncidents", ignore = true)
     @Mapping(target = "instanceId", source = "id")
@@ -67,5 +65,13 @@ public abstract class ProcessInstanceMapper {
             default -> {
             }
         }
+    }
+
+    @Mapping(target = "hasIncidents", ignore = true)
+    @Mapping(target = "instanceId", source = "id")
+    public abstract RuntimeProcessInstanceData toRuntimeProcessInstanceData(ProcessInstance source);
+
+    public <T extends RuntimeProcessInstanceData> T createProcessInstanceData(@TargetType Class<T> processInstanceClass) {
+        return metadata.create(processInstanceClass);
     }
 }
