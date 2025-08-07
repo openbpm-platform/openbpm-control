@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:jmix="http://jmix.io/schema/bpm/bpmn" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1bhfunt" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.23.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.21.0">
+  <bpmn:process id="testActivityStatistics" name="testActivityStatistics" isExecutable="true" camunda:historyTimeToLive="P180D">
+    <bpmn:startEvent id="StartEvent_1">
+      <bpmn:outgoing>Flow_0wu3snj</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_0wu3snj" sourceRef="StartEvent_1" targetRef="testScriptTask" />
+    <bpmn:scriptTask id="testScriptTask" name="Test script task" scriptFormat="groovy" camunda:asyncBefore="true" camunda:exclusive="false">
+      <bpmn:incoming>Flow_0wu3snj</bpmn:incoming>
+      <bpmn:outgoing>Flow_1tmym9z</bpmn:outgoing>
+      <bpmn:script>fail = execution.getVariable('fail')
+
+if(fail != null) {
+  throw new RuntimeException("Unable to execute task")
+}</bpmn:script>
+    </bpmn:scriptTask>
+    <bpmn:sequenceFlow id="Flow_1tmym9z" sourceRef="testScriptTask" targetRef="testUserTask" />
+    <bpmn:userTask id="testUserTask" name="Test user task">
+      <bpmn:incoming>Flow_1tmym9z</bpmn:incoming>
+      <bpmn:outgoing>Flow_151aqid</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:endEvent id="Event_19ud1fc">
+      <bpmn:incoming>Flow_151aqid</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_151aqid" sourceRef="testUserTask" targetRef="Event_19ud1fc">
+      <bpmn:extensionElements>
+        <jmix:conditionDetails conditionSource="userTaskOutcome" />
+      </bpmn:extensionElements>
+    </bpmn:sequenceFlow>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="testActivityStatistics">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="179" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1csgb66_di" bpmnElement="testScriptTask">
+        <dc:Bounds x="270" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_160ayuy_di" bpmnElement="testUserTask">
+        <dc:Bounds x="430" y="77" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_19ud1fc_di" bpmnElement="Event_19ud1fc">
+        <dc:Bounds x="592" y="99" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0wu3snj_di" bpmnElement="Flow_0wu3snj">
+        <di:waypoint x="215" y="117" />
+        <di:waypoint x="270" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1tmym9z_di" bpmnElement="Flow_1tmym9z">
+        <di:waypoint x="370" y="117" />
+        <di:waypoint x="430" y="117" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_151aqid_di" bpmnElement="Flow_151aqid">
+        <di:waypoint x="530" y="117" />
+        <di:waypoint x="592" y="117" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

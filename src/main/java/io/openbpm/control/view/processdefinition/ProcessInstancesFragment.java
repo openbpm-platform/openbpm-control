@@ -6,11 +6,15 @@
 package io.openbpm.control.view.processdefinition;
 
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.router.RouteParameters;
+import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.jmix.core.AccessManager;
 import io.jmix.core.DataLoadContext;
 import io.jmix.core.Messages;
@@ -18,6 +22,7 @@ import io.jmix.core.Metadata;
 import io.jmix.flowui.Fragments;
 import io.jmix.flowui.Notifications;
 import io.jmix.flowui.UiComponents;
+import io.jmix.flowui.UiEventPublisher;
 import io.jmix.flowui.ViewNavigators;
 import io.jmix.flowui.accesscontext.UiEntityContext;
 import io.jmix.flowui.component.grid.DataGrid;
@@ -37,10 +42,12 @@ import io.jmix.flowui.view.MessageBundle;
 import io.jmix.flowui.view.Subscribe;
 import io.jmix.flowui.view.Supply;
 import io.jmix.flowui.view.ViewComponent;
+import io.openbpm.control.entity.filter.ProcessInstanceFilter;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
+import io.openbpm.control.entity.processinstance.RuntimeProcessInstanceData;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
-import io.openbpm.control.view.processinstance.ProcessInstanceStateColumnFragment;
+import io.openbpm.control.view.processdefinition.event.ResetActivityEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
@@ -63,7 +70,7 @@ public class ProcessInstancesFragment extends Fragment<VerticalLayout> {
     @ViewComponent
     protected InstanceContainer<ProcessDefinitionData> processDefinitionDataDc;
     @ViewComponent
-    protected CollectionContainer<ProcessInstanceData> processInstanceDataDc;
+    protected CollectionContainer<RuntimeProcessInstanceData> processInstanceDataDc;
 
     @Autowired
     protected ProcessInstanceService processInstanceService;
@@ -72,7 +79,7 @@ public class ProcessInstancesFragment extends Fragment<VerticalLayout> {
     protected VerticalLayout processInstanceVBox;
 
     @ViewComponent
-    protected DataGrid<ProcessInstanceData> processInstancesGrid;
+    protected DataGrid<RuntimeProcessInstanceData> processInstancesGrid;
 
     @ViewComponent
     protected SimplePagination processInstancesPagination;
@@ -85,6 +92,12 @@ public class ProcessInstancesFragment extends Fragment<VerticalLayout> {
 
     @Autowired
     protected UiComponents uiComponents;
+    @ViewComponent
+    private Div selectedActivityContainer;
+    @Autowired
+    private UiEventPublisher uiEventPublisher;
+    @ViewComponent
+    private InstanceContainer<ProcessInstanceFilter> processInstanceFilterDc;
 
     @Subscribe
     public void onReady(ReadyEvent event) {
@@ -97,13 +110,12 @@ public class ProcessInstancesFragment extends Fragment<VerticalLayout> {
 
     @Install(to = "processInstancesPagination", subject = "totalCountDelegate")
     protected Integer processInstancesPaginationTotalCountDelegate(final DataLoadContext dataLoadContext) {
-        ProcessDefinitionData processDefinition = processDefinitionDataDc.getItem();
-        return (int) processInstanceService.getCountByProcessDefinitionId(processDefinition.getProcessDefinitionId());
+        return (int) processInstanceService.getRuntimeInstancesCount(processInstanceFilterDc.getItem());
     }
 
     @Subscribe("processInstancesGrid.edit")
     public void onProcessDefinitionsGridViewDetails(ActionPerformedEvent event) {
-        ProcessInstanceData selectedInstance = processInstancesGrid.getSingleSelectedItem();
+        RuntimeProcessInstanceData selectedInstance = processInstancesGrid.getSingleSelectedItem();
         if (selectedInstance == null) {
             return;
         }
@@ -111,21 +123,12 @@ public class ProcessInstancesFragment extends Fragment<VerticalLayout> {
     }
 
     @Install(to = "processInstancesGrid.id", subject = "tooltipGenerator")
-    protected String processInstancesGridIdTooltipGenerator(final ProcessInstanceData processInstanceData) {
-        return processInstanceData.getInstanceId();
-    }
-
-    @Supply(to = "processInstancesGrid.state", subject = "renderer")
-    protected Renderer<ProcessInstanceData> processInstancesGridStateRenderer() {
-        return new ComponentRenderer<>(processInstanceData -> {
-            ProcessInstanceStateColumnFragment processInstancesFragment = fragments.create(this, ProcessInstanceStateColumnFragment.class);
-            processInstancesFragment.setItem(processInstanceData);
-            return processInstancesFragment;
-        });
+    protected String processInstancesGridIdTooltipGenerator(final RuntimeProcessInstanceData processInstanceData) {
+        return processInstanceData.getId();
     }
 
     @Supply(to = "processInstancesGrid.actions", subject = "renderer")
-    protected Renderer<ProcessInstanceData> processInstancesGridActionsRenderer() {
+    protected Renderer<RuntimeProcessInstanceData> processInstancesGridActionsRenderer() {
         return new ComponentRenderer<>(processInstance -> {
             UiEntityContext context = new UiEntityContext(metadata.getClass(processInstance));
             accessManager.applyRegisteredConstraints(context);
@@ -143,11 +146,39 @@ public class ProcessInstancesFragment extends Fragment<VerticalLayout> {
         });
     }
 
-    protected void openProcessInstanceDetailView(ProcessInstanceData selectedInstance) {
+
+    protected void openProcessInstanceDetailView(RuntimeProcessInstanceData selectedInstance) {
         viewNavigators.detailView(getCurrentView(), ProcessInstanceData.class)
                 .withRouteParameters(new RouteParameters("id", selectedInstance.getId()))
                 .withBackwardNavigation(true)
                 .navigate();
     }
 
+    public void clearActivity() {
+        selectedActivityContainer.removeAll();
+    }
+
+    public void showActivity(String elementId, String elementType, String elementName) {
+        selectedActivityContainer.removeAll();
+
+        Span activityBadge = new Span(messageBundle.formatMessage("selectedActivityBadge.text", elementId));
+        activityBadge.getElement().getThemeList().add("badge pill primary small");
+        activityBadge.setHeight("min-content");
+
+        Tooltip tooltip = Tooltip.forComponent(activityBadge);
+        tooltip.setText("%s: %s".formatted(elementType, elementName));
+
+        JmixButton clearBtn = uiComponents.create(JmixButton.class);
+        clearBtn.setIcon(VaadinIcon.CLOSE_SMALL.create());
+        clearBtn.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
+        clearBtn.addClassNames(LumoUtility.TextColor.PRIMARY_CONTRAST);
+        clearBtn.addClickListener(clickEvent -> {
+            clearActivity();
+            uiEventPublisher.publishEventForCurrentUI(new ResetActivityEvent(this, elementId));
+        });
+
+        activityBadge.add(clearBtn);
+
+        selectedActivityContainer.add(activityBadge);
+    }
 }

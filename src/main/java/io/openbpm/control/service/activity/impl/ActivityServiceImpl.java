@@ -5,11 +5,15 @@
 
 package io.openbpm.control.service.activity.impl;
 
+import feign.FeignException;
+import feign.utils.ExceptionUtils;
 import io.jmix.core.Sort;
 import io.openbpm.control.entity.activity.ActivityInstanceTreeItem;
 import io.openbpm.control.entity.activity.ActivityShortData;
 import io.openbpm.control.entity.activity.HistoricActivityInstanceData;
+import io.openbpm.control.entity.activity.ProcessActivityStatistics;
 import io.openbpm.control.entity.filter.ActivityFilter;
+import io.openbpm.control.exception.EngineNotSelectedException;
 import io.openbpm.control.mapper.ActivityMapper;
 import io.openbpm.control.mapper.HistoryActivityMapper;
 import io.openbpm.control.service.activity.ActivityLoadContext;
@@ -17,8 +21,10 @@ import io.openbpm.control.service.activity.ActivityService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.camunda.community.rest.client.api.HistoryApiClient;
+import org.camunda.community.rest.client.api.ProcessDefinitionApiClient;
 import org.camunda.community.rest.client.api.ProcessInstanceApiClient;
 import org.camunda.community.rest.client.model.ActivityInstanceDto;
+import org.camunda.community.rest.client.model.ActivityStatisticsResultDto;
 import org.camunda.community.rest.client.model.CountResultDto;
 import org.camunda.community.rest.client.model.HistoricActivityInstanceDto;
 import org.camunda.community.rest.client.model.HistoricActivityInstanceQueryDto;
@@ -27,6 +33,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
+import java.net.ConnectException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,15 +46,18 @@ public class ActivityServiceImpl implements ActivityService {
     protected final HistoryApiClient historyApiClient;
     protected final ActivityMapper activityMapper;
     protected final ProcessInstanceApiClient processInstanceApi;
+    protected final ProcessDefinitionApiClient processDefinitionApi;
 
     public ActivityServiceImpl(HistoryActivityMapper historyActivityMapper,
                                HistoryApiClient historyApiClient,
                                ActivityMapper activityMapper,
-                               ProcessInstanceApiClient processInstanceApi) {
+                               ProcessInstanceApiClient processInstanceApi,
+                               ProcessDefinitionApiClient processDefinitionApi) {
         this.historyActivityMapper = historyActivityMapper;
         this.historyApiClient = historyApiClient;
         this.activityMapper = activityMapper;
         this.processInstanceApi = processInstanceApi;
+        this.processDefinitionApi = processDefinitionApi;
     }
 
     @Override
@@ -149,6 +159,42 @@ public class ActivityServiceImpl implements ActivityService {
         }
         log.error("Error while getting history activity by id {}, status code: {}", activityInstanceId, response.getStatusCode());
         return null;
+    }
+
+    @Override
+    public List<ProcessActivityStatistics> getStatisticsByProcessId(String processDefinitionId) {
+        try {
+            ResponseEntity<List<ActivityStatisticsResultDto>> response = processDefinitionApi.getActivityStatistics(processDefinitionId, true, true, null);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                List<ActivityStatisticsResultDto> statisticsResultDtoList = response.getBody();
+                if (statisticsResultDtoList != null) {
+                    return statisticsResultDtoList
+                            .stream()
+                            .map(activityMapper::fromActivityStatisticsResult)
+                            .toList();
+                }
+            }
+        } catch (Exception e) {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if (rootCause instanceof EngineNotSelectedException) {
+                log.warn("Unable to load process definition activity statistics by id '{}' because BPM engine not selected", processDefinitionId);
+                return null;
+            }
+
+            if (rootCause instanceof ConnectException) {
+                log.error("Unable load process definition activity statistics by id '{}' because of connection error: ", processDefinitionId, e);
+                return null;
+            }
+
+            if (rootCause instanceof FeignException feignException && feignException.status() == 404) {
+                log.warn("Unable to load process definition activity statistics by id '{}' because process does not exist", processDefinitionId);
+                return null;
+            }
+
+            throw e;
+
+        }
+        return List.of();
     }
 
     protected HistoricActivityInstanceQueryDto createActivityQueryDto(@Nullable ActivityFilter filter) {

@@ -211,7 +211,9 @@ public class ProcessInstanceListView extends StandardListView<ProcessInstanceDat
         LoadContext.Query query = loadContext.getQuery();
         ProcessInstanceFilter filter = processInstanceFilterDc.getItemOrNull();
 
-        ProcessInstanceLoadContext context = new ProcessInstanceLoadContext().setFilter(filter);
+        ProcessInstanceLoadContext context = new ProcessInstanceLoadContext().setFilter(filter)
+                .setLoadIncidents(true);
+
         if (query != null) {
             context = context.setFirstResult(query.getFirstResult())
                     .setMaxResults(query.getMaxResults())

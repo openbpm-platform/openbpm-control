@@ -8,6 +8,7 @@ package io.openbpm.control.service.processinstance;
 import io.jmix.core.Sort;
 import io.openbpm.control.entity.filter.ProcessInstanceFilter;
 import io.openbpm.control.service.ItemListLoadContext;
+import lombok.Getter;
 
 /**
  * A context that contains the following options to load incidents:
@@ -34,7 +35,10 @@ import io.openbpm.control.service.ItemListLoadContext;
  * @see io.jmix.core.Metadata
  * @see Sort
  */
+@Getter
 public class ProcessInstanceLoadContext extends ItemListLoadContext<ProcessInstanceFilter> {
+
+    protected boolean loadIncidents;
 
     /**
      * Sets a process instance filter.
@@ -77,6 +81,17 @@ public class ProcessInstanceLoadContext extends ItemListLoadContext<ProcessInsta
      */
     public ProcessInstanceLoadContext setSort(Sort sort) {
         this.sort = sort;
+        return this;
+    }
+
+    /**
+     * Sets a flag that allows to load incidents for the state.
+     *
+     * @param loadIncidents needs to load incidents to mark the instance state.
+     * @return current context
+     */
+    public ProcessInstanceLoadContext setLoadIncidents(boolean loadIncidents) {
+        this.loadIncidents = loadIncidents;
         return this;
     }
 }

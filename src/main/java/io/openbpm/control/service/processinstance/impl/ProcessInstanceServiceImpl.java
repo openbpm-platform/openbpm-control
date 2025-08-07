@@ -10,6 +10,7 @@ import feign.utils.ExceptionUtils;
 import io.jmix.core.Sort;
 import io.openbpm.control.entity.filter.ProcessInstanceFilter;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
+import io.openbpm.control.entity.processinstance.RuntimeProcessInstanceData;
 import io.openbpm.control.entity.variable.VariableInstanceData;
 import io.openbpm.control.exception.EngineNotSelectedException;
 import io.openbpm.control.mapper.ProcessInstanceMapper;
@@ -18,6 +19,7 @@ import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
 import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.ProcessInstanceApiClient;
@@ -40,8 +42,7 @@ import java.util.stream.Collectors;
 
 import static io.openbpm.control.service.variable.VariableUtils.createVariableMap;
 import static io.openbpm.control.util.EngineRestUtils.getCountResult;
-import static io.openbpm.control.util.QueryUtils.addHistoryFilters;
-import static io.openbpm.control.util.QueryUtils.addHistorySort;
+import static io.openbpm.control.util.QueryUtils.*;
 
 @Slf4j
 @Service("control_ProcessInstanceService")
@@ -73,7 +74,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
                 List<HistoricProcessInstanceDto> processInstances = Optional.ofNullable(responseEntity.getBody()).orElse(List.of());
 
-                List<String> instancesWithIncidents = findRunningInstancesWithIncidents(processInstances);
+                List<String> instancesWithIncidents = context.isLoadIncidents() ? findRunningInstancesWithIncidents(processInstances) : List.of();
 
                 return processInstances
                         .stream()
@@ -102,6 +103,45 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     }
 
+    @Override
+    public List<RuntimeProcessInstanceData> findAllRuntimeInstances(ProcessInstanceLoadContext loadContext) {
+        try {
+            ProcessInstanceQuery processInstanceQuery = remoteRuntimeService.createProcessInstanceQuery();
+
+            addRuntimeFilters(processInstanceQuery, loadContext.getFilter());
+            addRuntimeSort(processInstanceQuery, loadContext.getSort());
+
+            List<ProcessInstance> processInstances;
+            if (loadContext.getFirstResult() != null && loadContext.getMaxResults() != null) {
+                processInstances = processInstanceQuery.listPage(loadContext.getFirstResult(), loadContext.getMaxResults());
+            } else {
+                processInstances = processInstanceQuery.list();
+            }
+
+            List<String> instancesWithIncidents = loadContext.isLoadIncidents() ? findRuntimeInstancesWithIncidents(processInstances) : List.of();
+
+            return processInstances
+                    .stream()
+                    .map(source -> {
+                        RuntimeProcessInstanceData processInstanceData = processInstanceMapper.toRuntimeProcessInstanceData(source);
+                        processInstanceData.setHasIncidents(instancesWithIncidents.contains(source.getId()));
+                        return processInstanceData;
+                    })
+                    .toList();
+
+        } catch (Exception e) {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if (rootCause instanceof EngineNotSelectedException) {
+                log.warn("Unable to load runtime process instances because BPM engine not selected");
+                return List.of();
+            }
+            if (rootCause instanceof ConnectException) {
+                log.error("Unable to load runtime process instances because of connection error: ", e);
+                return List.of();
+            }
+            throw e;
+        }
+    }
 
     @Override
     public long getHistoricInstancesCount(ProcessInstanceFilter filter) {
@@ -123,6 +163,28 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
             }
             if (rootCause instanceof ConnectException) {
                 log.error("Unable to load historic process instances count because of connection error: ", e);
+                return 0;
+            }
+            throw e;
+        }
+    }
+
+    @Override
+    public long getRuntimeInstancesCount(ProcessInstanceFilter filter) {
+        try {
+            ProcessInstanceQuery processInstanceQuery = remoteRuntimeService.createProcessInstanceQuery();
+
+            addRuntimeFilters(processInstanceQuery, filter);
+
+            return processInstanceQuery.count();
+        } catch (Exception e) {
+            Throwable rootCause = ExceptionUtils.getRootCause(e);
+            if (rootCause instanceof EngineNotSelectedException) {
+                log.warn("Unable to load runtime process instances count because BPM engine not selected");
+                return 0;
+            }
+            if (rootCause instanceof ConnectException) {
+                log.error("Unable to load runtime process instances count because of connection error: ", e);
                 return 0;
             }
             throw e;
@@ -353,6 +415,18 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
                 .map(HistoricProcessInstanceDto::getId)
                 .collect(Collectors.toSet());
 
+        return loadInstancesWithIncidents(activeInstanceIds);
+    }
+
+
+    protected List<String> findRuntimeInstancesWithIncidents(List<ProcessInstance> processInstances) {
+        Set<String> activeInstanceIds = processInstances.stream()
+                .map(processInstance -> processInstance.getId())
+                .collect(Collectors.toSet());
+        return loadInstancesWithIncidents(activeInstanceIds);
+    }
+
+    protected List<String> loadInstancesWithIncidents(Set<String> activeInstanceIds) {
         List<ProcessInstance> instancesWithIncidents = remoteRuntimeService.createProcessInstanceQuery()
                 .withIncident()
                 .processInstanceIds(activeInstanceIds)
