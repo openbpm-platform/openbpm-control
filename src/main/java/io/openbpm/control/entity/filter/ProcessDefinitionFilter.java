@@ -41,6 +41,10 @@ public class ProcessDefinitionFilter {
 
     protected Boolean latestVersionOnly = true;
 
+    protected String versionTag;
+
+    protected Integer version;
+
     public ProcessDefinitionState getState() {
         return state == null ? null : ProcessDefinitionState.fromId(state);
     }
