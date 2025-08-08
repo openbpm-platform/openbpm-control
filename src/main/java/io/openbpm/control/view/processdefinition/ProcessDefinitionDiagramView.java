@@ -8,8 +8,10 @@ package io.openbpm.control.view.processdefinition;
 
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
+import io.jmix.flowui.component.UiComponentUtils;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
+import io.openbpm.control.uicomponent.viewer.handler.CallActivityOverlayClickHandler;
 import io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment;
 import io.openbpm.control.view.main.MainView;
 import io.jmix.flowui.model.InstanceContainer;
@@ -29,6 +31,8 @@ public class ProcessDefinitionDiagramView extends StandardView {
     protected BpmnViewerFragment viewerFragment;
     @ViewComponent
     protected InstanceContainer<ProcessDefinitionData> processDefinitionDc;
+    @Autowired
+    protected CallActivityOverlayClickHandler callActivityClickHandler;
 
     @SuppressWarnings("LombokSetterMayBeUsed")
     public void setProcessDefinition(ProcessDefinitionData processDefinitionId) {
@@ -47,6 +51,12 @@ public class ProcessDefinitionDiagramView extends StandardView {
 
         String bpmnXml = processDefinitionService.getBpmnXml(processDefinition.getProcessDefinitionId());
         viewerFragment.initViewer(bpmnXml);
+        viewerFragment.showCalledProcessOverlays();
+        viewerFragment.addCalledProcessOverlayClickListener(callActivityOverlayClickEvent -> {
+            callActivityClickHandler.handleProcessNavigation(processDefinitionDc.getItem(),
+                    callActivityOverlayClickEvent.getCallActivity(),
+                    UiComponentUtils.isComponentAttachedToDialog(this));
+        });
     }
 
 }

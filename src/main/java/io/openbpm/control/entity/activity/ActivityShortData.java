@@ -30,6 +30,16 @@ public class ActivityShortData {
 
     protected String activityType;
 
+    protected String calledProcessInstanceId;
+
+    public String getCalledProcessInstanceId() {
+        return calledProcessInstanceId;
+    }
+
+    public void setCalledProcessInstanceId(String calledProcessInstanceId) {
+        this.calledProcessInstanceId = calledProcessInstanceId;
+    }
+
     public UUID getId() {
         return id;
     }

@@ -27,6 +27,7 @@ import io.jmix.flowui.ViewNavigators;
 import io.jmix.flowui.component.tabsheet.JmixTabSheet;
 import io.jmix.flowui.model.InstanceContainer;
 import io.jmix.flowui.view.*;
+import io.openbpm.control.dto.ActivityIncidentData;
 import io.openbpm.control.entity.activity.ActivityShortData;
 import io.openbpm.control.entity.decisioninstance.HistoricDecisionInstanceShortData;
 import io.openbpm.control.entity.filter.DecisionInstanceFilter;
@@ -38,7 +39,7 @@ import io.openbpm.control.service.decisioninstance.DecisionInstanceService;
 import io.openbpm.control.service.incident.IncidentService;
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
-import io.openbpm.control.dto.ActivityIncidentData;
+import io.openbpm.control.uicomponent.viewer.handler.CallActivityOverlayClickHandler;
 import io.openbpm.control.view.decisioninstance.DecisionInstanceDetailView;
 import io.openbpm.control.view.event.TitleUpdateEvent;
 import io.openbpm.control.view.processinstance.event.ExternalTaskRetriesUpdateEvent;
@@ -50,6 +51,7 @@ import io.openbpm.uikit.component.bpmnviewer.command.AddMarkerCmd;
 import io.openbpm.uikit.component.bpmnviewer.command.ElementMarkerType;
 import io.openbpm.uikit.component.bpmnviewer.command.SetElementColorCmd;
 import io.openbpm.uikit.component.bpmnviewer.command.SetIncidentCountCmd;
+import io.openbpm.uikit.component.bpmnviewer.command.ShowCalledInstanceOverlayCmd;
 import io.openbpm.uikit.component.bpmnviewer.command.ShowDecisionInstanceLinkOverlayCmd;
 import io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment;
 import org.apache.commons.lang3.StringUtils;
@@ -57,7 +59,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.Nullable;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Route(value = "bpm/process-instances/:id", layout = DefaultMainViewParent.class)
@@ -86,6 +91,8 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
     protected ActivityService activityService;
     @Autowired
     protected ComponentHelper componentHelper;
+    @Autowired
+    protected CallActivityOverlayClickHandler callActivityClickHandler;
     @Autowired
     protected Messages messages;
     @Autowired
@@ -200,6 +207,8 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
             diagramFragment.addImportCompleteListener(event -> handleProcessXmlImportComplete());
             diagramFragment.addDecisionInstanceLinkOverlayClickListener(
                     event -> handleDecisionInstanceLinkOverlayClicked(event.getDecisionInstanceId()));
+            diagramFragment.addCalledProcessInstanceOverlayClickListener(event ->
+                    callActivityClickHandler.handleInstancesNavigation(event.getProcessInstanceIds()));
         } else if (processBpmnXml == null) {
             emptyDiagramBox.setVisible(true);
             diagramFragment.setVisible(false);
@@ -222,6 +231,7 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
     protected void showFinishedActivities(String processInstanceId) {
         List<ActivityShortData> finishedActivities = activityService.findFinishedActivities(processInstanceId);
 
+        Map<String, List<String>> calledInstancesByActivityId = new HashMap<>();
         for (ActivityShortData activityData : finishedActivities) {
             String activityId = activityData.getActivityId();
             if (!Strings.isNullOrEmpty(activityId)) {
@@ -235,18 +245,46 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
                 diagramFragment.showDecisionInstanceLinkOverlay(new ShowDecisionInstanceLinkOverlayCmd(activityId,
                         decisionInstanceId, tooltipMessage));
             }
+
+            addCalledInstance(activityData, calledInstancesByActivityId);
         }
+
+        showCalledInstanceOverlays(calledInstancesByActivityId);
     }
 
     protected void showRunningActivities(String processInstanceId) {
         List<ActivityShortData> runningActivities = activityService.findRunningActivities(processInstanceId);
 
+        Map<String, List<String>> calledInstances = new HashMap<>();
         for (ActivityShortData activityData : runningActivities) {
             String activityId = activityData.getActivityId();
             if (!Strings.isNullOrEmpty(activityId)) {
                 diagramFragment.addMarker(new AddMarkerCmd(activityId, ElementMarkerType.RUNNING_ACTIVITY));
             }
+            addCalledInstance(activityData, calledInstances);
         }
+
+        showCalledInstanceOverlays(calledInstances);
+    }
+
+    protected void addCalledInstance(ActivityShortData activityData, Map<String, List<String>> calledInstancesByActivityId) {
+        if (StringUtils.isNotEmpty(activityData.getCalledProcessInstanceId())) {
+            List<String> activityCalledInstances
+                    = calledInstancesByActivityId.getOrDefault(activityData.getActivityId(), new ArrayList<>());
+
+            activityCalledInstances.add(activityData.getCalledProcessInstanceId());
+            calledInstancesByActivityId.put(activityData.getActivityId(), activityCalledInstances);
+        }
+    }
+
+    protected void showCalledInstanceOverlays(Map<String, List<String>> calledInstances) {
+        calledInstances.forEach((activityId, calledInstanceIds) -> {
+            ShowCalledInstanceOverlayCmd showCalledInstanceOverlayCmd = new ShowCalledInstanceOverlayCmd();
+            showCalledInstanceOverlayCmd.setElementId(activityId);
+            showCalledInstanceOverlayCmd.setProcessInstanceIds(calledInstanceIds);
+
+            diagramFragment.showCalledInstance(showCalledInstanceOverlayCmd);
+        });
     }
 
     protected void sendUpdateViewTitleEvent() {
@@ -298,9 +336,9 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
         Component contentByTab = relatedEntitiesTabSheet.getContentByTab(tab);
         return contentByTab != null
                 ? contentByTab
-                        .getChildren()
-                        .findFirst()
-                        .orElse(null)
+                .getChildren()
+                .findFirst()
+                .orElse(null)
                 : null;
     }
 

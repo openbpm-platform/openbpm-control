@@ -18,6 +18,7 @@ import io.openbpm.control.service.processinstance.ProcessInstanceLoadContext;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
 import lombok.extern.slf4j.Slf4j;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.variable.VariableMap;
@@ -421,7 +422,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
 
     protected List<String> findRuntimeInstancesWithIncidents(List<ProcessInstance> processInstances) {
         Set<String> activeInstanceIds = processInstances.stream()
-                .map(processInstance -> processInstance.getId())
+                .map(Execution::getId)
                 .collect(Collectors.toSet());
         return loadInstancesWithIncidents(activeInstanceIds);
     }
@@ -430,7 +431,7 @@ public class ProcessInstanceServiceImpl implements ProcessInstanceService {
         List<ProcessInstance> instancesWithIncidents = remoteRuntimeService.createProcessInstanceQuery()
                 .withIncident()
                 .processInstanceIds(activeInstanceIds)
-                .list();
+                .listPage(0, activeInstanceIds.size());
 
         return instancesWithIncidents.stream().map(ProcessInstance::getId).toList();
     }
