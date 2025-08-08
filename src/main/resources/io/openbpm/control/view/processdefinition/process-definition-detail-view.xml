@@ -19,9 +19,6 @@
             <fetchPlan extends="_base"/>
         </instance>
     </data>
-    <facets>
-        <dataLoadCoordinator auto="true"/>
-    </facets>
     <actions>
         <action id="closeAction" type="detail_close" text="msg:///actions.Close"/>
     </actions>
