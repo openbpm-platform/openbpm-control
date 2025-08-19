@@ -23,6 +23,7 @@ import io.jmix.flowui.Notifications;
 import io.jmix.flowui.UiComponents;
 import io.jmix.flowui.UiEventPublisher;
 import io.jmix.flowui.ViewNavigators;
+import io.jmix.flowui.component.UiComponentUtils;
 import io.jmix.flowui.component.codeeditor.CodeEditor;
 import io.jmix.flowui.model.CollectionContainer;
 import io.jmix.flowui.model.CollectionLoader;
@@ -40,7 +41,9 @@ import io.openbpm.control.service.processdefinition.ProcessDefinitionLoadContext
 import io.openbpm.control.service.processdefinition.ProcessDefinitionService;
 import io.openbpm.control.service.processinstance.ProcessInstanceLoadContext;
 import io.openbpm.control.service.processinstance.ProcessInstanceService;
+import io.openbpm.control.uicomponent.viewer.handler.CallActivityOverlayClickHandler;
 import io.openbpm.control.view.event.TitleUpdateEvent;
+import io.openbpm.control.view.processdefinition.event.ReloadSelectedProcess;
 import io.openbpm.control.view.processdefinition.event.ResetActivityEvent;
 import io.openbpm.uikit.component.bpmnviewer.ViewerMode;
 import io.openbpm.uikit.component.bpmnviewer.command.AddMarkerCmd;
@@ -88,6 +91,8 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
     protected UiEventPublisher uiEventPublisher;
     @Autowired
     protected Metadata metadata;
+    @Autowired
+    protected CallActivityOverlayClickHandler callActivityClickHandler;
 
     @ViewComponent
     protected InstanceContainer<ProcessDefinitionData> processDefinitionDataDc;
@@ -136,32 +141,23 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
     public void onInit(final InitEvent event) {
         addClassNames(LumoUtility.Padding.Top.NONE);
         initTabIcons();
-
-        ProcessInstanceFilter processInstanceFilter = metadata.create(ProcessInstanceFilter.class);
-        processInstanceFilter.setUnfinished(true);
-        processInstanceFilterDc.setItem(processInstanceFilter);
     }
 
     @Subscribe
     protected void onBeforeShow(BeforeShowEvent event) {
+        initProcessInstanceFilter();
+
+        processDefinitionDataDl.load();
         initVersionLookup(getEditedEntity());
 
-        updateInstancesCount();
-        String processDefinitionBpmnXml = processDefinitionService.getBpmnXml(getEditedEntity().getProcessDefinitionId());
+        updateAllRunningInstancesCount();
 
         viewerFragment.showStatisticsButton(true);
-        initViewer(processDefinitionBpmnXml);
-        generalPanel.refresh();
     }
 
     @Subscribe
     public void onReady(final ReadyEvent event) {
         sendUpdateViewTitleEvent();
-    }
-
-    @Subscribe(id = "processInstanceDataDc", target = Target.DATA_CONTAINER)
-    public void onProcessInstanceDataDcCollectionChange(final CollectionContainer.CollectionChangeEvent<RuntimeProcessInstanceData> event) {
-        updateInstancesCount();
     }
 
     @Override
@@ -196,34 +192,28 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
 
     @Subscribe("versionComboBox")
     protected void onVersionLookupValueChange(AbstractField.ComponentValueChangeEvent<ComboBox<ProcessDefinitionData>, ProcessDefinitionData> event) {
-        ProcessDefinitionData selectedProcessDefinition = event.getValue();
-        processDefinitionDataDc.setItem(selectedProcessDefinition);
-
-        updateInstancesCount();
-        generalPanel.refresh();
-
-        sendUpdateViewTitleEvent();
+        if (event.isFromClient()) {
+            ProcessDefinitionData selectedProcessDefinition = event.getValue();
+            processDefinitionDataDc.setItem(selectedProcessDefinition);
+        }
     }
 
     @Subscribe(id = "processDefinitionDataDc", target = Target.DATA_CONTAINER)
     protected void onProcessDefinitionDcItemChange(InstanceContainer.ItemChangeEvent<ProcessDefinitionData> event) {
         ProcessDefinitionData processDefinition = event.getItem();
 
-
-        String bpmnXml = "";
         if (processDefinition != null) {
-            bpmnXml = processDefinitionService.getBpmnXml(processDefinition.getProcessDefinitionId());
-        }
+            String bpmnXml = processDefinitionService.getBpmnXml(processDefinition.getProcessDefinitionId());
 
-        initViewer(bpmnXml);
-        bpmnXmlEditor.setValue(bpmnXml);
+            generalPanel.refresh();
 
-        if (processDefinition != null) {
+            initViewer(bpmnXml);
+            bpmnXmlEditor.setValue(bpmnXml);
+
             processInstanceFilterDc.getItem().setProcessDefinitionId(processDefinition.getProcessDefinitionId());
-            processInstanceDataDl.load();
-        }
 
-        sendUpdateViewTitleEvent();
+            sendUpdateViewTitleEvent();
+        }
     }
 
     @Install(to = "processInstanceDataDl", target = Target.DATA_LOADER)
@@ -245,15 +235,15 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
 
     @Install(to = "processDefinitionDataDl", target = Target.DATA_LOADER)
     protected ProcessDefinitionData loadProcessDefinition(LoadContext<ProcessDefinitionData> loadContext) {
-        ProcessDefinitionData item = processDefinitionDataDc.getItemOrNull();
-        String id = item == null ? Objects.requireNonNull(loadContext.getId()).toString() : item.getId();
+        String id = Objects.requireNonNull(loadContext.getId()).toString();
         return processDefinitionService.getById(id);
     }
 
     @Subscribe(id = "processInstanceFilterDc", target = Target.DATA_CONTAINER)
     protected void onProcessInstanceFilterDcItemPropertyChange(final InstanceContainer.ItemPropertyChangeEvent<ProcessInstanceFilter> event) {
-        if (event.getProperty().equals("activeActivityIdIn")) {
-            updateCurrentVersionCount();
+        if (event.getProperty().equals("activeActivityIdIn")
+                || event.getProperty().equals("processDefinitionId")) {
+            updateCurrentVersionInstancesCount(event.getItem());
             processInstanceDataDl.load();
         }
     }
@@ -266,8 +256,25 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
         processInstanceFilterDc.getItem().setActiveActivityIdIn(null);
     }
 
+    @EventListener
+    public void handleReloadSelectedProcess(ReloadSelectedProcess reloadSelectedProcess) {
+        ProcessDefinitionData item = processDefinitionDataDc.getItem();
+        ProcessDefinitionData reloaded = processDefinitionService.getById(item.getId());
+
+        processDefinitionDataDc.setItem(reloaded);
+
+        updateCurrentVersionInstancesCount(processInstanceFilterDc.getItem());
+        processInstanceDataDl.load();
+    }
+
     protected void initViewer(String bpmnXml) {
         viewerFragment.initViewer(bpmnXml);
+        viewerFragment.showCalledProcessOverlays();
+        viewerFragment.addCalledProcessOverlayClickListener(callActivityOverlayClickEvent -> {
+            callActivityClickHandler.handleProcessNavigation(processDefinitionDataDc.getItem(),
+                    callActivityOverlayClickEvent.getCallActivity(),
+                    UiComponentUtils.isComponentAttachedToDialog(this));
+        });
         showStatistics();
     }
 
@@ -318,23 +325,25 @@ public class ProcessDefinitionDetailView extends StandardDetailView<ProcessDefin
         }
     }
 
-    protected void updateInstancesCount() {
-        ProcessDefinitionData item = processDefinitionDataDc.getItem();
-
-        updateCurrentVersionCount();
-
-        long allVersionsInstancesCount = processInstanceService.getCountByProcessDefinitionKey(item.getKey());
+    protected void updateAllRunningInstancesCount() {
+        long allVersionsInstancesCount = processInstanceService.getCountByProcessDefinitionKey(getEditedEntity().getKey());
         allVersionsInstancesCountSpan.setText(String.valueOf(allVersionsInstancesCount));
     }
 
-    protected void updateCurrentVersionCount() {
-        long currentVersionInstancesCount = processInstanceService.getRuntimeInstancesCount(processInstanceFilterDc.getItem());
+    protected void updateCurrentVersionInstancesCount(ProcessInstanceFilter filter) {
+        long currentVersionInstancesCount = processInstanceService.getRuntimeInstancesCount(filter);
         updateTabCaption(currentVersionInstancesCount);
     }
 
     protected void updateTabCaption(long count) {
         tabsheetProcessInstancesTab.setLabel(messageBundle.formatMessage("processInstancesTab.label", count));
         tabsheetProcessInstancesTab.addComponentAsFirst(VaadinIcon.TASKS.create());
+    }
+
+    protected void initProcessInstanceFilter() {
+        ProcessInstanceFilter processInstanceFilter = metadata.create(ProcessInstanceFilter.class);
+        processInstanceFilter.setUnfinished(true);
+        processInstanceFilterDc.setItem(processInstanceFilter);
     }
 
     protected void initVersionLookup(ProcessDefinitionData processDefinition) {

@@ -48,6 +48,8 @@ public class ProcessInstanceFilter {
 
     protected List<String> activeActivityIdIn;
 
+    protected List<String> processInstanceIds;
+
     public Boolean getUnfinished() {
         return unfinished;
     }

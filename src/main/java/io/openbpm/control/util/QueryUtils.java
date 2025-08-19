@@ -28,6 +28,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -45,6 +46,7 @@ public class QueryUtils {
             return;
         }
 
+        addIfNotNull(filter.getProcessInstanceIds(), instanceIds -> processInstanceQuery.processInstanceIds(new HashSet<>(instanceIds)));
         addIfStringNotEmpty(filter.getProcessDefinitionId(), processInstanceQuery::processDefinitionId);
         addIfStringNotEmpty(filter.getProcessDefinitionKey(), processInstanceQuery::processDefinitionKey);
         wrapAndAddStringIfNotEmpty(filter.getBusinessKeyLike(), processInstanceQuery::processInstanceBusinessKeyLike);
@@ -78,6 +80,7 @@ public class QueryUtils {
             return;
         }
 
+        addIfNotNull(filter.getProcessInstanceIds(), queryDto::processInstanceIds);
         addIfStringNotEmpty(filter.getProcessDefinitionId(), queryDto::processDefinitionId);
         addIfStringNotEmpty(filter.getProcessDefinitionKey(), queryDto::processDefinitionKey);
         addIfStringNotEmpty(filter.getProcessInstanceId(), queryDto::processInstanceId);
@@ -141,6 +144,8 @@ public class QueryUtils {
         wrapAndAddStringIfNotEmpty(filter.getNameLike(), processDefinitionQuery::processDefinitionNameLike);
 
         addIfStringNotEmpty(filter.getKey(), processDefinitionQuery::processDefinitionKey);
+        addIfStringNotEmpty(filter.getVersionTag(), processDefinitionQuery::versionTag);
+        addIfNotNull(filter.getVersion(), processDefinitionQuery::processDefinitionVersion);
 
         addCollectionIfNotEmpty(filter.getKeyIn(), processDefinitionQuery::processDefinitionKeyIn);
         addCollectionIfNotEmpty(filter.getIdIn(), processDefinitionQuery::processDefinitionIdIn);

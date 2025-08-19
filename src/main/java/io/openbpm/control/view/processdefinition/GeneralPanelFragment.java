@@ -15,6 +15,7 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.jmix.core.Messages;
 import io.jmix.flowui.DialogWindows;
 import io.jmix.flowui.Notifications;
+import io.jmix.flowui.UiEventPublisher;
 import io.jmix.flowui.ViewNavigators;
 import io.jmix.flowui.component.datetimepicker.TypedDateTimePicker;
 import io.jmix.flowui.component.formlayout.JmixFormLayout;
@@ -38,6 +39,7 @@ import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
 import io.openbpm.control.service.deployment.DeploymentService;
 import io.openbpm.control.view.deploymentdata.DeploymentDetailView;
+import io.openbpm.control.view.processdefinition.event.ReloadSelectedProcess;
 import io.openbpm.control.view.processinstancemigration.ProcessInstanceMigrationView;
 import io.openbpm.control.view.startprocess.StartProcessWithVariableView;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,6 +93,8 @@ public class GeneralPanelFragment extends Fragment<FlexLayout> {
     protected CopyComponentValueToClipboardAction copyIdAction;
     @ViewComponent
     protected CopyComponentValueToClipboardAction copyKeyAction;
+    @Autowired
+    protected UiEventPublisher uiEventPublisher;
 
     @Subscribe
     public void onReady(ReadyEvent event) {
@@ -100,7 +104,6 @@ public class GeneralPanelFragment extends Fragment<FlexLayout> {
     @Subscribe(target = Target.HOST_CONTROLLER)
     public void onHostBeforeShow(View.BeforeShowEvent event) {
         initActionButtons();
-        initDeploymentData();
 
         copyIdAction.setTarget(idField);
         copyKeyAction.setTarget(keyField);
@@ -244,11 +247,6 @@ public class GeneralPanelFragment extends Fragment<FlexLayout> {
 
 
     protected void reloadProcessDefinition() {
-        if (processDefinitionDataDc instanceof HasLoader container) {
-            DataLoader loader = container.getLoader();
-            if (loader != null) {
-                loader.load();
-            }
-        }
+        uiEventPublisher.publishEventForCurrentUI(new ReloadSelectedProcess(this));
     }
 }
