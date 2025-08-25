@@ -5,46 +5,64 @@
 
 package io.openbpm.control.service.variable.impl;
 
+import io.jmix.core.EntityStates;
 import io.jmix.core.Sort;
 import io.openbpm.control.entity.filter.VariableFilter;
 import io.openbpm.control.entity.variable.HistoricVariableInstanceData;
+import io.openbpm.control.entity.variable.ObjectTypeInfo;
 import io.openbpm.control.entity.variable.VariableInstanceData;
 import io.openbpm.control.mapper.VariableMapper;
+import io.openbpm.control.service.client.EngineRestClient;
+import io.openbpm.control.service.engine.EngineService;
 import io.openbpm.control.service.variable.VariableLoadContext;
 import io.openbpm.control.service.variable.VariableService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.community.rest.client.api.HistoryApiClient;
+import org.camunda.community.rest.client.api.ProcessInstanceApiClient;
 import org.camunda.community.rest.client.api.VariableInstanceApiClient;
 import org.camunda.community.rest.client.model.*;
 import org.camunda.community.rest.impl.RemoteRuntimeService;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.io.File;
+import java.util.*;
 
 import static io.openbpm.control.util.EngineRestUtils.getCountResult;
 
 @Service("control_VariableService")
 @Slf4j
 public class VariableServiceImpl implements VariableService {
+
     protected final HistoryApiClient historyApiClient;
     protected final VariableMapper variableMapper;
     protected final RemoteRuntimeService remoteRuntimeService;
     protected final VariableInstanceApiClient variableInstanceApiClient;
+    protected final ProcessInstanceApiClient processInstanceApiClient;
+    protected final EntityStates entityStates;
+    protected final EngineService engineService;
+    protected final EngineRestClient engineRestClient;
 
     public VariableServiceImpl(HistoryApiClient historyApiClient,
                                VariableMapper variableMapper,
                                RemoteRuntimeService remoteRuntimeService,
-                               VariableInstanceApiClient variableInstanceApiClient) {
+                               VariableInstanceApiClient variableInstanceApiClient,
+                               ProcessInstanceApiClient processInstanceApiClient,
+                               EntityStates entityStates,
+                               EngineService engineService,
+                               EngineRestClient engineRestClient) {
         this.historyApiClient = historyApiClient;
         this.variableMapper = variableMapper;
         this.remoteRuntimeService = remoteRuntimeService;
         this.variableInstanceApiClient = variableInstanceApiClient;
+        this.processInstanceApiClient = processInstanceApiClient;
+        this.entityStates = entityStates;
+        this.engineService = engineService;
+        this.engineRestClient = engineRestClient;
     }
 
     @Override
@@ -58,18 +76,42 @@ public class VariableServiceImpl implements VariableService {
         }
 
         ResponseEntity<List<VariableInstanceDto>> response = variableInstanceApiClient.queryVariableInstances(loadContext.getFirstResult(), loadContext.getMaxResults(),
-                true, queryDto
+                false, queryDto
         );
 
         if (response.getStatusCode().is2xxSuccessful()) {
             return CollectionUtils.emptyIfNull(response.getBody())
                     .stream()
-                    .map(variableMapper::fromVariableDto)
+                    .map(variableInstanceDto -> {
+                        VariableInstanceData variableInstanceData = variableMapper.fromVariableDto(variableInstanceDto);
+                        entityStates.setNew(variableInstanceData, false);
+                        return variableInstanceData;
+                    })
                     .toList();
         }
 
         log.error("Error on loading runtime variables, query {}, status code {}", queryDto, response.getStatusCode());
         return List.of();
+    }
+
+    @Override
+    public VariableInstanceData findRuntimeVariableById(String variableInstanceId) {
+        ResponseEntity<VariableInstanceDto> response = variableInstanceApiClient.getVariableInstance(variableInstanceId, false);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            VariableInstanceDto variableInstanceDto = response.getBody();
+            return variableInstanceDto != null ? variableMapper.fromVariableDto(variableInstanceDto) : null;
+        }
+        log.error("Error on loading runtime variables, variable id {}, status code {}", variableInstanceId, response.getStatusCode());
+        return null;
+    }
+
+    @Override
+    public Resource getVariableInstanceBinary(String variableInstanceId) {
+        ResponseEntity<Resource> response = variableInstanceApiClient.getVariableInstanceBinary(variableInstanceId);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return response.getBody();
+        }
+        return null;
     }
 
     @Override
@@ -121,7 +163,21 @@ public class VariableServiceImpl implements VariableService {
     @Override
     public void updateVariableLocal(VariableInstanceData variableInstanceData) {
         Objects.requireNonNull(variableInstanceData.getExecutionId(), "executionId can not be null");
-        remoteRuntimeService.setVariableLocal(variableInstanceData.getExecutionId(), variableInstanceData.getName(), variableInstanceData.getValue());
+
+        VariableValueDto variableValueDto = new VariableValueDto();
+        variableValueDto.type(variableInstanceData.getType());
+
+        if (variableInstanceData.getValueInfo() != null && variableInstanceData.getValueInfo().getObject() != null) {
+            ObjectTypeInfo objectTypeInfo = variableInstanceData.getValueInfo().getObject();
+            Map<String, Object> valueInfoMap = new HashMap<>();
+            valueInfoMap.put("objectTypeName", objectTypeInfo.getObjectTypeName());
+            valueInfoMap.put("serializationDataFormat", objectTypeInfo.getSerializationDataFormat());
+
+            variableValueDto.valueInfo(valueInfoMap);
+        }
+        variableValueDto.value(variableInstanceData.getValue());
+
+        processInstanceApiClient.setProcessInstanceVariable(variableInstanceData.getExecutionId(), variableInstanceData.getName(), variableValueDto);
     }
 
     @Override
@@ -133,6 +189,17 @@ public class VariableServiceImpl implements VariableService {
         }
         log.error("Error on find historic variable, variable id {}, status code {}", variableInstanceId, response.getStatusCode());
         return null;
+    }
+
+    @Override
+    public void removeVariableLocal(VariableInstanceData variableInstanceData) {
+        Objects.requireNonNull(variableInstanceData.getExecutionId(), "executionId can not be null");
+        remoteRuntimeService.removeVariableLocal(variableInstanceData.getExecutionId(), variableInstanceData.getName());
+    }
+
+    @Override
+    public void updateVariableBinary(VariableInstanceData variableInstanceData, File data) {
+        engineRestClient.updateVariableBinary(variableInstanceData, data);
     }
 
     protected List<VariableInstanceQueryDtoSortingInner> createSortDtoList(Sort sort) {
@@ -211,6 +278,9 @@ public class VariableServiceImpl implements VariableService {
             }
             if (StringUtils.isNotBlank(filter.getProcessInstanceId())) {
                 variableInstanceQueryDto.addProcessInstanceIdInItem(filter.getProcessInstanceId());
+            }
+            if (StringUtils.isNotBlank(filter.getVariableName())) {
+                variableInstanceQueryDto.setVariableName(filter.getVariableName());
             }
         }
         return variableInstanceQueryDto;

@@ -21,6 +21,8 @@ public class VariableFilter {
 
     protected String activityInstanceId;
 
+    protected String variableName;
+
     public String getActivityInstanceId() {
         return activityInstanceId;
     }
@@ -43,5 +45,13 @@ public class VariableFilter {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public String getVariableName() {
+        return variableName;
+    }
+
+    public void setVariableName(String variableName) {
+        this.variableName = variableName;
     }
 }
