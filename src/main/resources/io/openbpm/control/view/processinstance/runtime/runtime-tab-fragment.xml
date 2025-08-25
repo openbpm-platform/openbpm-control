@@ -22,12 +22,12 @@
                 <vbox id="activityTreeContainer" padding="true" themeNames="spacing-s" height="100%">
                     <h4 text="msg://activityInstancesTree"/>
                     <app:noClickTreeDataGrid id="activityInstancesTree" dataContainer="runtimeActivityInstancesDc"
-                                  classNames="activity-instances-tree" themeNames="compact"
-                                  hierarchyProperty="parentActivityInstance"
-                                  width="100%" minHeight="10em"
-                                  selectionMode="SINGLE">
+                                             classNames="activity-instances-tree" themeNames="compact"
+                                             hierarchyProperty="parentActivityInstance"
+                                             width="100%" minHeight="10em"
+                                             selectionMode="SINGLE">
                         <columns>
-                            <column property="activityId" sortable="false" flexGrow="1" />
+                            <column property="activityId" sortable="false" flexGrow="1"/>
                         </columns>
                     </app:noClickTreeDataGrid>
                 </vbox>
@@ -35,7 +35,9 @@
                     <tab id="runtimeVariablesTab">
                         <vbox height="100%" padding="false" themeNames="spacing-s">
                             <hbox id="runtimeVariableGridActionsPanel" classNames="buttons-panel" padding="false">
-                                <button action="runtimeVariablesGrid.edit" themeNames="primary small"/>
+                                <button action="runtimeVariablesGrid.create" themeNames="primary small"/>
+                                <button action="runtimeVariablesGrid.edit" themeNames="small"/>
+                                <button action="runtimeVariablesGrid.remove" themeNames="small"/>
                                 <simplePagination id="runtimeVariablesPagination" dataLoader="runtimeVariablesDl"/>
                             </hbox>
                             <dataGrid id="runtimeVariablesGrid" themeNames="compact"
@@ -43,13 +45,15 @@
                                       height="100%" minHeight="10em"
                                       width="100%">
                                 <actions>
-                                    <action id="edit"
-                                            type="list_edit"/>
+                                    <action id="create" type="list_create"/>
+                                    <action id="edit" type="list_edit"/>
+                                    <action id="remove" type="list_remove"/>
                                 </actions>
                                 <columns resizable="true">
                                     <column property="name" flexGrow="1"/>
                                     <column property="type" flexGrow="1"/>
-                                    <column key="value" header="msg://variableValueHeader" flexGrow="1" sortable="false"/>
+                                    <column key="value" header="msg://variableValueHeader" flexGrow="1"
+                                            sortable="false"/>
                                     <column property="activityInstanceId" header="msg://scopeValueHeader"/>
                                 </columns>
                             </dataGrid>

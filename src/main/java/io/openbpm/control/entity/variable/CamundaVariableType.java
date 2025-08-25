@@ -20,7 +20,8 @@ public enum CamundaVariableType implements EnumClass<String> {
     BOOLEAN("Boolean", true),
     DATE("Date", true),
     OBJECT("Object", false),
-    FILE("File", false),;
+    FILE("File", false),
+    BYTES("Bytes", false);
 
     private final String id;
     private final boolean primitive;

@@ -17,15 +17,19 @@ import com.vaadin.flow.data.renderer.TextRenderer;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.jmix.core.DataLoadContext;
 import io.jmix.core.LoadContext;
+import io.jmix.core.Messages;
 import io.jmix.core.Metadata;
 import io.jmix.flowui.DialogWindows;
+import io.jmix.flowui.Dialogs;
 import io.jmix.flowui.Fragments;
+import io.jmix.flowui.action.DialogAction;
 import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.component.grid.TreeDataGrid;
 import io.jmix.flowui.component.tabsheet.JmixTabSheet;
 import io.jmix.flowui.fragment.Fragment;
 import io.jmix.flowui.fragment.FragmentDescriptor;
 import io.jmix.flowui.kit.action.ActionPerformedEvent;
+import io.jmix.flowui.kit.action.ActionVariant;
 import io.jmix.flowui.model.CollectionContainer;
 import io.jmix.flowui.model.CollectionLoader;
 import io.jmix.flowui.model.InstanceContainer;
@@ -34,7 +38,9 @@ import io.openbpm.control.entity.activity.ActivityInstanceTreeItem;
 import io.openbpm.control.entity.filter.*;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceState;
+import io.openbpm.control.entity.variable.ObjectTypeInfo;
 import io.openbpm.control.entity.variable.VariableInstanceData;
+import io.openbpm.control.entity.variable.VariableValueInfo;
 import io.openbpm.control.service.activity.ActivityService;
 import io.openbpm.control.service.externaltask.ExternalTaskService;
 import io.openbpm.control.service.incident.IncidentService;
@@ -71,12 +77,8 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
     protected Metadata metadata;
     @Autowired
     protected Fragments fragments;
-
-    @ViewComponent
-    protected MessageBundle messageBundle;
     @Autowired
     protected DialogWindows dialogWindows;
-
     @Autowired
     protected ActivityService activityService;
     @Autowired
@@ -87,7 +89,16 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
     protected ExternalTaskService externalTaskService;
     @Autowired
     protected JobService jobService;
+    @Autowired
+    protected IncidentService incidentService;
+    @Autowired
+    private Dialogs dialogs;
+    @Autowired
+    private Messages messages;
 
+
+    @ViewComponent
+    protected MessageBundle messageBundle;
     @ViewComponent
     protected CollectionLoader<ActivityInstanceTreeItem> runtimeActivityInstancesDl;
     @ViewComponent
@@ -98,18 +109,14 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
     protected CollectionLoader<VariableInstanceData> runtimeVariablesDl;
     @ViewComponent
     protected DataGrid<VariableInstanceData> runtimeVariablesGrid;
-
     @ViewComponent
     protected TreeDataGrid<ActivityInstanceTreeItem> activityInstancesTree;
-
     @ViewComponent
     protected JmixTabSheet runtimeTabsheet;
     @ViewComponent
     protected VerticalLayout activityTreeContainer;
 
     protected VariableFilter variableFilter;
-    @Autowired
-    protected IncidentService incidentService;
 
     @Subscribe
     public void onReady(ReadyEvent event) {
@@ -228,6 +235,33 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
         return getVariableValueColumnText(variableInstanceData);
     }
 
+    @Subscribe("runtimeVariablesGrid.create")
+    public void onRuntimeVariablesGridCreate(final ActionPerformedEvent event) {
+        dialogWindows.detail(getCurrentView(), VariableInstanceData.class)
+                .withViewClass(VariableInstanceDataDetail.class)
+                .withViewConfigurer(view -> {
+                    view.setNewVariable(true);
+                    view.setSaveEnabled(true);
+                    view.setValidationEnabled(true);
+                    view.setProcessInstanceId(processInstanceDataDc.getItem().getId());
+                })
+                .newEntity()
+                .withInitializer(variableInstanceData -> {
+                    VariableValueInfo variableValueInfo = metadata.create(VariableValueInfo.class);
+                    ObjectTypeInfo objectTypeInfo = metadata.create(ObjectTypeInfo.class);
+                    variableValueInfo.setObject(objectTypeInfo);
+                    variableInstanceData.setValueInfo(variableValueInfo);
+                    variableInstanceData.setExecutionId(processInstanceDataDc.getItem().getInstanceId());
+                })
+                .withAfterCloseListener(afterCloseEvent -> {
+                    if (afterCloseEvent.closedWith(StandardOutcome.SAVE)) {
+                        runtimeVariablesDl.load();
+                    }
+                })
+                .build()
+                .open();
+    }
+
     @Subscribe("runtimeVariablesGrid.edit")
     public void onRuntimeVariablesGridEdit(final ActionPerformedEvent event) {
         VariableInstanceData variableInstanceData = runtimeVariablesGrid.getSingleSelectedItem();
@@ -237,12 +271,38 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
         dialogWindows.detail(getCurrentView(), VariableInstanceData.class)
                 .editEntity(variableInstanceData)
                 .withViewClass(VariableInstanceDataDetail.class)
+                .withViewConfigurer(view -> {
+                    view.setSaveEnabled(true);
+                    view.setValidationEnabled(true);
+                })
                 .withAfterCloseListener(afterCloseEvent -> {
                     if (afterCloseEvent.closedWith(StandardOutcome.SAVE)) {
                         runtimeVariablesDl.load();
                     }
                 })
                 .build()
+                .open();
+    }
+
+    @Subscribe("runtimeVariablesGrid.remove")
+    public void onRuntimeVariablesGridRemove(final ActionPerformedEvent event) {
+        VariableInstanceData variableInstanceData = runtimeVariablesGrid.getSingleSelectedItem();
+        if (variableInstanceData == null) {
+            return;
+        }
+
+        dialogs.createOptionDialog()
+                .withHeader(messageBundle.getMessage("removeProcessVariableTaskDialog.header"))
+                .withText(messageBundle.getMessage("removeProcessVariableTaskDialog.text"))
+                .withActions(new DialogAction(DialogAction.Type.YES)
+                                .withIcon(VaadinIcon.TRASH.create())
+                                .withText(messages.getMessage("actions.Remove"))
+                                .withVariant(ActionVariant.PRIMARY)
+                                .withHandler(actionPerformedEvent -> {
+                                    variableService.removeVariableLocal(variableInstanceData);
+                                    runtimeVariablesDl.load();
+                                }),
+                        new DialogAction(DialogAction.Type.CANCEL))
                 .open();
     }
 
@@ -307,7 +367,8 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
                     externalTasksTabFragment.refreshIfChanged(getSelectedActivityId());
                 }
             }
-            default -> {}
+            default -> {
+            }
         }
 
         loadAndUpdateUserTasksCount();
@@ -448,8 +509,8 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
         Component contentByTab = runtimeTabsheet.getContentByTab(tab);
         return contentByTab != null
                 ? contentByTab.getChildren()
-                        .findFirst()
-                        .orElse(null)
+                .findFirst()
+                .orElse(null)
                 : null;
     }
 
