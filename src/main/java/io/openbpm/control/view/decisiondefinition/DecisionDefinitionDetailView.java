@@ -88,6 +88,8 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
     private JmixTabSheet tabSheet;
     @ViewComponent
     private HorizontalLayout detailActions;
+    @ViewComponent
+    private TypedTextField<Object> deploymentIdField;
 
     private String title = "";
 
@@ -192,6 +194,7 @@ public class DecisionDefinitionDetailView extends StandardDetailView<DecisionDef
         DeploymentData deployment = deploymentService.findById(getEditedEntity().getDeploymentId());
         if (deployment != null) {
             String source = deployment.getSource();
+            deploymentIdField.setTypedValue(deployment.getDeploymentId());
             deploymentSourceField.setTypedValue(source);
             deploymentTimeField.setTypedValue(deployment.getDeploymentTime());
         }
