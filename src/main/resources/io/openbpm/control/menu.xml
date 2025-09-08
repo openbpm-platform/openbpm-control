@@ -13,9 +13,6 @@
     <item view="bpm_ProcessInstance.list"
           description="msg://io.openbpm.control/menu_config.bpm_ProcessInstance.list.description"
           title="msg://io.openbpm.control/menu_config.bpm_ProcessInstance.list.title" icon="TASKS">
-        <urlQueryParameters>
-            <parameter name="mode" value="active"/>
-        </urlQueryParameters>
     </item>
     <item view="IncidentData.list" title="msg://io.openbpm.control.view.incidentdata/incidentDataListView.title"
           icon="WARNING"/>
