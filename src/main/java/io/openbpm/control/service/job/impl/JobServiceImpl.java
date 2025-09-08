@@ -6,6 +6,7 @@
 package io.openbpm.control.service.job.impl;
 
 import com.google.common.base.Strings;
+import feign.FeignException;
 import io.jmix.core.Sort;
 import io.openbpm.control.entity.filter.JobFilter;
 import io.openbpm.control.entity.job.JobData;
@@ -19,11 +20,14 @@ import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.JobApiClient;
 import org.camunda.community.rest.client.api.JobDefinitionApiClient;
 import org.camunda.community.rest.client.model.*;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static io.openbpm.control.util.EngineRestUtils.getCountResult;
@@ -35,6 +39,15 @@ public class JobServiceImpl implements JobService {
     protected final JobApiClient jobApiClient;
     protected final JobDefinitionApiClient jobDefinitionApiClient;
     protected final HistoryApiClient historyApiClient;
+
+    @Value("${feign.client.config.job.url:http://localhost:8080/engine-rest}")
+    protected String engineRestUrl;
+
+    @Value("${camunda.username:admin}")
+    protected String camundaUsername;
+
+    @Value("${camunda.password:admin}")
+    protected String camundaPassword;
 
     public JobServiceImpl(JobMapper jobMapper,
                           JobApiClient jobApiClient,
@@ -115,12 +128,15 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public String getErrorDetails(String jobId) {
-        ResponseEntity<String> response = jobApiClient.getStacktrace(jobId);
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return Strings.nullToEmpty(response.getBody());
+        try {
+            ResponseEntity<String> response = jobApiClient.getStacktrace(jobId);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return Strings.nullToEmpty(response.getBody());
+            }
+            return "";
+        } catch (FeignException.NotAcceptable e) {
+            return fallbackGetStacktrace(jobId);
         }
-
-        return "";
     }
 
     @Override
@@ -170,5 +186,28 @@ public class JobServiceImpl implements JobService {
         }
 
         return jobQueryDtoSortingInners;
+    }
+
+    protected String fallbackGetStacktrace(String jobId) {
+        try {
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+            headers.setBasicAuth(camundaUsername, camundaPassword);
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            ResponseEntity<String> response = restTemplate.exchange(
+                    engineRestUrl + "/job/" + jobId + "/stacktrace",
+                    HttpMethod.GET,
+                    entity,
+                    String.class
+            );
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return Strings.nullToEmpty(response.getBody());
+            }
+            return "";
+        } catch (Exception e) {
+            System.err.println("Fallback request failed for jobId: " + jobId + ", error: " + e.getMessage());
+            return "";
+        }
     }
 }
