@@ -155,7 +155,7 @@ public class JobServiceImpl implements JobService {
             ResponseEntity<HistoricJobLogDto> jobLogResponse = historyApiClient.getHistoricJobLog(jobId);
             return jobLogResponse.getStatusCode().is2xxSuccessful() && jobLogResponse.getBody() != null;
         } catch (FeignException e) {
-            System.err.println("Error checking job log presence for jobId: " + jobId + ", error: " + e.getMessage());
+            log.error("Error checking job log presence for jobId: {}, error: ", jobId, e);
             return false;
         }
     }
@@ -218,7 +218,7 @@ public class JobServiceImpl implements JobService {
             }
             return "";
         } catch (Exception e) {
-            System.err.println("Fallback request failed for history jobId: " + jobId + ", error: " + e.getMessage());
+            log.error("Fallback request failed for history jobId: {}, error: {}", jobId, e.getMessage(), e);
             return "";
         }
     }
