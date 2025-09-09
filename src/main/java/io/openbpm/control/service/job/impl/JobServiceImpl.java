@@ -154,7 +154,8 @@ public class JobServiceImpl implements JobService {
         try {
             ResponseEntity<HistoricJobLogDto> jobLogResponse = historyApiClient.getHistoricJobLog(jobId);
             return jobLogResponse.getStatusCode().is2xxSuccessful() && jobLogResponse.getBody() != null;
-        } catch (FeignException.NotFound e) {
+        } catch (FeignException e) {
+            System.err.println("Error checking job log presence for jobId: " + jobId + ", error: " + e.getMessage());
             return false;
         }
     }
