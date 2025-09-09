@@ -16,13 +16,12 @@ import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.view.*;
 import io.openbpm.control.entity.incident.HistoricIncidentData;
 import io.openbpm.control.service.incident.IncidentService;
+import io.openbpm.control.service.job.impl.JobServiceImpl;
 import io.openbpm.control.view.externaltask.ExternalTaskErrorDetailsView;
 import io.openbpm.control.view.job.JobErrorDetailsView;
 import io.openbpm.control.view.main.MainView;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.util.Objects;
 
 @Route(value = "historic-incidents/:id", layout = MainView.class)
 @ViewController("HistoricIncidentData.detail")
@@ -45,6 +44,8 @@ public class HistoricIncidentDataDetailView extends StandardDetailView<HistoricI
     protected TypedTextField<Object> rootCauseIncidentIdField;
     @Autowired
     protected DialogWindows dialogWindows;
+    @Autowired
+    protected JobServiceImpl jobService;
 
     @Subscribe
     public void onInit(final InitEvent event) {
@@ -71,11 +72,11 @@ public class HistoricIncidentDataDetailView extends StandardDetailView<HistoricI
         boolean notEmptyPayload = getEditedEntity().getConfiguration() != null;
 
         if (getEditedEntity().isExternalTaskFailed()) {
-            viewStacktraceBtn.setVisible(notEmptyPayload);
+            viewStacktraceBtn.setVisible(notEmptyPayload && jobService.isHistoryJobLogPresent(getEditedEntity().getConfiguration()));
             configurationField.setLabel(messages.getMessage("io.openbpm.control.view.incidentdata/externalTaskIdLabel"));
         } else if (getEditedEntity().isJobFailed()) {
             configurationField.setLabel(messages.getMessage("io.openbpm.control.view.incidentdata/jobIdLabel"));
-            viewStacktraceBtn.setVisible(notEmptyPayload);
+            viewStacktraceBtn.setVisible(notEmptyPayload && jobService.isHistoryJobLogPresent(getEditedEntity().getConfiguration()));
         } else {
             viewStacktraceBtn.setVisible(false);
         }
