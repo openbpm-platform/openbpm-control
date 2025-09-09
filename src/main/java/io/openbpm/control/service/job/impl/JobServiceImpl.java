@@ -206,7 +206,7 @@ public class JobServiceImpl implements JobService {
             }
             return "";
         } catch (Exception e) {
-            System.err.println("Fallback request failed for jobId: " + jobId + ", error: " + e.getMessage());
+            log.error("Fallback request failed for jobId: {}, error: {}", jobId, e.getMessage(), e);
             return "";
         }
     }
