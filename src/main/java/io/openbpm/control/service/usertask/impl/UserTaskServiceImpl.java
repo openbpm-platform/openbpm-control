@@ -106,8 +106,13 @@ public class UserTaskServiceImpl implements UserTaskService {
                 .taskId(taskId));
         if (taskResponse.getStatusCode().is2xxSuccessful()) {
             List<HistoricTaskInstanceDto> taskInstanceDtoList = taskResponse.getBody();
-            HistoricTaskInstanceDto task = CollectionUtils.isNotEmpty(taskInstanceDtoList) ? taskInstanceDtoList.getFirst() : null;
-            return task != null ? taskMapper.fromTaskDto(task) : null;
+
+            if (CollectionUtils.isNotEmpty(taskInstanceDtoList)) {
+                HistoricTaskInstanceDto task = taskInstanceDtoList.get(0);
+                return taskMapper.fromTaskDto(task);
+            }
+
+            return null;
         }
         log.error("Error on user task loading, task id: {}, status code: {}", taskId, taskResponse.getStatusCode());
         return null;
@@ -227,8 +232,10 @@ public class UserTaskServiceImpl implements UserTaskService {
                     case "name" -> sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.TASK_NAME);
                     case "startTime" ->
                             sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.START_TIME);
-                    case "endTime" -> sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.END_TIME);
-                    case "dueDate" -> sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.DUE_DATE);
+                    case "endTime" ->
+                            sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.END_TIME);
+                    case "dueDate" ->
+                            sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.DUE_DATE);
                     case "assignee" ->
                             sortOption.setSortBy(HistoricTaskInstanceQueryDtoSortingInner.SortByEnum.ASSIGNEE);
                     default -> {
