@@ -167,6 +167,7 @@ public class VariableInstanceDataDetail extends StandardDetailView<VariableInsta
             long runtimeVariablesCount = variableService.getRuntimeVariablesCount(variableFilter);
             if (runtimeVariablesCount > 0) {
                 event.getErrors().add(nameField, messageBundle.getMessage("variableNameAlreadyExistsError"));
+                nameField.setInvalid(true);
             }
         }
     }

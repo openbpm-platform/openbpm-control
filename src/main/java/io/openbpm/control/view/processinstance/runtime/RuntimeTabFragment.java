@@ -57,11 +57,13 @@ import org.springframework.context.event.EventListener;
 import org.springframework.lang.Nullable;
 
 import java.util.List;
+import java.util.Set;
 
 import static io.jmix.flowui.component.UiComponentUtils.getCurrentView;
 
 @FragmentDescriptor("runtime-tab-fragment.xml")
 public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
+
     public static final String USER_TASKS_TAB_ID = "userTasksTab";
     public static final String JOBS_TAB_ID = "jobsTab";
     public static final String EXTERNAL_TASKS_TAB_ID = "externalTasksTab";
@@ -286,8 +288,8 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
 
     @Subscribe("runtimeVariablesGrid.remove")
     public void onRuntimeVariablesGridRemove(final ActionPerformedEvent event) {
-        VariableInstanceData variableInstanceData = runtimeVariablesGrid.getSingleSelectedItem();
-        if (variableInstanceData == null) {
+        Set<VariableInstanceData> variableItems = runtimeVariablesGrid.getSelectedItems();
+        if (variableItems.isEmpty()) {
             return;
         }
 
@@ -299,7 +301,9 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
                                 .withText(messages.getMessage("actions.Remove"))
                                 .withVariant(ActionVariant.PRIMARY)
                                 .withHandler(actionPerformedEvent -> {
-                                    variableService.removeVariableLocal(variableInstanceData);
+                                    ProcessInstanceData processInstanceData = processInstanceDataDc.getItem();
+
+                                    variableService.removeVariablesLocal(processInstanceData.getInstanceId(), variableItems);
                                     runtimeVariablesDl.load();
                                 }),
                         new DialogAction(DialogAction.Type.CANCEL))

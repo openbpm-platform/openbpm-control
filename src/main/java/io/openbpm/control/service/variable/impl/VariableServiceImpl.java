@@ -198,6 +198,17 @@ public class VariableServiceImpl implements VariableService {
     }
 
     @Override
+    public void removeVariablesLocal(String executionId, Set<VariableInstanceData> variableItems) {
+        Objects.requireNonNull(executionId, "executionId can not be null");
+
+        List<String> nameList = variableItems.stream()
+                .map(VariableInstanceData::getName)
+                .toList();
+
+        remoteRuntimeService.removeVariablesLocal(executionId, nameList);
+    }
+
+    @Override
     public void updateVariableBinary(VariableInstanceData variableInstanceData, File data) {
         engineRestClient.updateVariableBinary(variableInstanceData, data);
     }
