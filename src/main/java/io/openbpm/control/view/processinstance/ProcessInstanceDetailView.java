@@ -47,23 +47,15 @@ import io.openbpm.control.view.processinstance.event.IncidentUpdateEvent;
 import io.openbpm.control.view.processinstance.event.JobRetriesUpdateEvent;
 import io.openbpm.control.view.processinstance.history.HistoryTabFragment;
 import io.openbpm.control.view.util.ComponentHelper;
-import io.openbpm.uikit.component.bpmnviewer.command.AddMarkerCmd;
-import io.openbpm.uikit.component.bpmnviewer.command.ElementMarkerType;
-import io.openbpm.uikit.component.bpmnviewer.command.SetElementColorCmd;
-import io.openbpm.uikit.component.bpmnviewer.command.SetIncidentCountCmd;
-import io.openbpm.uikit.component.bpmnviewer.command.ShowCalledInstanceOverlayCmd;
-import io.openbpm.uikit.component.bpmnviewer.command.ShowDecisionInstanceLinkOverlayCmd;
+import io.openbpm.uikit.component.bpmnviewer.command.*;
 import io.openbpm.uikit.fragment.bpmnviewer.BpmnViewerFragment;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.lang.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Route(value = "bpm/process-instances/:id", layout = DefaultMainViewParent.class)
 @ViewController("bpm_ProcessInstanceData.detail")
@@ -361,8 +353,9 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
         filter.setProcessInstanceId(processInstanceDataDc.getItem().getInstanceId());
         List<HistoricDecisionInstanceShortData> allHistoryDecisionInstances =
                 decisionInstanceService.findAllHistoryDecisionInstances(loadContext);
-        if (!allHistoryDecisionInstances.isEmpty()) {
-            return allHistoryDecisionInstances.getFirst().getDecisionInstanceId();
+
+        if (CollectionUtils.isNotEmpty(allHistoryDecisionInstances)) {
+            return allHistoryDecisionInstances.get(0).getDecisionInstanceId();
         }
         return null;
     }
