@@ -47,6 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 
 import java.io.*;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.Set;
 
@@ -369,6 +370,11 @@ public class VariableInstanceDataDetail extends StandardDetailView<VariableInsta
     protected <V extends Comparable<?>> TypedDateTimePicker<V> createDateField(Class<V> clazz) {
         TypedDateTimePicker<V> component = uiComponents.create(TypedDateTimePicker.class);
         component.setDatatype(datatypeRegistry.get(clazz));
+
+        if (getEditedEntity().getValue() == null) {
+            component.setValue(LocalDateTime.now());
+        }
+
         component.addTypedValueChangeListener(event -> {
             V value = event.getValue();
             getEditedEntity().setValue(value);
