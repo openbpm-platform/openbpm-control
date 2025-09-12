@@ -13,6 +13,7 @@ import org.springframework.lang.Nullable;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Provides methods for managing process variable instances in the BPM engine.
@@ -91,6 +92,14 @@ public interface VariableService {
      */
     void removeVariableLocal(VariableInstanceData variableInstanceData);
 
+    /**
+     * Removes the specified set of process variable instances
+     * from the engine runtime data within the given execution context.
+     *
+     * @param executionId   identifier of the process execution context
+     * @param variableItems set of process variable instances to be removed
+     */
+    void removeVariablesLocal(String executionId, Set<VariableInstanceData> variableItems);
     /**
      * Updates the binary value of the specified process variable instance
      * with the provided file data.

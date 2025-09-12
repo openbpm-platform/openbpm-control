@@ -40,10 +40,13 @@
                                 <button action="runtimeVariablesGrid.remove" themeNames="small"/>
                                 <simplePagination id="runtimeVariablesPagination" dataLoader="runtimeVariablesDl"/>
                             </hbox>
-                            <dataGrid id="runtimeVariablesGrid" themeNames="compact"
+                            <dataGrid id="runtimeVariablesGrid"
+                                      themeNames="compact"
                                       dataContainer="runtimeVariablesDc"
-                                      height="100%" minHeight="10em"
-                                      width="100%">
+                                      height="100%"
+                                      minHeight="10em"
+                                      width="100%"
+                                      selectionMode="MULTI">
                                 <actions>
                                     <action id="create" type="list_create"/>
                                     <action id="edit" type="list_edit"/>
