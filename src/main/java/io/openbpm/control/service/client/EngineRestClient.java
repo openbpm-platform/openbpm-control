@@ -41,14 +41,16 @@ public class EngineRestClient {
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
         BpmEngine engine = engineService.getSelectedEngine();
-        if (engine == null || BooleanUtils.isTrue(engine.getAuthEnabled())) {
+        if (engine == null) {
             throw new EngineConnectionFailedException(HttpStatus.SERVICE_UNAVAILABLE.value(), "Server unavailable");
         }
 
-        if (engine.getAuthType() == AuthType.BASIC) {
-            headers.setBasicAuth(Strings.nullToEmpty(engine.getBasicAuthUsername()), Strings.nullToEmpty(engine.getBasicAuthPassword()));
-        } else if (engine.getAuthType() == AuthType.HTTP_HEADER) {
-            headers.add(engine.getHttpHeaderName(), engine.getHttpHeaderValue());
+        if (BooleanUtils.isTrue(engine.getAuthEnabled())) {
+            if (engine.getAuthType() == AuthType.BASIC) {
+                headers.setBasicAuth(Strings.nullToEmpty(engine.getBasicAuthUsername()), Strings.nullToEmpty(engine.getBasicAuthPassword()));
+            } else if (engine.getAuthType() == AuthType.HTTP_HEADER) {
+                headers.add(engine.getHttpHeaderName(), engine.getHttpHeaderValue());
+            }
         }
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
