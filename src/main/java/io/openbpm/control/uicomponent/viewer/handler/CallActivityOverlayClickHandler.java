@@ -83,7 +83,7 @@ public class CallActivityOverlayClickHandler {
         if (CollectionUtils.size(calledProcessInstanceIds) == 1) {
             viewNavigators.detailView(getCurrentView(), ProcessInstanceData.class)
                     .withViewClass(ProcessInstanceDetailView.class)
-                    .withRouteParameters(new RouteParameters("id", calledProcessInstanceIds.getFirst()))
+                    .withRouteParameters(new RouteParameters("id", calledProcessInstanceIds.get(0)))
                     .withBackwardNavigation(true)
                     .navigate();
         } else {
@@ -109,8 +109,9 @@ public class CallActivityOverlayClickHandler {
                     .withType(Notifications.Type.WARNING)
                     .show();
             return null;
+        } else {
+            return calledProcesses.get(0);
         }
-        return CollectionUtils.isNotEmpty(calledProcesses) ? calledProcesses.getFirst() : null;
     }
 
     protected String getAdditionalFilterMessage(@Nullable String binding, ProcessDefinitionFilter filter) {
@@ -153,7 +154,7 @@ public class CallActivityOverlayClickHandler {
             }
             case "versionTag" -> filter.setVersionTag(callActivityData.getVersionTag());
             case "deployment" -> filter.setDeploymentId(parentProcess.getDeploymentId());
-            case null, default -> filter.setLatestVersionOnly(true);
+            default -> filter.setLatestVersionOnly(true);
         }
 
         return filter;

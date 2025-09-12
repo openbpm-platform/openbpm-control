@@ -26,7 +26,7 @@ version = '1.0.999-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -50,7 +50,7 @@ repositories {
         }
     } else {
         maven {
-            url 'https://nexus.openbpm.io/repository/public'
+            url 'https://nexus.openbpm.io/repository/releases'
         }
     }
 }

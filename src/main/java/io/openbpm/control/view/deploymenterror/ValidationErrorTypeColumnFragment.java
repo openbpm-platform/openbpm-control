@@ -26,10 +26,15 @@ public class ValidationErrorTypeColumnFragment extends FragmentRenderer<Horizont
         super.setItem(item);
 
         ValidationErrorType type = item.getType();
+
+        if (type == null) {
+            errorType.setVisible(false);
+            return;
+        }
+
         switch (type) {
             case ERROR -> errorType.getElement().getThemeList().add("error");
             case WARNING -> errorType.getElement().getThemeList().add("warning");
-            case null -> errorType.setVisible(false);
             default -> errorType.getElement().getThemeList().add("contrast");
         }
     }

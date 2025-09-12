@@ -65,6 +65,7 @@ import static io.jmix.flowui.component.UiComponentUtils.getCurrentView;
 @LookupComponent("incidentsDataGrid")
 @DialogMode(width = "50em")
 public class IncidentDataListView extends StandardListView<IncidentData> {
+
     @Autowired
     protected Metadata metadata;
     @Autowired
@@ -79,32 +80,25 @@ public class IncidentDataListView extends StandardListView<IncidentData> {
     protected UiComponents uiComponents;
     @Autowired
     protected Dialogs dialogs;
-    @ViewComponent
-    protected MessageBundle messageBundle;
     @Autowired
     protected Notifications notifications;
-
+    @Autowired
+    private DialogWindows dialogWindows;
     @Autowired
     protected IncidentService incidentService;
     @Autowired
     protected ProcessDefinitionService processDefinitionService;
-    @Autowired
-    protected JobService jobService;
-    @Autowired
-    protected ExternalTaskService externalTaskService;
 
+    @ViewComponent
+    protected MessageBundle messageBundle;
     @ViewComponent
     protected InstanceContainer<IncidentFilter> filterDc;
     @ViewComponent
     protected CollectionLoader<IncidentData> incidentsDl;
-
     @ViewComponent
     protected DataGrid<IncidentData> incidentsDataGrid;
 
-
     protected Map<String, ProcessDefinitionData> processDefinitionsMap = new HashMap<>();
-    @Autowired
-    private DialogWindows dialogWindows;
 
     @Subscribe
     public void onInit(final InitEvent event) {
@@ -266,7 +260,7 @@ public class IncidentDataListView extends StandardListView<IncidentData> {
     }
 
     protected void initDataGridHeaderRow() {
-        HeaderRow headerRow = incidentsDataGrid.getHeaderRows().getFirst();
+        HeaderRow headerRow = incidentsDataGrid.getDefaultHeaderRow();
 
         addColumnFilter(headerRow, "activityId", this::createActivityColumnFilter);
         addColumnFilter(headerRow, "message", this::createMessageColumnFilter);
