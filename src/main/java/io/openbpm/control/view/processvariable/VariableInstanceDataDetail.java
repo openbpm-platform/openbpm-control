@@ -17,9 +17,7 @@ import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.theme.lumo.LumoUtility;
-import io.jmix.core.LoadContext;
-import io.jmix.core.Metadata;
-import io.jmix.core.SaveContext;
+import io.jmix.core.*;
 import io.jmix.core.metamodel.datatype.DatatypeRegistry;
 import io.jmix.flowui.Actions;
 import io.jmix.flowui.UiComponents;
@@ -71,6 +69,8 @@ public class VariableInstanceDataDetail extends StandardDetailView<VariableInsta
     protected Actions actions;
     @Autowired
     protected VariableService variableService;
+    @Autowired
+    private CoreProperties coreProperties;
 
     @ViewComponent
     protected MessageBundle messageBundle;
@@ -312,7 +312,15 @@ public class VariableInstanceDataDetail extends StandardDetailView<VariableInsta
         OutputStream outputBuffer = memoryBuffer.getFileData().getOutputBuffer();
         ByteArrayOutputStream fileBytes = ((ByteArrayOutputStream) outputBuffer);
 
-        File outputFile = new File(memoryBuffer.getFileName());
+        String tempDir = coreProperties.getTempDir();
+
+        File dir = new File(tempDir);
+        if (!dir.exists() && !dir.mkdirs()) {
+            throw new FileStorageException(FileStorageException.Type.IO_EXCEPTION,
+                    "Cannot create temp directory: " + dir.getAbsolutePath());
+        }
+
+        File outputFile = new File(tempDir, memoryBuffer.getFileName());
         try (FileOutputStream outputStream = new FileOutputStream(outputFile)) {
             fileBytes.writeTo(outputStream);
             getEditedEntity().setValue(outputFile);
