@@ -50,7 +50,7 @@ repositories {
         }
     } else {
         maven {
-            url 'https://nexus.openbpm.io/repository/releases'
+            url 'https://nexus.openbpm.io/repository/public'
         }
     }
 }
