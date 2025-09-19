@@ -73,4 +73,13 @@ public interface JobService {
      * @return error details
      */
     String getHistoryErrorDetails(String jobId);
+
+
+    /**
+     * Loads from the engine history the job with the specified identifier.
+     *
+     * @param jobId a job identifier
+     * @return boolean
+     */
+    boolean isHistoryJobLogPresent(String jobId);
 }
