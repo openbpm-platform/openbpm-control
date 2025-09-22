@@ -27,6 +27,7 @@ public class ProcessInstanceTerminateView extends StandardView {
     public void onTerminateAction(final ActionPerformedEvent event) {
         String processInstanceId = processInstanceData.getId();
         processInstanceService.terminateById(processInstanceId);
+        close(StandardOutcome.SAVE);
     }
 
     @Subscribe("cancelAction")
