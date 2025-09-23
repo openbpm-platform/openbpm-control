@@ -12,6 +12,7 @@ import io.openbpm.control.entity.filter.JobFilter;
 import io.openbpm.control.entity.job.JobData;
 import io.openbpm.control.entity.job.JobDefinitionData;
 import io.openbpm.control.mapper.JobMapper;
+import io.openbpm.control.service.client.EngineRestClient;
 import io.openbpm.control.service.job.JobLoadContext;
 import io.openbpm.control.service.job.JobService;
 import lombok.extern.slf4j.Slf4j;
@@ -20,14 +21,11 @@ import org.camunda.community.rest.client.api.HistoryApiClient;
 import org.camunda.community.rest.client.api.JobApiClient;
 import org.camunda.community.rest.client.api.JobDefinitionApiClient;
 import org.camunda.community.rest.client.model.*;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static io.openbpm.control.util.EngineRestUtils.getCountResult;
@@ -39,24 +37,18 @@ public class JobServiceImpl implements JobService {
     protected final JobApiClient jobApiClient;
     protected final JobDefinitionApiClient jobDefinitionApiClient;
     protected final HistoryApiClient historyApiClient;
-
-    @Value("${feign.client.config.job.url:http://localhost:8080/engine-rest}")
-    protected String engineRestUrl;
-
-    @Value("${camunda.username:admin}")
-    protected String camundaUsername;
-
-    @Value("${camunda.password:admin}")
-    protected String camundaPassword;
+    protected final EngineRestClient engineRestClient;
 
     public JobServiceImpl(JobMapper jobMapper,
                           JobApiClient jobApiClient,
                           JobDefinitionApiClient jobDefinitionApiClient,
-                          HistoryApiClient historyApiClient) {
+                          HistoryApiClient historyApiClient,
+                          EngineRestClient engineRestClient) {
         this.jobMapper = jobMapper;
         this.jobApiClient = jobApiClient;
         this.jobDefinitionApiClient = jobDefinitionApiClient;
         this.historyApiClient = historyApiClient;
+        this.engineRestClient = engineRestClient;
     }
 
     @Override
@@ -145,7 +137,7 @@ public class JobServiceImpl implements JobService {
             }
             return "";
         } catch (FeignException.NotAcceptable e) {
-            return fallbackGetHistoryStacktrace(jobId);
+            return engineRestClient.fallbackGetHistoryStacktrace(jobId);
         }
     }
 
@@ -198,28 +190,5 @@ public class JobServiceImpl implements JobService {
         }
 
         return jobQueryDtoSortingInners;
-    }
-
-    protected String fallbackGetHistoryStacktrace(String jobId) {
-        try {
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
-            headers.setBasicAuth(camundaUsername, camundaPassword);
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<String> response = restTemplate.exchange(
-                    engineRestUrl + "/history/job-log/" + jobId + "/stacktrace",
-                    HttpMethod.GET,
-                    entity,
-                    String.class
-            );
-            if (response.getStatusCode().is2xxSuccessful()) {
-                return Strings.nullToEmpty(response.getBody());
-            }
-            return "";
-        } catch (Exception e) {
-            log.error("Fallback request failed for history jobId: {}, error: {}", jobId, e.getMessage(), e);
-            return "";
-        }
     }
 }

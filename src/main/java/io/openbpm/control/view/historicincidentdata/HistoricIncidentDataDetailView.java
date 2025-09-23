@@ -70,13 +70,14 @@ public class HistoricIncidentDataDetailView extends StandardDetailView<HistoricI
 
     protected void initIncidentTypeRelatedFields() {
         boolean notEmptyPayload = getEditedEntity().getConfiguration() != null;
+        boolean historyJobLogPresent = jobService.isHistoryJobLogPresent(getEditedEntity().getConfiguration());
 
         if (getEditedEntity().isExternalTaskFailed()) {
-            viewStacktraceBtn.setVisible(notEmptyPayload && jobService.isHistoryJobLogPresent(getEditedEntity().getConfiguration()));
+            viewStacktraceBtn.setVisible(notEmptyPayload && historyJobLogPresent);
             configurationField.setLabel(messages.getMessage("io.openbpm.control.view.incidentdata/externalTaskIdLabel"));
         } else if (getEditedEntity().isJobFailed()) {
             configurationField.setLabel(messages.getMessage("io.openbpm.control.view.incidentdata/jobIdLabel"));
-            viewStacktraceBtn.setVisible(notEmptyPayload && jobService.isHistoryJobLogPresent(getEditedEntity().getConfiguration()));
+            viewStacktraceBtn.setVisible(notEmptyPayload && historyJobLogPresent);
         } else {
             viewStacktraceBtn.setVisible(false);
         }
