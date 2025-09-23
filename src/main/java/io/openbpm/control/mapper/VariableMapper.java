@@ -38,7 +38,7 @@ public abstract class VariableMapper {
         return metadata.create(HistoricVariableInstanceData.class);
     }
 
-    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "id", source = "id")
     @Mapping(target = "variableInstanceId", source = "id")
     @Mapping(target = "valueInfo", expression = "java(createValueInfo(source.getValueInfo()))")
     public abstract VariableInstanceData fromVariableDto(VariableInstanceDto source);
@@ -52,16 +52,16 @@ public abstract class VariableMapper {
     public VariableValueInfo createValueInfo(Map<String, Object> valueInfoMap) {
         if (valueInfoMap != null && !valueInfoMap.isEmpty()) {
             VariableValueInfo variableValueInfo = metadata.create(VariableValueInfo.class);
-            Object objectData = valueInfoMap.get("object");
-            if (objectData instanceof Map<?, ?> objectDataMap) {
-                ObjectTypeInfo objectTypeInfo = metadata.create(ObjectTypeInfo.class);
-                objectTypeInfo.setObjectTypeName((String) objectDataMap.get("objectTypeName"));
-                objectTypeInfo.setSerializationDataFormat((String) objectDataMap.get("serializationDataFormat"));
-            }
+
+            ObjectTypeInfo objectTypeInfo = metadata.create(ObjectTypeInfo.class);
+            objectTypeInfo.setObjectTypeName((String) valueInfoMap.get("objectTypeName"));
+            objectTypeInfo.setSerializationDataFormat((String) valueInfoMap.get("serializationDataFormat"));
+
+            variableValueInfo.setObject(objectTypeInfo);
 
             variableValueInfo.setEncoding((String) valueInfoMap.get("encoding"));
             variableValueInfo.setFilename((String) valueInfoMap.get("filename"));
-            variableValueInfo.setMimeType((String) valueInfoMap.get("mimetype"));
+            variableValueInfo.setMimeType((String) valueInfoMap.get("mimeType"));
             return variableValueInfo;
         }
         return null;

@@ -214,9 +214,13 @@ public class IncidentServiceImpl implements IncidentService {
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             List<HistoricIncidentDto> historicIncidentDtos = response.getBody();
-            HistoricIncidentDto incidentDto = CollectionUtils.isNotEmpty(historicIncidentDtos) ? historicIncidentDtos.getFirst() : null;
 
-            return incidentDto != null ? incidentMapper.fromHistoricIncidentModel(historicIncidentDtos.getFirst()) : null;
+            if (CollectionUtils.isNotEmpty(historicIncidentDtos)) {
+                HistoricIncidentDto incidentDto = historicIncidentDtos.get(0);
+                return incidentMapper.fromHistoricIncidentModel(incidentDto);
+            } else {
+                return null;
+            }
         }
 
         log.error("Error on loading historic incident by id {}, status code {}", id, response.getStatusCode());
@@ -227,7 +231,9 @@ public class IncidentServiceImpl implements IncidentService {
         if (sort == null || sort.getOrders().isEmpty()) {
             return null;
         }
-        Sort.Order order = sort.getOrders().getFirst();
+
+        Sort.Order order = sort.getOrders().get(0);
+
         return switch (order.getProperty()) {
             case "id" -> "incidentId";
             case "type" -> "incidentType";
@@ -244,7 +250,9 @@ public class IncidentServiceImpl implements IncidentService {
         if (sort == null || sort.getOrders().isEmpty()) {
             return null;
         }
-        Sort.Order order = sort.getOrders().getFirst();
+
+        Sort.Order order = sort.getOrders().get(0);
+
         return switch (order.getProperty()) {
             case "id" -> "incidentId";
             case "type" -> "incidentType";
@@ -261,7 +269,8 @@ public class IncidentServiceImpl implements IncidentService {
         if (sort == null || sort.getOrders().isEmpty()) {
             return null;
         }
-        Sort.Order order = sort.getOrders().getFirst();
+
+        Sort.Order order = sort.getOrders().get(0);
         Sort.Direction direction = order.getDirection();
         if (direction == Sort.Direction.ASC) {
             return "asc";

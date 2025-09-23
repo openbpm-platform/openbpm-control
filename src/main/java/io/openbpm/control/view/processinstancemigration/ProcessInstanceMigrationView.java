@@ -126,7 +126,7 @@ public class ProcessInstanceMigrationView extends StandardView {
         });
 
         if (!definitions.isEmpty()) {
-            processDefinitionVersionComboBox.setValue(definitions.getFirst());
+            processDefinitionVersionComboBox.setValue(definitions.get(0));
         }
     }
 

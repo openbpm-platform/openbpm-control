@@ -17,15 +17,7 @@ import io.jmix.flowui.component.checkbox.JmixCheckbox;
 import io.jmix.flowui.component.radiobuttongroup.JmixRadioButtonGroup;
 import io.jmix.flowui.component.textfield.TypedTextField;
 import io.jmix.flowui.fragment.Fragment;
-import io.jmix.flowui.view.EditedEntityContainer;
-import io.jmix.flowui.view.Install;
-import io.jmix.flowui.view.MessageBundle;
-import io.jmix.flowui.view.StandardDetailView;
-import io.jmix.flowui.view.Subscribe;
-import io.jmix.flowui.view.Target;
-import io.jmix.flowui.view.ViewComponent;
-import io.jmix.flowui.view.ViewController;
-import io.jmix.flowui.view.ViewDescriptor;
+import io.jmix.flowui.view.*;
 import io.openbpm.control.action.TestEngineConnectionAction;
 import io.openbpm.control.entity.engine.AuthType;
 import io.openbpm.control.entity.engine.BpmEngine;
@@ -131,11 +123,21 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
     public void onAuthTypeGroupComponentValueChange(final AbstractField.ComponentValueChangeEvent<JmixRadioButtonGroup<AuthType>, AuthType> event) {
         AuthType type = event.getValue();
 
-        Fragment<VerticalLayout> authFragment = switch (type) {
-            case BASIC -> fragments.create(this, BasicAuthFragment.class);
-            case HTTP_HEADER -> fragments.create(this, HttpHeaderAuthFragment.class);
-            case null, default -> null;
-        };
+        Fragment<VerticalLayout> authFragment = null;
+
+        if (type != null) {
+            switch (type) {
+                case BASIC:
+                    authFragment = fragments.create(this, BasicAuthFragment.class);
+                    break;
+                case HTTP_HEADER:
+                    authFragment = fragments.create(this, HttpHeaderAuthFragment.class);
+                    break;
+                default:
+                    authFragment = null;
+                    break;
+            }
+        }
 
         authBox.removeAll();
         if (authFragment != null) {

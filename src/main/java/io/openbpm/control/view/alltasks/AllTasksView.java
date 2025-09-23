@@ -328,11 +328,15 @@ public class AllTasksView extends StandardListView<UserTaskData> {
     @Subscribe("stateTypeGroup")
     protected void onStateTypeGroupComponentValueChange(final AbstractField.ComponentValueChangeEvent<JmixRadioButtonGroup<UserTaskStateFilterOption>, UserTaskStateFilterOption> event) {
         UserTaskStateFilterOption option = event.getValue();
+
+        if (option == null) {
+            setAllStatesFilter();
+        }
+
         switch (option) {
             case ALL -> setAllStatesFilter();
             case ACTIVE -> setActiveTasksFilter();
             case SUSPENDED -> setSuspendedTasksFilter();
-            case null -> setAllStatesFilter();
         }
         if (event.isFromClient()) {
             tasksDl.load();
