@@ -139,7 +139,7 @@ public class ProcessInstanceListView extends StandardListView<ProcessInstanceDat
 
 
     protected void initDataGridHeaderRow() {
-        HeaderRow headerRow = processInstancesGrid.getHeaderRows().getFirst();
+        HeaderRow headerRow = processInstancesGrid.getDefaultHeaderRow();
 
         addColumnFilter(headerRow, "id", this::createIdColumnFilter);
         addColumnFilter(headerRow, "processDefinitionId", this::createProcessColumnFilter);

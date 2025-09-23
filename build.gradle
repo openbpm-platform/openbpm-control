@@ -26,7 +26,7 @@ version = '1.1.999-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(17)
     }
 }
 
@@ -75,6 +75,8 @@ dependencies {
     implementation 'io.jmix.datatools:jmix-datatools-starter'
     implementation 'io.jmix.datatools:jmix-datatools-flowui-starter'
     implementation 'io.jmix.charts:jmix-charts-flowui-starter'
+    implementation 'io.jmix.translations:jmix-translations-de'
+    implementation 'io.jmix.translations:jmix-translations-es'
     implementation 'io.jmix.translations:jmix-translations-ru'
 
     //Vaadin add-ons

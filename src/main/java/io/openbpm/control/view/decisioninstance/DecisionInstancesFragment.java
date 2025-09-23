@@ -188,7 +188,8 @@ public class DecisionInstancesFragment extends Fragment<VerticalLayout> {
     }
 
     protected void initDataGridHeaderRow() {
-        HeaderRow headerRow = decisionInstancesGrid.getHeaderRows().getFirst();
+        HeaderRow headerRow = decisionInstancesGrid.getDefaultHeaderRow();
+
         addColumnFilter(headerRow, "evaluationTime", this::createEvaluationTimeColumnFilter);
         addColumnFilter(headerRow, "processDefinitionKey", this::createProcessDefinitionKeyColumnFilter);
         addColumnFilter(headerRow, "processInstanceId", this::createProcessInstanceIdColumnFilter);

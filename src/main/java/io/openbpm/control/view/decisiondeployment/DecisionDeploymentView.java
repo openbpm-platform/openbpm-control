@@ -278,6 +278,7 @@ public class DecisionDeploymentView extends AbstractResourceDeploymentView {
             return;
         }
         boolean multipleDecisionDefinitions = decisionDefinitions.size() > 1;
+
         if (multipleDecisionDefinitions) {
             Tooltip tooltip = decisionCountInfoIcon.getTooltip();
             String decisionDefinitionsString = getDecisionDefinitionsString();
@@ -285,7 +286,7 @@ public class DecisionDeploymentView extends AbstractResourceDeploymentView {
             decisionCountLabel.setText(messageBundle.formatMessage(
                     "collaborationDecisionsLabel", String.valueOf(decisionDefinitions.size())));
         } else {
-            decisionIdLabel.setText(decisionDefinitions.getFirst().getKey());
+            decisionIdLabel.setText(decisionDefinitions.get(0).getKey());
         }
 
         decisionInfoHBox.setVisible(true);

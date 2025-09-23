@@ -17,15 +17,7 @@ import io.jmix.flowui.component.checkbox.JmixCheckbox;
 import io.jmix.flowui.component.radiobuttongroup.JmixRadioButtonGroup;
 import io.jmix.flowui.component.textfield.TypedTextField;
 import io.jmix.flowui.fragment.Fragment;
-import io.jmix.flowui.view.EditedEntityContainer;
-import io.jmix.flowui.view.Install;
-import io.jmix.flowui.view.MessageBundle;
-import io.jmix.flowui.view.StandardDetailView;
-import io.jmix.flowui.view.Subscribe;
-import io.jmix.flowui.view.Target;
-import io.jmix.flowui.view.ViewComponent;
-import io.jmix.flowui.view.ViewController;
-import io.jmix.flowui.view.ViewDescriptor;
+import io.jmix.flowui.view.*;
 import io.openbpm.control.action.TestEngineConnectionAction;
 import io.openbpm.control.entity.engine.AuthType;
 import io.openbpm.control.entity.engine.BpmEngine;
@@ -37,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 
 import java.util.Set;
 
@@ -54,6 +47,8 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
     protected EngineService engineService;
     @Autowired
     protected EntityStates entityStates;
+    @Autowired
+    protected BuildProperties buildProperties;
 
     @ViewComponent
     protected MessageBundle messageBundle;
@@ -65,6 +60,8 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
     protected JmixCheckbox defaultField;
     @ViewComponent
     protected TestEngineConnectionAction testConnectionAction;
+    @ViewComponent
+    protected TypedTextField<String> baseUrlField;
 
     @Subscribe
     public void onInitEntity(final InitEntityEvent<BpmEngine> event) {
@@ -86,6 +83,12 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
         if (BooleanUtils.isTrue(engine.getIsDefault()) && !entityStates.isNew(engine)) {
             defaultField.setEnabled(false);
         }
+
+        String buildType = buildProperties.get("buildType");
+        String hostExample = StringUtils.equals(buildType, "docker") ? "http://host.docker.internal:8080/engine-rest"
+                : "http://localhost:8080/engine-rest";
+
+        baseUrlField.setHelperText(messageBundle.formatMessage("baseUrlField.helperText", hostExample));
     }
 
     @Override
@@ -131,11 +134,21 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
     public void onAuthTypeGroupComponentValueChange(final AbstractField.ComponentValueChangeEvent<JmixRadioButtonGroup<AuthType>, AuthType> event) {
         AuthType type = event.getValue();
 
-        Fragment<VerticalLayout> authFragment = switch (type) {
-            case BASIC -> fragments.create(this, BasicAuthFragment.class);
-            case HTTP_HEADER -> fragments.create(this, HttpHeaderAuthFragment.class);
-            case null, default -> null;
-        };
+        Fragment<VerticalLayout> authFragment = null;
+
+        if (type != null) {
+            switch (type) {
+                case BASIC:
+                    authFragment = fragments.create(this, BasicAuthFragment.class);
+                    break;
+                case HTTP_HEADER:
+                    authFragment = fragments.create(this, HttpHeaderAuthFragment.class);
+                    break;
+                default:
+                    authFragment = null;
+                    break;
+            }
+        }
 
         authBox.removeAll();
         if (authFragment != null) {
