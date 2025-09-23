@@ -43,9 +43,14 @@ public class VariableUtils {
     }
 
     public static TypedValue createPrimitiveTypedValue(VariableInstanceData variableInstanceData) {
-        TypedValue typedValue = null;
         Object value = variableInstanceData.getValue();
         CamundaVariableType camundaVariableType = CamundaVariableType.fromId(variableInstanceData.getType());
+
+        if (camundaVariableType == null) {
+            return Variables.untypedValue(value);
+        }
+
+        TypedValue typedValue;
         switch (camundaVariableType) {
             case STRING -> typedValue = Variables.stringValue((String) value);
             case LONG -> typedValue = Variables.longValue((Long) value);
@@ -55,7 +60,7 @@ public class VariableUtils {
             case INTEGER -> typedValue = Variables.integerValue((Integer) value);
             case DATE -> typedValue = Variables.dateValue((Date) value);
             case NULL -> typedValue = Variables.untypedNullValue();
-            case null, default -> typedValue = Variables.untypedValue(value);
+            default -> typedValue = Variables.untypedValue(value);
         }
         return typedValue;
     }

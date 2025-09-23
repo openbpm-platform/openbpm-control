@@ -28,12 +28,7 @@ import io.jmix.flowui.kit.action.ActionVariant;
 import io.jmix.flowui.kit.component.ComponentUtils;
 import io.jmix.flowui.kit.component.button.JmixButton;
 import io.jmix.flowui.kit.component.upload.event.FileUploadSucceededEvent;
-import io.jmix.flowui.view.MessageBundle;
-import io.jmix.flowui.view.StandardOutcome;
-import io.jmix.flowui.view.Subscribe;
-import io.jmix.flowui.view.ViewComponent;
-import io.jmix.flowui.view.ViewController;
-import io.jmix.flowui.view.ViewDescriptor;
+import io.jmix.flowui.view.*;
 import io.openbpm.control.dto.BpmProcessDefinition;
 import io.openbpm.control.entity.filter.ProcessDefinitionFilter;
 import io.openbpm.control.entity.processdefinition.ProcessDefinitionData;
@@ -281,7 +276,7 @@ public class NewProcessDeploymentView extends AbstractResourceDeploymentView {
             tooltip.setText(processDefinitionsString);
             processCountLabel.setText(messageBundle.formatMessage("collaborationProcessesLabel", String.valueOf(processDefinitions.size())));
         } else {
-            processIdLabel.setText(processDefinitions.getFirst().getKey());
+            processIdLabel.setText(processDefinitions.get(0).getKey());
         }
 
         processInfoHBox.setVisible(true);

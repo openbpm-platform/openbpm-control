@@ -20,6 +20,7 @@ import io.openbpm.control.entity.filter.ProcessInstanceFilter;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceState;
 import io.openbpm.control.view.processinstance.filter.ProcessInstanceStateHeaderFilter;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -69,8 +70,8 @@ public class ProcessInstanceListParamBinder extends AbstractUrlQueryParametersBi
     @Override
     public void updateState(QueryParameters queryParameters) {
         List<String> modeStrings = queryParameters.getParameters().get(MODE_URL_PARAM);
-        if (modeStrings != null) {
-            ProcessInstanceViewMode mode = ProcessInstanceViewMode.fromId(modeStrings.getFirst());
+        if (CollectionUtils.isNotEmpty(modeStrings)) {
+            ProcessInstanceViewMode mode = ProcessInstanceViewMode.fromId(modeStrings.get(0));
             loadInstances(mode);
         }
     }
@@ -103,6 +104,13 @@ public class ProcessInstanceListParamBinder extends AbstractUrlQueryParametersBi
     }
 
     private void loadInstances(ProcessInstanceViewMode mode) {
+        if (mode == null) {
+            this.filterDc.getItem().setState(null);
+            this.filterDc.getItem().setUnfinished(true);
+            this.processInstanceDl.load();
+            return;
+        }
+
         switch (mode) {
             case ALL -> {
                 this.filterDc.getItem().setState(null);
@@ -114,7 +122,7 @@ public class ProcessInstanceListParamBinder extends AbstractUrlQueryParametersBi
                 this.filterDc.getItem().setUnfinished(null);
                 this.processInstanceDl.load();
             }
-            case null, default -> {
+            default -> {
                 this.filterDc.getItem().setState(null);
                 this.filterDc.getItem().setUnfinished(true);
                 this.processInstanceDl.load();
