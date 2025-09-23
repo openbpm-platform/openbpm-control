@@ -25,9 +25,11 @@ import io.jmix.flowui.UiComponents;
 import io.jmix.flowui.UiEventPublisher;
 import io.jmix.flowui.ViewNavigators;
 import io.jmix.flowui.component.tabsheet.JmixTabSheet;
+import io.jmix.flowui.model.CollectionContainer;
 import io.jmix.flowui.model.InstanceContainer;
 import io.jmix.flowui.view.*;
 import io.openbpm.control.dto.ActivityIncidentData;
+import io.openbpm.control.entity.activity.ActivityInstanceTreeItem;
 import io.openbpm.control.entity.activity.ActivityShortData;
 import io.openbpm.control.entity.decisioninstance.HistoricDecisionInstanceShortData;
 import io.openbpm.control.entity.filter.DecisionInstanceFilter;
@@ -56,6 +58,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.lang.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Route(value = "bpm/process-instances/:id", layout = DefaultMainViewParent.class)
 @ViewController("bpm_ProcessInstanceData.detail")
@@ -98,6 +101,8 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
     protected JmixTabSheet relatedEntitiesTabSheet;
     @ViewComponent
     protected InstanceContainer<ProcessInstanceData> processInstanceDataDc;
+    @ViewComponent
+    protected CollectionContainer<ActivityInstanceTreeItem> runtimeActivityInstancesDc;
     @ViewComponent
     protected BpmnViewerFragment diagramFragment;
     @ViewComponent
@@ -185,9 +190,14 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
         return title;
     }
 
-    @Install(to = "processInstanceLoader", target = Target.DATA_LOADER)
-    protected ProcessInstanceData processInstanceLoaderLoadDelegate(final LoadContext<ProcessInstanceData> loadContext) {
+    @Install(to = "processInstanceDataDl", target = Target.DATA_LOADER)
+    protected ProcessInstanceData processInstanceDataDlLoadDelegate(final LoadContext<ProcessInstanceData> loadContext) {
         return processInstanceService.getProcessInstanceById(Objects.requireNonNull(loadContext.getId()).toString());
+    }
+
+    @Install(to = "runtimeActivityInstancesDl", target = Target.DATA_LOADER)
+    protected List<ActivityInstanceTreeItem> runtimeActivityInstancesDlLoadDelegate(final LoadContext<ActivityInstanceTreeItem> loadContext) {
+        return activityService.getActivityInstancesTree(processInstanceDataDc.getItem().getInstanceId());
     }
 
     protected void initBpmnViewerFragment() {
@@ -245,14 +255,21 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
     }
 
     protected void showRunningActivities(String processInstanceId) {
-        List<ActivityShortData> runningActivities = activityService.findRunningActivities(processInstanceId);
+        Set<String> runtimeActivityIds = runtimeActivityInstancesDc.getItems()
+                .stream().filter(treeItem -> treeItem.getParentActivityInstance() != null)
+                .map(ActivityInstanceTreeItem::getActivityId)
+                .collect(Collectors.toSet());
 
-        Map<String, List<String>> calledInstances = new HashMap<>();
-        for (ActivityShortData activityData : runningActivities) {
-            String activityId = activityData.getActivityId();
+        runtimeActivityIds.forEach(activityId -> {
             if (!Strings.isNullOrEmpty(activityId)) {
                 diagramFragment.addMarker(new AddMarkerCmd(activityId, ElementMarkerType.RUNNING_ACTIVITY));
             }
+        });
+
+        List<ActivityShortData> runningHistoricActivities = activityService.findRunningActivities(processInstanceId);
+
+        Map<String, List<String>> calledInstances = new HashMap<>();
+        for (ActivityShortData activityData : runningHistoricActivities) {
             addCalledInstance(activityData, calledInstances);
         }
 

@@ -14,8 +14,11 @@
     <data>
         <instance id="processInstanceDataDc"
                   class="io.openbpm.control.entity.processinstance.ProcessInstanceData">
-            <loader id="processInstanceLoader" readOnly="true"/>
+            <loader id="processInstanceDataDl" readOnly="true"/>
         </instance>
+        <collection id="runtimeActivityInstancesDc" class="io.openbpm.control.entity.activity.ActivityInstanceTreeItem">
+            <loader id="runtimeActivityInstancesDl" readOnly="true"/>
+        </collection>
     </data>
     <facets>
         <dataLoadCoordinator auto="true"/>
@@ -41,9 +44,9 @@
             </split>
             <fragment class="io.openbpm.control.view.processinstance.generalpanel.GeneralPanelFragment"/>
         </hbox>
-        <hbox id="windowActions" width="100%" justifyContent="END"
+        <hbox id="windowActions" width="100%" justifyContent="START"
               classNames="sticky-buttons-bottom-panel pl-s pr-s pb-s pt-s">
-            <button id="closeAction" action="closeAction" alignSelf="END"/>
+            <button id="closeAction" action="closeAction"/>
         </hbox>
     </layout>
 </view>

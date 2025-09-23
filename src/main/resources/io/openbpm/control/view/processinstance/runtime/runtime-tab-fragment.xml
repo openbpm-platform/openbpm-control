@@ -8,7 +8,7 @@
         <instance id="processInstanceDataDc"
                   class="io.openbpm.control.entity.processinstance.ProcessInstanceData" provided="true"/>
 
-        <collection id="runtimeActivityInstancesDc" class="io.openbpm.control.entity.activity.ActivityInstanceTreeItem">
+        <collection id="runtimeActivityInstancesDc" class="io.openbpm.control.entity.activity.ActivityInstanceTreeItem" provided="true">
             <loader id="runtimeActivityInstancesDl" readOnly="true"/>
         </collection>
 
