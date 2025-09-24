@@ -6,11 +6,13 @@
 package io.openbpm.control.service.job.impl;
 
 import com.google.common.base.Strings;
+import feign.FeignException;
 import io.jmix.core.Sort;
 import io.openbpm.control.entity.filter.JobFilter;
 import io.openbpm.control.entity.job.JobData;
 import io.openbpm.control.entity.job.JobDefinitionData;
 import io.openbpm.control.mapper.JobMapper;
+import io.openbpm.control.service.client.EngineRestClient;
 import io.openbpm.control.service.job.JobLoadContext;
 import io.openbpm.control.service.job.JobService;
 import lombok.extern.slf4j.Slf4j;
@@ -35,15 +37,18 @@ public class JobServiceImpl implements JobService {
     protected final JobApiClient jobApiClient;
     protected final JobDefinitionApiClient jobDefinitionApiClient;
     protected final HistoryApiClient historyApiClient;
+    protected final EngineRestClient engineRestClient;
 
     public JobServiceImpl(JobMapper jobMapper,
                           JobApiClient jobApiClient,
                           JobDefinitionApiClient jobDefinitionApiClient,
-                          HistoryApiClient historyApiClient) {
+                          HistoryApiClient historyApiClient,
+                          EngineRestClient engineRestClient) {
         this.jobMapper = jobMapper;
         this.jobApiClient = jobApiClient;
         this.jobDefinitionApiClient = jobDefinitionApiClient;
         this.historyApiClient = historyApiClient;
+        this.engineRestClient = engineRestClient;
     }
 
     @Override
@@ -125,11 +130,26 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public String getHistoryErrorDetails(String jobId) {
-        ResponseEntity<String> response = historyApiClient.getStacktraceHistoricJobLog(jobId);
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return Strings.nullToEmpty(response.getBody());
+        try {
+            ResponseEntity<String> response = historyApiClient.getStacktraceHistoricJobLog(jobId);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return Strings.nullToEmpty(response.getBody());
+            }
+            return "";
+        } catch (FeignException.NotAcceptable e) {
+            return engineRestClient.fallbackGetHistoryStacktrace(jobId);
         }
-        return "";
+    }
+
+    @Override
+    public boolean isHistoryJobLogPresent(String jobId) {
+        try {
+            ResponseEntity<HistoricJobLogDto> jobLogResponse = historyApiClient.getHistoricJobLog(jobId);
+            return jobLogResponse.getStatusCode().is2xxSuccessful() && jobLogResponse.getBody() != null;
+        } catch (FeignException e) {
+            log.error("Error checking job log presence for jobId: {}, error: ", jobId, e);
+            return false;
+        }
     }
 
     protected JobQueryDto createJobQueryDto(JobFilter filter) {
