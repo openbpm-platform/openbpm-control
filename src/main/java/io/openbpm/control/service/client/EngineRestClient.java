@@ -67,14 +67,13 @@ public class EngineRestClient {
         }
     }
 
-    public String fallbackGetHistoryStacktrace(String jobId) {
+    public String fallbackGetStacktrace(String jobId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
         BpmEngine engine = engineService.getSelectedEngine();
         if (engine == null) {
             throw new EngineConnectionFailedException(HttpStatus.SERVICE_UNAVAILABLE.value(), "Server unavailable");
         }
-
         if (BooleanUtils.isTrue(engine.getAuthEnabled())) {
             if (engine.getAuthType() == AuthType.BASIC) {
                 headers.setBasicAuth(Strings.nullToEmpty(engine.getBasicAuthUsername()), Strings.nullToEmpty(engine.getBasicAuthPassword()));
@@ -82,9 +81,10 @@ public class EngineRestClient {
                 headers.add(engine.getHttpHeaderName(), engine.getHttpHeaderValue());
             }
         }
+
         HttpEntity<String> entity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(
-                engine.getBaseUrl() + "/history/job-log/" + jobId + "/stacktrace",
+                engine.getBaseUrl() + "/job/" + jobId + "/stacktrace",
                 HttpMethod.GET,
                 entity,
                 String.class

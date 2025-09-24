@@ -120,12 +120,15 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public String getErrorDetails(String jobId) {
-        ResponseEntity<String> response = jobApiClient.getStacktrace(jobId);
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return Strings.nullToEmpty(response.getBody());
+        try {
+            ResponseEntity<String> response = jobApiClient.getStacktrace(jobId);
+            if (response.getStatusCode().is2xxSuccessful()) {
+                return Strings.nullToEmpty(response.getBody());
+            }
+            return "";
+        } catch (FeignException.NotAcceptable e) {
+            return engineRestClient.fallbackGetStacktrace(jobId);
         }
-
-        return "";
     }
 
     @Override
