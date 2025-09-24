@@ -120,28 +120,20 @@ public class JobServiceImpl implements JobService {
 
     @Override
     public String getErrorDetails(String jobId) {
-        try {
-            ResponseEntity<String> response = jobApiClient.getStacktrace(jobId);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                return Strings.nullToEmpty(response.getBody());
-            }
-            return "";
-        } catch (FeignException.NotAcceptable e) {
-            return engineRestClient.fallbackGetStacktrace(jobId);
+        ResponseEntity<String> response = engineRestClient.getStacktrace(jobId);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return Strings.nullToEmpty(response.getBody());
         }
+        return "";
     }
 
     @Override
     public String getHistoryErrorDetails(String jobId) {
-        try {
-            ResponseEntity<String> response = historyApiClient.getStacktraceHistoricJobLog(jobId);
-            if (response.getStatusCode().is2xxSuccessful()) {
-                return Strings.nullToEmpty(response.getBody());
-            }
-            return "";
-        } catch (FeignException.NotAcceptable e) {
-            return engineRestClient.fallbackGetHistoryStacktrace(jobId);
+        ResponseEntity<String> response = engineRestClient.getStacktraceHistoricJobLog(jobId);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return Strings.nullToEmpty(response.getBody());
         }
+        return "";
     }
 
     @Override
