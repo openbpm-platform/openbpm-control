@@ -67,7 +67,7 @@ public class EngineRestClient {
         }
     }
 
-    public String fallbackGetStacktrace(String jobId) {
+    public ResponseEntity<String> getStacktrace(String jobId) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
         BpmEngine engine = engineService.getSelectedEngine();
@@ -83,15 +83,37 @@ public class EngineRestClient {
         }
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        ResponseEntity<String> response = restTemplate.exchange(
+
+        return restTemplate.exchange(
                 engine.getBaseUrl() + "/job/" + jobId + "/stacktrace",
                 HttpMethod.GET,
                 entity,
                 String.class
         );
-        if (response.getStatusCode().is2xxSuccessful()) {
-            return Strings.nullToEmpty(response.getBody());
+    }
+
+    public ResponseEntity<String> getStacktraceHistoricJobLog(String jobId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+        BpmEngine engine = engineService.getSelectedEngine();
+        if (engine == null) {
+            throw new EngineConnectionFailedException(HttpStatus.SERVICE_UNAVAILABLE.value(), "Server unavailable");
         }
-        return "";
+        if (BooleanUtils.isTrue(engine.getAuthEnabled())) {
+            if (engine.getAuthType() == AuthType.BASIC) {
+                headers.setBasicAuth(Strings.nullToEmpty(engine.getBasicAuthUsername()), Strings.nullToEmpty(engine.getBasicAuthPassword()));
+            } else if (engine.getAuthType() == AuthType.HTTP_HEADER) {
+                headers.add(engine.getHttpHeaderName(), engine.getHttpHeaderValue());
+            }
+        }
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        return restTemplate.exchange(
+                engine.getBaseUrl() + "/history/job/" + jobId + "/stacktrace",
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
     }
 }
