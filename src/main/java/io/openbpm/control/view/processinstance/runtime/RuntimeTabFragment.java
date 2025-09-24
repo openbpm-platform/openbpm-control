@@ -82,8 +82,6 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
     @Autowired
     protected DialogWindows dialogWindows;
     @Autowired
-    protected ActivityService activityService;
-    @Autowired
     protected VariableService variableService;
     @Autowired
     protected UserTaskService userTaskService;
@@ -101,8 +99,6 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
 
     @ViewComponent
     protected MessageBundle messageBundle;
-    @ViewComponent
-    protected CollectionLoader<ActivityInstanceTreeItem> runtimeActivityInstancesDl;
     @ViewComponent
     protected CollectionContainer<ActivityInstanceTreeItem> runtimeActivityInstancesDc;
     @ViewComponent
@@ -138,7 +134,6 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
             initExternalTasksTab();
             initIncidentsTab();
 
-            runtimeActivityInstancesDl.load();
             activityInstancesTree.expand(runtimeActivityInstancesDc.getItems());
             runtimeVariablesDl.load();
 
@@ -308,12 +303,6 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
                                 }),
                         new DialogAction(DialogAction.Type.CANCEL))
                 .open();
-    }
-
-
-    @Install(to = "runtimeActivityInstancesDl", target = Target.DATA_LOADER)
-    protected List<ActivityInstanceTreeItem> runtimeActivityInstancesDlLoadDelegate(final LoadContext<ActivityInstanceTreeItem> loadContext) {
-        return activityService.getActivityInstancesTree(processInstanceDataDc.getItem().getInstanceId());
     }
 
     @Install(to = "runtimeVariablesDl", target = Target.DATA_LOADER)
