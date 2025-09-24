@@ -53,7 +53,7 @@
                 <textField id="baseUrlField" width="100%" colspan="2"
                            label="msg://io.openbpm.control.entity.engine/BpmEngine.baseUrl" valueChangeMode="ON_BLUR"
                            property="baseUrl"
-                           helperText="msg://baseUrlField.helperText" classNames="pt-s"/>
+                           classNames="pt-s"/>
             </formLayout>
             <vbox id="details" padding="false"
                   width="100%" themeNames="spacing-xs">

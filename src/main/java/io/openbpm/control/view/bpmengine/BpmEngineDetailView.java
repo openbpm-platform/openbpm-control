@@ -29,6 +29,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 
 import java.util.Set;
 
@@ -46,6 +47,8 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
     protected EngineService engineService;
     @Autowired
     protected EntityStates entityStates;
+    @Autowired
+    protected BuildProperties buildProperties;
 
     @ViewComponent
     protected MessageBundle messageBundle;
@@ -57,6 +60,8 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
     protected JmixCheckbox defaultField;
     @ViewComponent
     protected TestEngineConnectionAction testConnectionAction;
+    @ViewComponent
+    protected TypedTextField<String> baseUrlField;
 
     @Subscribe
     public void onInitEntity(final InitEntityEvent<BpmEngine> event) {
@@ -78,6 +83,12 @@ public class BpmEngineDetailView extends StandardDetailView<BpmEngine> {
         if (BooleanUtils.isTrue(engine.getIsDefault()) && !entityStates.isNew(engine)) {
             defaultField.setEnabled(false);
         }
+
+        String buildType = buildProperties.get("buildType");
+        String hostExample = StringUtils.equals(buildType, "docker") ? "http://host.docker.internal:8080/engine-rest"
+                : "http://localhost:8080/engine-rest";
+
+        baseUrlField.setHelperText(messageBundle.formatMessage("baseUrlField.helperText", hostExample));
     }
 
     @Override
