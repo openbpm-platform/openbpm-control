@@ -8,8 +8,10 @@ package io.openbpm.control.uicomponent.menu;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.ListItem;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.router.*;
 import io.jmix.flowui.component.main.JmixListMenu;
 import io.jmix.flowui.kit.component.main.ListMenu;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.lang.Nullable;
@@ -72,6 +74,22 @@ public class ControlListMenu extends JmixListMenu {
             return menuItemComponent;
         }
         return super.createMenuRecursively(menuItem);
+    }
+
+    @Override
+    protected @NotNull RouterLink createMenuItemComponent(@NotNull MenuItem menuItem) {
+        RouterLink menuItemComponent = super.createMenuItemComponent(menuItem);
+        if ("bpm_ProcessInstance.list".equals(menuItem.getId())) {
+            menuItemComponent.setHighlightCondition((HighlightCondition<RouterLink>) (routerLink, event) -> {
+                Location menuLocation = new Location(routerLink.getHref());
+                String menuPath = menuLocation.getPath();
+
+                String currentPath = event.getLocation().getPath();
+
+                return currentPath.equals(menuPath);
+            });
+        }
+        return menuItemComponent;
     }
 
     @Nullable
