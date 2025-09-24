@@ -17,6 +17,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.File;
+import java.util.Collections;
 
 @Component("control_EngineRestClient")
 public class EngineRestClient {
@@ -64,5 +65,33 @@ public class EngineRestClient {
             log.error("Error on update process variable, process id {}, process name {}, status code {}",
                     variableInstanceData.getVariableInstanceId(), name, response.getStatusCode());
         }
+    }
+
+    public String fallbackGetHistoryStacktrace(String jobId) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.TEXT_PLAIN));
+        BpmEngine engine = engineService.getSelectedEngine();
+        if (engine == null) {
+            throw new EngineConnectionFailedException(HttpStatus.SERVICE_UNAVAILABLE.value(), "Server unavailable");
+        }
+
+        if (BooleanUtils.isTrue(engine.getAuthEnabled())) {
+            if (engine.getAuthType() == AuthType.BASIC) {
+                headers.setBasicAuth(Strings.nullToEmpty(engine.getBasicAuthUsername()), Strings.nullToEmpty(engine.getBasicAuthPassword()));
+            } else if (engine.getAuthType() == AuthType.HTTP_HEADER) {
+                headers.add(engine.getHttpHeaderName(), engine.getHttpHeaderValue());
+            }
+        }
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<String> response = restTemplate.exchange(
+                engine.getBaseUrl() + "/history/job-log/" + jobId + "/stacktrace",
+                HttpMethod.GET,
+                entity,
+                String.class
+        );
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return Strings.nullToEmpty(response.getBody());
+        }
+        return "";
     }
 }
