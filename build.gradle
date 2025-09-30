@@ -94,7 +94,6 @@ dependencies {
     testCompileOnly "org.projectlombok:lombok:${lombokVersion}"
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     implementation 'org.hsqldb:hsqldb'
-    implementation 'org.postgresql:postgresql'
 }
 
 configurations.implementation {

@@ -9,13 +9,11 @@ if %errorlevel% neq 0 (
 )
 
 :: Check Java version
-for /f "tokens=3 delims=." %%a in ('java -version 2^>^&1 ^| findstr /i "version"') do (
+for /f "tokens=3" %%a in ('java -version 2^>^&1 ^| findstr /i "version"') do (
     set JAVA_VERSION=%%a
 )
 set JAVA_VERSION=!JAVA_VERSION:"=!
-for /f "tokens=1 delims=." %%a in ("!JAVA_VERSION!") do (
-    set JAVA_MAJOR=%%a
-)
+set JAVA_MAJOR=!JAVA_VERSION:~2,2!
 if !JAVA_MAJOR! lss 17 (
     echo Java 17 or higher is required, current version: !JAVA_VERSION!
     exit /b 1
@@ -23,17 +21,21 @@ if !JAVA_MAJOR! lss 17 (
 
 :: Default parameters
 set JAR_NAME=openbpm-control.jar
+set DB_NAME=control
+set DB_PATH=.\data\%DB_NAME%
+set DB_USER=sa
+set DB_PASS=
 set PORT=8081
-set PROFILE=%1
-if "!PROFILE!"=="" (
-    set PROFILE=hsqldb
-)
 
 :: JVM parameters
-set JVM_OPTS=-Xms256m -Xmx512m -Dspring.profiles.active=!PROFILE!
+set JVM_OPTS=-Xms256m -Xmx512m
+
+:: Spring Boot parameters
+set SPRING_OPTS=--spring.datasource.url=jdbc:hsqldb:file:%DB_PATH% --spring.datasource.username=%DB_USER% --spring.datasource.password=%DB_PASS%
 
 :: Start the application
-echo Starting the application with profile: !PROFILE!...
+echo Starting the application with HSQLDB...
+echo Database path: %DB_PATH%
 
 :: Redirect output to a temporary file to monitor logs
 set LOG_FILE=%TEMP%\openbpm-control.log
