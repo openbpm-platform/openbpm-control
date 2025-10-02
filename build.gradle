@@ -95,6 +95,9 @@ dependencies {
     testAnnotationProcessor "org.projectlombok:lombok:${lombokVersion}"
     implementation 'org.hsqldb:hsqldb'
     implementation 'org.postgresql:postgresql'
+    implementation 'com.mysql:mysql-connector-j'
+    implementation 'com.oracle.database.jdbc:ojdbc11'
+    implementation 'org.mariadb.jdbc:mariadb-java-client'
 }
 
 configurations.implementation {
