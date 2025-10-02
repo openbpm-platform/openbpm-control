@@ -2,11 +2,7 @@
 
 # Default parameters
 JAR_NAME="openbpm-control.jar"
-DB_NAME="control"
-DB_PATH="./data/$DB_NAME"
-DB_USER="sa"
-DB_PASS=""
-
+PROFILE=${1:-hsqldb}
 PORT=8081
 
 # Check if Java is installed
@@ -38,14 +34,10 @@ open_browser() {
 }
 
 # JVM parameters
-JVM_OPTS="-Xms256m -Xmx512m"
-
-# Spring Boot parameters
-SPRING_OPTS="--spring.datasource.url=jdbc:hsqldb:file:$DB_PATH --spring.datasource.username=$DB_USER --spring.datasource.password=$DB_PASS"
+JVM_OPTS="-Xms256m -Xmx512m -Dspring.profiles.active=$PROFILE"
 
 # Start the application
-echo "Starting the application with HSQLDB..."
-echo "Database path: $DB_PATH"
+echo "Starting the application with profile: $PROFILE..."
 java $JVM_OPTS -jar $JAR_NAME $SPRING_OPTS "$@" --server.port=$PORT 2>&1 | tee /tmp/openbpm-control.log &
 
 # Wait for the "Tomcat started on port" message
