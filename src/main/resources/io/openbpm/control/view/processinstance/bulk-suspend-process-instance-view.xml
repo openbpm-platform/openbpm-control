@@ -3,11 +3,11 @@
       title="msg://bulkSuspendProcessInstances.title">
     <actions>
         <action id="suspendAction"
-                text="msg:///actions.Retry"
+                text="msg:///actions.Suspend"
                 icon="PAUSE"
                 actionVariant="PRIMARY"/>
         <action id="cancelAction"
-                text="msg:///actions.Suspend"
+                text="msg:///actions.Cancel"
                 icon="BAN"/>
     </actions>
 
