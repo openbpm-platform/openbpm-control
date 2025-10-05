@@ -26,7 +26,9 @@ import io.jmix.flowui.UiEventPublisher;
 import io.jmix.flowui.ViewNavigators;
 import io.jmix.flowui.component.tabsheet.JmixTabSheet;
 import io.jmix.flowui.model.CollectionContainer;
+import io.jmix.flowui.model.CollectionLoader;
 import io.jmix.flowui.model.InstanceContainer;
+import io.jmix.flowui.model.InstanceLoader;
 import io.jmix.flowui.view.*;
 import io.openbpm.control.dto.ActivityIncidentData;
 import io.openbpm.control.entity.activity.ActivityInstanceTreeItem;
@@ -104,6 +106,10 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
     @ViewComponent
     protected CollectionContainer<ActivityInstanceTreeItem> runtimeActivityInstancesDc;
     @ViewComponent
+    protected InstanceLoader<ProcessInstanceData> processInstanceDataDl;
+    @ViewComponent
+    protected CollectionLoader<ActivityInstanceTreeItem> runtimeActivityInstancesDl;
+    @ViewComponent
     protected BpmnViewerFragment diagramFragment;
     @ViewComponent
     protected VerticalLayout emptyDiagramBox;
@@ -127,12 +133,19 @@ public class ProcessInstanceDetailView extends StandardDetailView<ProcessInstanc
     @SuppressWarnings("JmixIncorrectCreateGuiComponent")
     @Subscribe
     public void onBeforeShow(BeforeShowEvent event) {
+        processInstanceDataDl.load();
+
         ProcessInstanceData processInstanceData = processInstanceDataDc.getItem();
+        ProcessInstanceState state = processInstanceData.getState();
+        if (state != ProcessInstanceState.COMPLETED) {
+            runtimeActivityInstancesDl.load();
+        }
+
         if (processInstanceData.getEndTime() != null) {
             relatedEntitiesTabSheet.getTabAt(RUNTIME_TAB_IDX).setEnabled(false);
             Tab historyTab = relatedEntitiesTabSheet.getTabAt(HISTORY_TAB_IDX);
             relatedEntitiesTabSheet.setSelectedTab(historyTab);
-            //force init a tab content because attach event is not triggered
+            //force init a tab content because an attach event is not triggered
             LazyTabContent contentByTab = (LazyTabContent) relatedEntitiesTabSheet.getContentByTab(historyTab);
             if (contentByTab != null) {
                 contentByTab.init();

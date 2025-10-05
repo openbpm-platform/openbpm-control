@@ -20,9 +20,6 @@
             <loader id="runtimeActivityInstancesDl" readOnly="true"/>
         </collection>
     </data>
-    <facets>
-        <dataLoadCoordinator auto="true"/>
-    </facets>
     <layout expand="box" padding="false">
         <hbox id="box" width="100%" spacing="false">
             <split id="rootBox" orientation="VERTICAL" splitterPosition="50" themeNames="splitter-spacing" width="100%">
