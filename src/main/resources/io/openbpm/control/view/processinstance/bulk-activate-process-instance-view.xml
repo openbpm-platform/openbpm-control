@@ -3,7 +3,7 @@
       title="msg://bulkActivateProcessInstances.title">
     <actions>
         <action id="activateAction"
-                text="msg:///actions.Retry"
+                text="msg:///actions.Activate"
                 icon="PLAY"
                 actionVariant="PRIMARY"/>
         <action id="cancelAction"
