@@ -38,6 +38,7 @@
                                 <button action="runtimeVariablesGrid.create" themeNames="primary small"/>
                                 <button action="runtimeVariablesGrid.edit" themeNames="small"/>
                                 <button action="runtimeVariablesGrid.remove" themeNames="small"/>
+                                <button id="downloadButton" text="msg:///actions.Download" icon="DOWNLOAD_ALT" action="runtimeVariablesGrid.download" themeNames="small" enabled="false"/>
                                 <simplePagination id="runtimeVariablesPagination" dataLoader="runtimeVariablesDl"/>
                             </hbox>
                             <dataGrid id="runtimeVariablesGrid"
@@ -51,6 +52,7 @@
                                     <action id="create" type="list_create"/>
                                     <action id="edit" type="list_edit"/>
                                     <action id="remove" type="list_remove"/>
+                                    <action id="download" type="list_itemTracking"/>
                                 </actions>
                                 <columns resizable="true">
                                     <column property="name" flexGrow="1"/>
