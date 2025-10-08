@@ -296,6 +296,7 @@ public class VariableInstanceDataDetail extends StandardDetailView<VariableInsta
         }
 
         fileUploadField.addFileUploadSucceededListener(this::handleFileUpload);
+        fileUploadField.setHelperText(messageBundle.getMessage("variableNameFileTypeMaxSize"));
 
         byte[] binaryValue = loadBinaryValue(variableInstanceData);
         fileUploadField.setValue(binaryValue);

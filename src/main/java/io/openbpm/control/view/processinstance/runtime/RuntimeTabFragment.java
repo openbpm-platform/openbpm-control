@@ -6,6 +6,7 @@
 package io.openbpm.control.view.processinstance.runtime;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.GridSortOrder;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -14,6 +15,7 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.data.event.SortEvent;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.data.renderer.TextRenderer;
+import com.vaadin.flow.data.selection.SelectionEvent;
 import com.vaadin.flow.theme.lumo.LumoUtility;
 import io.jmix.core.DataLoadContext;
 import io.jmix.core.LoadContext;
@@ -26,6 +28,7 @@ import io.jmix.flowui.action.DialogAction;
 import io.jmix.flowui.component.grid.DataGrid;
 import io.jmix.flowui.component.grid.TreeDataGrid;
 import io.jmix.flowui.component.tabsheet.JmixTabSheet;
+import io.jmix.flowui.download.Downloader;
 import io.jmix.flowui.fragment.Fragment;
 import io.jmix.flowui.fragment.FragmentDescriptor;
 import io.jmix.flowui.kit.action.ActionPerformedEvent;
@@ -38,10 +41,11 @@ import io.openbpm.control.entity.activity.ActivityInstanceTreeItem;
 import io.openbpm.control.entity.filter.*;
 import io.openbpm.control.entity.processinstance.ProcessInstanceData;
 import io.openbpm.control.entity.processinstance.ProcessInstanceState;
+import io.openbpm.control.entity.variable.CamundaVariableType;
 import io.openbpm.control.entity.variable.ObjectTypeInfo;
 import io.openbpm.control.entity.variable.VariableInstanceData;
 import io.openbpm.control.entity.variable.VariableValueInfo;
-import io.openbpm.control.service.activity.ActivityService;
+import io.openbpm.control.exception.EngineResourceNotAvailableException;
 import io.openbpm.control.service.externaltask.ExternalTaskService;
 import io.openbpm.control.service.incident.IncidentService;
 import io.openbpm.control.service.job.JobService;
@@ -54,8 +58,11 @@ import io.openbpm.control.view.processvariable.VariableInstanceDataDetail;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.io.Resource;
 import org.springframework.lang.Nullable;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -95,7 +102,8 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
     private Dialogs dialogs;
     @Autowired
     private Messages messages;
-
+    @Autowired
+    protected Downloader downloader;
 
     @ViewComponent
     protected MessageBundle messageBundle;
@@ -113,6 +121,8 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
     protected JmixTabSheet runtimeTabsheet;
     @ViewComponent
     protected VerticalLayout activityTreeContainer;
+    @ViewComponent
+    protected Button downloadButton;
 
     protected VariableFilter variableFilter;
 
@@ -320,6 +330,27 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
         return variableService.findRuntimeVariables(context);
     }
 
+    @Subscribe("runtimeVariablesGrid")
+    public void onRuntimeVariablesGridSelection(final SelectionEvent<DataGrid<VariableInstanceData>, VariableInstanceData> event) {
+        VariableInstanceData selectedItem = runtimeVariablesGrid.getSingleSelectedItem();
+        boolean isFileType = selectedItem != null &&
+                CamundaVariableType.FILE.getId().equals(selectedItem.getType())
+                && selectedItem.getValueInfo() != null;
+        downloadButton.setEnabled(isFileType);
+    }
+
+    @Subscribe("runtimeVariablesGrid.download")
+    public void onRuntimeVariablesGridDownload(final ActionPerformedEvent event) {
+        VariableInstanceData selectedItem = runtimeVariablesGrid.getSingleSelectedItem();
+        if (selectedItem != null) {
+            Resource fileResource = variableService.getVariableInstanceBinary(selectedItem.getVariableInstanceId());
+            byte[] byteArrayContent = getByteArrayContent(fileResource);
+            if (fileResource.getFilename() != null) {
+                downloader.download(() -> new ByteArrayInputStream(byteArrayContent), fileResource.getFilename());
+            } downloader.download(() -> new ByteArrayInputStream(byteArrayContent), selectedItem.getValueInfo().getFilename());
+        }
+    }
+
 
     @Install(to = "runtimeVariablesPagination", subject = "totalCountDelegate")
     protected Integer runtimeVariablesPaginationTotalCountDelegate(final DataLoadContext dataLoadContext) {
@@ -481,6 +512,9 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
         if (variableInstance.getValue() != null) {
             return variableInstance.getValue().toString();
         }
+        if (variableInstance.getType().equals(CamundaVariableType.FILE.getId())) {
+            return variableInstance.getValueInfo().getFilename();
+        }
         return null;
     }
 
@@ -505,6 +539,16 @@ public class RuntimeTabFragment extends Fragment<HorizontalLayout> {
                 .findFirst()
                 .orElse(null)
                 : null;
+    }
+
+    private static byte[] getByteArrayContent(Resource deploymentResourceData) {
+        byte[] byteArray;
+        try {
+            byteArray = deploymentResourceData.getContentAsByteArray();
+        } catch (IOException e) {
+            throw new EngineResourceNotAvailableException(deploymentResourceData.getFilename());
+        }
+        return byteArray;
     }
 
 }
