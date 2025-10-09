@@ -79,7 +79,7 @@ public class Camunda7JobServiceFindAllTest extends AbstractCamunda7IntegrationTe
                 .deploy("test_support/testTimerJob.bpmn")
                 .startByKey("testTimerJob", 2);
 
-        String instanceId = sampleDataManager.getStartedInstances("testTimerJob").getFirst();
+        String instanceId = sampleDataManager.getStartedInstances("testTimerJob").get(0);
 
         JobFilter jobFilter = dataManager.create(JobFilter.class);
         jobFilter.setProcessInstanceId(instanceId);

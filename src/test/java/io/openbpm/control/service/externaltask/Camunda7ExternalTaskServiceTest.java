@@ -59,7 +59,7 @@ public class Camunda7ExternalTaskServiceTest extends AbstractCamunda7Integration
 
         List<String> instanceIds = sampleDataManager.getStartedInstances("testExternalTaskRetriesUpdate");
 
-        ExternalTaskDto sourceTaskDto = camundaRestTestHelper.getExternalTasks(camunda7, instanceIds).getFirst();
+        ExternalTaskDto sourceTaskDto = camundaRestTestHelper.getExternalTasks(camunda7, instanceIds).get(0);
         String externalTaskId = sourceTaskDto.getId();
 
         //when
@@ -123,7 +123,7 @@ public class Camunda7ExternalTaskServiceTest extends AbstractCamunda7Integration
                 .deploy("test_support/testExternalTasksListLoad.bpmn")
                 .startByKey("testExternalTasksListLoad", 2);
 
-        String instanceId = sampleDataManager.getStartedInstances("testExternalTasksListLoad").getFirst();
+        String instanceId = sampleDataManager.getStartedInstances("testExternalTasksListLoad").get(0);
 
         ExternalTaskFilter filter = dataManager.create(ExternalTaskFilter.class);
         filter.setProcessInstanceId(instanceId);
@@ -145,7 +145,7 @@ public class Camunda7ExternalTaskServiceTest extends AbstractCamunda7Integration
                 .startByKey("testFailedExternalTask");
 
         List<String> instanceIds = sampleDataManager.getStartedInstances("testFailedExternalTask");
-        String taskId = camundaRestTestHelper.getExternalTaskIds(camunda7, instanceIds).getFirst();
+        String taskId = camundaRestTestHelper.getExternalTaskIds(camunda7, instanceIds).get(0);
 
         camundaRestTestHelper.failExternalTask(camunda7, taskId, HandleFailureDto.builder()
                 .errorMessage("Service not available")
@@ -171,7 +171,7 @@ public class Camunda7ExternalTaskServiceTest extends AbstractCamunda7Integration
                 .startByKey("testFailedExternalTask");
 
         List<String> instanceIds = sampleDataManager.getStartedInstances("testFailedExternalTask");
-        String taskId = camundaRestTestHelper.getExternalTaskIds(camunda7, instanceIds).getFirst();
+        String taskId = camundaRestTestHelper.getExternalTaskIds(camunda7, instanceIds).get(0);
 
         //when
         String errorDetails = externalTaskService.getErrorDetails(taskId);

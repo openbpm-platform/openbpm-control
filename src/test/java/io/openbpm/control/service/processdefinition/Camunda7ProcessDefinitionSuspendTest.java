@@ -48,7 +48,7 @@ public class Camunda7ProcessDefinitionSuspendTest extends AbstractCamunda7Integr
         CamundaSampleDataManager sampleDataManager = applicationContext.getBean(CamundaSampleDataManager.class, camunda7)
                 .deploy("test_support/vacationApproval.bpmn");
 
-        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").getFirst();
+        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").get(0);
 
         //when
         processDefinitionService.suspendById(processVersionId, true);
@@ -67,9 +67,9 @@ public class Camunda7ProcessDefinitionSuspendTest extends AbstractCamunda7Integr
                 .deploy("test_support/vacationApproval.bpmn")
                 .startByKey("vacation_approval");
 
-        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").getFirst();
+        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").get(0);
 
-        RuntimeProcessInstanceDto activeInstance = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processVersionId).getFirst();
+        RuntimeProcessInstanceDto activeInstance = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processVersionId).get(0);
 
         //when
         processDefinitionService.suspendById(processVersionId, true);
@@ -98,9 +98,9 @@ public class Camunda7ProcessDefinitionSuspendTest extends AbstractCamunda7Integr
                 .deploy("test_support/vacationApproval.bpmn")
                 .startByKey("vacation_approval");
 
-        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").getFirst();
+        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").get(0);
 
-        RuntimeProcessInstanceDto activeInstance = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processVersionId).getFirst();
+        RuntimeProcessInstanceDto activeInstance = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processVersionId).get(0);
 
         //when
         processDefinitionService.suspendById(processVersionId, false);

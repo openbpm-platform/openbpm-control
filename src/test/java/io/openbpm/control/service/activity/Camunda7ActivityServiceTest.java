@@ -53,7 +53,7 @@ public class Camunda7ActivityServiceTest extends AbstractCamunda7IntegrationTest
                 .startByKey("testActivityStatistics", startProcessDto, 2)
                 .waitJobsExecution();
 
-        String processDefId = sampleDataManager.getDeployedProcessVersions("testActivityStatistics").getFirst();
+        String processDefId = sampleDataManager.getDeployedProcessVersions("testActivityStatistics").get(0);
 
         // when
         List<ProcessActivityStatistics> stats = activityService.getStatisticsByProcessId(processDefId);

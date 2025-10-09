@@ -184,7 +184,7 @@ public class CamundaRestTestHelper {
     public VariableInstanceDto getVariable(Camunda7Container<?> camunda, String name) {
         try {
             List<VariableInstanceDto> variables = restHelper.getList(camunda, "/variable-instance?variableName=" + name, VariableInstanceDto.class);
-            return CollectionUtils.isNotEmpty(variables) ? variables.getFirst() : null;
+            return CollectionUtils.isNotEmpty(variables) ? variables.get(0) : null;
         } catch (HttpClientErrorException e) {
             return null;
         }
@@ -194,7 +194,7 @@ public class CamundaRestTestHelper {
     public HistoricUserTaskDto findHistoryUserTask(Camunda7Container<?> camunda, String taskId) {
         List<HistoricUserTaskDto> tasks = restHelper.getList(camunda, "/history/task?taskId=" + taskId, HistoricUserTaskDto.class);
 
-        return CollectionUtils.isNotEmpty(tasks) ? tasks.getFirst() : null;
+        return CollectionUtils.isNotEmpty(tasks) ? tasks.get(0) : null;
     }
 
 

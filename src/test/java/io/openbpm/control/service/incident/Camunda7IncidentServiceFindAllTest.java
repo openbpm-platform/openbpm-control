@@ -142,7 +142,7 @@ public class Camunda7IncidentServiceFindAllTest extends AbstractCamunda7Integrat
                 .retryFailedJobs("testResolvedFailedJobIncident")
                 .waitJobsExecution();
 
-        String testFailedJobIncidentProcessId = sampleDataManager.getDeployedProcessVersions("testFailedJobIncident").getFirst();
+        String testFailedJobIncidentProcessId = sampleDataManager.getDeployedProcessVersions("testFailedJobIncident").get(0);
 
         IncidentLoadContext loadContext = new IncidentLoadContext();
 

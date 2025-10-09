@@ -46,7 +46,7 @@ public class Camunda7UserTaskSetAssigneeTest extends AbstractCamunda7Integration
                 .deploy("test_support/testUserTaskWithoutAssignee.bpmn")
                 .startByKey("userTaskWithoutAssignee");
 
-        RuntimeUserTaskDto sourceUserTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "userTaskWithoutAssignee").getFirst();
+        RuntimeUserTaskDto sourceUserTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "userTaskWithoutAssignee").get(0);
 
         //when
         userTaskService.setAssignee(sourceUserTask.getId(), "manager");
@@ -67,7 +67,7 @@ public class Camunda7UserTaskSetAssigneeTest extends AbstractCamunda7Integration
                 .deploy("test_support/testUserTaskWithAssignee.bpmn")
                 .startByKey("userTaskWithAssignee");
 
-        RuntimeUserTaskDto sourceUserTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "userTaskWithAssignee").getFirst();
+        RuntimeUserTaskDto sourceUserTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "userTaskWithAssignee").get(0);
 
         //when
         userTaskService.setAssignee(sourceUserTask.getId(), "manager");
@@ -88,7 +88,7 @@ public class Camunda7UserTaskSetAssigneeTest extends AbstractCamunda7Integration
                 .deploy("test_support/testUserTaskWithAssignee.bpmn")
                 .startByKey("userTaskWithAssignee");
 
-        RuntimeUserTaskDto sourceUserTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "userTaskWithAssignee").getFirst();
+        RuntimeUserTaskDto sourceUserTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "userTaskWithAssignee").get(0);
 
         //when
         userTaskService.setAssignee(sourceUserTask.getId(), "admin");

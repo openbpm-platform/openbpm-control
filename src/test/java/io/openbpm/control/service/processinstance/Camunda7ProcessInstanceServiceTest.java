@@ -99,7 +99,7 @@ public class Camunda7ProcessInstanceServiceTest extends AbstractCamunda7Integrat
                 .deploy("test_support/testVisitPlanningV1.bpmn")
                 .startByKey("visitPlanning");
 
-        String instanceId = camundaRestTestHelper.getActiveRuntimeInstancesByKey(camunda7, "visitPlanning").getFirst();
+        String instanceId = camundaRestTestHelper.getActiveRuntimeInstancesByKey(camunda7, "visitPlanning").get(0);
 
         resetSelectedEngine();
 
@@ -118,7 +118,7 @@ public class Camunda7ProcessInstanceServiceTest extends AbstractCamunda7Integrat
                 .deploy("test_support/testVisitPlanningV1.bpmn")
                 .startByKey("visitPlanning");
 
-        String instanceId = camundaRestTestHelper.getActiveRuntimeInstancesByKey(camunda7, "visitPlanning").getFirst();
+        String instanceId = camundaRestTestHelper.getActiveRuntimeInstancesByKey(camunda7, "visitPlanning").get(0);
 
         camunda7.stop();
 
@@ -136,8 +136,8 @@ public class Camunda7ProcessInstanceServiceTest extends AbstractCamunda7Integrat
         CamundaSampleDataManager sampleDataManager = applicationContext.getBean(CamundaSampleDataManager.class, camunda7)
                 .deploy("test_support/testVisitPlanningV1.bpmn")
                 .startByKey("visitPlanning");
-        String processId = sampleDataManager.getDeployedProcessVersions("visitPlanning").getFirst();
-        String instanceId = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processId).getFirst().getId();
+        String processId = sampleDataManager.getDeployedProcessVersions("visitPlanning").get(0);
+        String instanceId = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processId).get(0).getId();
 
         //when
         ProcessInstanceData foundInstance = processInstanceService.getProcessInstanceById(instanceId);
@@ -172,8 +172,8 @@ public class Camunda7ProcessInstanceServiceTest extends AbstractCamunda7Integrat
                 .deploy("test_support/testVisitPlanningV1.bpmn")
                 .startByKey("visitPlanning");
 
-        String processId = sampleDataManager.getDeployedProcessVersions("visitPlanning").getFirst();
-        String instanceId = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processId).getFirst().getId();
+        String processId = sampleDataManager.getDeployedProcessVersions("visitPlanning").get(0);
+        String instanceId = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processId).get(0).getId();
 
         camundaRestTestHelper.suspendInstanceById(camunda7, instanceId);
 
@@ -210,8 +210,8 @@ public class Camunda7ProcessInstanceServiceTest extends AbstractCamunda7Integrat
                 .deploy("test_support/testVisitPlanningV1.bpmn")
                 .startByKey("visitPlanning");
 
-        String processId = sampleDataManager.getDeployedProcessVersions("visitPlanning").getFirst();
-        String instanceId = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processId).getFirst().getId();
+        String processId = sampleDataManager.getDeployedProcessVersions("visitPlanning").get(0);
+        String instanceId = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processId).get(0).getId();
 
         camundaRestTestHelper.terminateExternallyInstance(camunda7, instanceId);
 
@@ -249,8 +249,8 @@ public class Camunda7ProcessInstanceServiceTest extends AbstractCamunda7Integrat
                 .deploy("test_support/testCompletedInstance.bpmn")
                 .startByKey("testCompletedInstance");
 
-        String processId = sampleDataManager.getDeployedProcessVersions("testCompletedInstance").getFirst();
-        String instanceId = camundaRestTestHelper.getHistoryInstancesById(camunda7, processId).getFirst().getId();
+        String processId = sampleDataManager.getDeployedProcessVersions("testCompletedInstance").get(0);
+        String instanceId = camundaRestTestHelper.getHistoryInstancesById(camunda7, processId).get(0).getId();
 
         //when
         ProcessInstanceData foundInstance = processInstanceService.getProcessInstanceById(instanceId);
@@ -301,7 +301,7 @@ public class Camunda7ProcessInstanceServiceTest extends AbstractCamunda7Integrat
                 .deploy("test_support/testVisitPlanningV2.bpmn")
                 .startByKey("visitPlanning", 2);
 
-        String processId = sampleDataManager.getDeployedProcessVersions("visitPlanning").getFirst();
+        String processId = sampleDataManager.getDeployedProcessVersions("visitPlanning").get(0);
 
         //when
         long instancesCount = processInstanceService.getCountByProcessDefinitionId(processId);

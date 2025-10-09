@@ -97,7 +97,7 @@ public class Camunda7UserTaskFindAllTest extends AbstractCamunda7IntegrationTest
                 .deploy("test_support/testUserTaskWithAssignee.bpmn")
                 .startByKey("userTaskWithoutAssignee");
 
-        RuntimeUserTaskDto task = camundaRestTestHelper.getRuntimeUserTasks(camunda7).getFirst();
+        RuntimeUserTaskDto task = camundaRestTestHelper.getRuntimeUserTasks(camunda7).get(0);
 
         camundaRestTestHelper.completeTaskById(camunda7, task.getId());
 

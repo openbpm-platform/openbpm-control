@@ -55,7 +55,7 @@ public class Camunda7JobServiceTest extends AbstractCamunda7IntegrationTest {
                 .deploy("test_support/testJobRetriesUpdate.bpmn")
                 .startByKey("testJobRetriesUpdate");
 
-        JobDto sourceJobDto = camundaRestTestHelper.getJobsByProcessKey(camunda7, "testJobRetriesUpdate").getFirst();
+        JobDto sourceJobDto = camundaRestTestHelper.getJobsByProcessKey(camunda7, "testJobRetriesUpdate").get(0);
         String jobId = sourceJobDto.getId();
 
         //when
@@ -101,7 +101,7 @@ public class Camunda7JobServiceTest extends AbstractCamunda7IntegrationTest {
                 .deploy("test_support/testTimerJob.bpmn")
                 .startByKey("testTimerJob");
 
-        JobDto sourceJobDto = camundaRestTestHelper.getJobsByProcessKey(camunda7, "testTimerJob").getFirst();
+        JobDto sourceJobDto = camundaRestTestHelper.getJobsByProcessKey(camunda7, "testTimerJob").get(0);
         String jobDefinitionId = sourceJobDto.getJobDefinitionId();
 
         //when
@@ -138,7 +138,7 @@ public class Camunda7JobServiceTest extends AbstractCamunda7IntegrationTest {
                 .deploy("test_support/testTimerJob.bpmn")
                 .startByKey("testTimerJob", 2);
 
-        String instanceId = sampleDataManager.getStartedInstances("testTimerJob").getFirst();
+        String instanceId = sampleDataManager.getStartedInstances("testTimerJob").get(0);
 
         JobFilter jobFilter = dataManager.create(JobFilter.class);
         jobFilter.setProcessInstanceId(instanceId);
@@ -161,7 +161,7 @@ public class Camunda7JobServiceTest extends AbstractCamunda7IntegrationTest {
                 .waitJobsExecution();
 
         List<String> instanceIds = sampleDataManager.getStartedInstances("testFailedJobIncident");
-        JobDto failedJob = camundaRestTestHelper.getFailedJobs(camunda7, instanceIds).getFirst();
+        JobDto failedJob = camundaRestTestHelper.getFailedJobs(camunda7, instanceIds).get(0);
 
         //when
         String errorDetails = jobService.getErrorDetails(failedJob.getId());
@@ -180,7 +180,7 @@ public class Camunda7JobServiceTest extends AbstractCamunda7IntegrationTest {
                 .deploy("test_support/testTimerJob.bpmn")
                 .startByKey("testTimerJob");
 
-        String jobId = camundaRestTestHelper.getJobIdsByProcessKey(camunda7, "testTimerJob").getFirst();
+        String jobId = camundaRestTestHelper.getJobIdsByProcessKey(camunda7, "testTimerJob").get(0);
 
         //when
         String errorDetails = jobService.getErrorDetails(jobId);
@@ -201,7 +201,7 @@ public class Camunda7JobServiceTest extends AbstractCamunda7IntegrationTest {
                 .waitJobsExecution();
 
         List<String> instanceIds = sampleDataManager.getStartedInstances("testFailedJobIncident");
-        JobDto failedJob = camundaRestTestHelper.getFailedJobs(camunda7, instanceIds).getFirst();
+        JobDto failedJob = camundaRestTestHelper.getFailedJobs(camunda7, instanceIds).get(0);
 
         //when
         String errorDetails = jobService.getHistoryErrorDetails(failedJob.getId());
@@ -224,7 +224,7 @@ public class Camunda7JobServiceTest extends AbstractCamunda7IntegrationTest {
                 .waitJobsExecution();
 
         List<String> instanceIds = sampleDataManager.getStartedInstances("testResolvedFailedJobIncident");
-        List<HistoricIncidentDto> incidents = camundaRestTestHelper.findHistoricIncidentsByInstanceId(camunda7, instanceIds.getFirst());
+        List<HistoricIncidentDto> incidents = camundaRestTestHelper.findHistoricIncidentsByInstanceId(camunda7, instanceIds.get(0));
 
         String jobId = null;
 
