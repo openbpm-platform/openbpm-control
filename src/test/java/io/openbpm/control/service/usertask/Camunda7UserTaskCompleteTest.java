@@ -69,7 +69,7 @@ public class Camunda7UserTaskCompleteTest extends AbstractCamunda7IntegrationTes
         camundaSampleDataManager.deploy("test_support/testUserTaskWithoutAssignee.bpmn")
                 .startByKey("userTaskWithoutAssignee");
 
-        RuntimeUserTaskDto userTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "userTaskWithoutAssignee").getFirst();
+        RuntimeUserTaskDto userTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "userTaskWithoutAssignee").get(0);
 
         String taskId = userTask.getId();
 
@@ -95,7 +95,7 @@ public class Camunda7UserTaskCompleteTest extends AbstractCamunda7IntegrationTes
         camundaSampleDataManager.deploy("test_support/testUserTaskVariable.bpmn")
                 .startByKey("testUserTaskVariable");
 
-        RuntimeUserTaskDto userTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "testUserTaskVariable").getFirst();
+        RuntimeUserTaskDto userTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "testUserTaskVariable").get(0);
 
         String taskId = userTask.getId();
         VariableInstanceData variableInstance = createVariableInstance("myVar", variableType, variableValue);
@@ -126,7 +126,7 @@ public class Camunda7UserTaskCompleteTest extends AbstractCamunda7IntegrationTes
         camundaSampleDataManager.deploy("test_support/testUserTaskVariable.bpmn")
                 .startByKey("testUserTaskVariable");
 
-        RuntimeUserTaskDto userTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "testUserTaskVariable").getFirst();
+        RuntimeUserTaskDto userTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "testUserTaskVariable").get(0);
 
         String taskId = userTask.getId();
         VariableInstanceData variableInstance = createVariableInstance("myInvalidVar", variableType, variableValue);
@@ -153,7 +153,7 @@ public class Camunda7UserTaskCompleteTest extends AbstractCamunda7IntegrationTes
         camundaSampleDataManager.deploy("test_support/testUserTaskVariable.bpmn")
                 .startByKey("testUserTaskVariable");
 
-        RuntimeUserTaskDto userTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "testUserTaskVariable").getFirst();
+        RuntimeUserTaskDto userTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "testUserTaskVariable").get(0);
 
         String taskId = userTask.getId();
         VariableInstanceData variableInstance = createVariableInstance("myNullVar", variableType, null);
@@ -183,7 +183,7 @@ public class Camunda7UserTaskCompleteTest extends AbstractCamunda7IntegrationTes
         camundaSampleDataManager.deploy("test_support/testUserTaskVariable.bpmn")
                 .startByKey("testUserTaskVariable");
 
-        RuntimeUserTaskDto userTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "testUserTaskVariable").getFirst();
+        RuntimeUserTaskDto userTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "testUserTaskVariable").get(0);
 
         String taskId = userTask.getId();
         VariableInstanceData variableInstance = createVariableInstance("myVar", "Short", Short.MAX_VALUE);
@@ -215,7 +215,7 @@ public class Camunda7UserTaskCompleteTest extends AbstractCamunda7IntegrationTes
         camundaSampleDataManager.deploy("test_support/testUserTaskVariable.bpmn")
                 .startByKey("testUserTaskVariable");
 
-        RuntimeUserTaskDto userTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "testUserTaskVariable").getFirst();
+        RuntimeUserTaskDto userTask = camundaRestTestHelper.findRuntimeUserTasksByProcessKey(camunda7, "testUserTaskVariable").get(0);
 
         String taskId = userTask.getId();
         Instant date = LocalDateTime.of(2025, 1, 12, 12, 0, 0).toInstant(ZoneOffset.UTC);
@@ -246,10 +246,10 @@ public class Camunda7UserTaskCompleteTest extends AbstractCamunda7IntegrationTes
         camundaSampleDataManager.deploy("test_support/testUserTaskWithoutAssignee.bpmn")
                 .startByKey("userTaskWithoutAssignee");
 
-        RuntimeProcessInstanceDto processInstance = camundaRestTestHelper.getRuntimeInstancesByKey(camunda7, "userTaskWithoutAssignee").getFirst();
+        RuntimeProcessInstanceDto processInstance = camundaRestTestHelper.getRuntimeInstancesByKey(camunda7, "userTaskWithoutAssignee").get(0);
         camundaRestTestHelper.suspendInstanceById(camunda7, processInstance.getId());
 
-        RuntimeUserTaskDto suspendedUserTask = camundaRestTestHelper.findRuntimeUserTasks(camunda7, processInstance.getId()).getFirst();
+        RuntimeUserTaskDto suspendedUserTask = camundaRestTestHelper.findRuntimeUserTasks(camunda7, processInstance.getId()).get(0);
         String suspendedTaskId = suspendedUserTask.getId();
 
         //when and then

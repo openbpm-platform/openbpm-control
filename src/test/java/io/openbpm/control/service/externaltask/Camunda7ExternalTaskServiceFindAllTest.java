@@ -108,7 +108,7 @@ public class Camunda7ExternalTaskServiceFindAllTest extends AbstractCamunda7Inte
                 .deploy("test_support/testExternalTasksListLoad.bpmn")
                 .startByKey("testExternalTasksListLoad", 2);
 
-        String instanceId = sampleDataManager.getStartedInstances("testExternalTasksListLoad").getFirst();
+        String instanceId = sampleDataManager.getStartedInstances("testExternalTasksListLoad").get(0);
 
         ExternalTaskFilter filter = dataManager.create(ExternalTaskFilter.class);
         filter.setProcessInstanceId(instanceId);

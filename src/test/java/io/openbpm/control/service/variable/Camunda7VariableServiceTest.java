@@ -65,7 +65,7 @@ public class Camunda7VariableServiceTest extends AbstractCamunda7IntegrationTest
                 .deploy("test_support/testUpdateVariable.bpmn")
                 .startByKey("testUpdateVariable", startProcessDto);
 
-        String processInstanceId = camundaSampleDataManager.getStartedInstances("testUpdateVariable").getFirst();
+        String processInstanceId = camundaSampleDataManager.getStartedInstances("testUpdateVariable").get(0);
 
         VariableInstanceData variableInstanceData = dataManager.create(VariableInstanceData.class);
         variableInstanceData.setName("myVariable");
@@ -101,7 +101,7 @@ public class Camunda7VariableServiceTest extends AbstractCamunda7IntegrationTest
                 .deploy("test_support/testUpdateVariable.bpmn")
                 .startByKey("testUpdateVariable");
 
-        String processInstanceId = camundaSampleDataManager.getStartedInstances("testUpdateVariable").getFirst();
+        String processInstanceId = camundaSampleDataManager.getStartedInstances("testUpdateVariable").get(0);
 
         VariableInstanceData variableInstanceData = dataManager.create(VariableInstanceData.class);
         variableInstanceData.setName("myNewVariable");

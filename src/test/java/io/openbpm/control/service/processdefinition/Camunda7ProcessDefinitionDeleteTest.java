@@ -51,7 +51,7 @@ public class Camunda7ProcessDefinitionDeleteTest extends AbstractCamunda7Integra
                 .deploy("test_support/vacationApproval.bpmn")
                 .startByKey("vacation_approval");
 
-        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").getFirst();
+        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").get(0);
 
         //when and then
         assertThatThrownBy(() -> {
@@ -74,7 +74,7 @@ public class Camunda7ProcessDefinitionDeleteTest extends AbstractCamunda7Integra
                 .deploy("test_support/vacationApproval.bpmn")
                 .startByKey("vacation_approval");
 
-        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").getFirst();
+        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").get(0);
 
         //when and then
         processDefinitionService.deleteById(processVersionId, true);

@@ -49,7 +49,7 @@ public class Camunda7ProcessInstanceSuspendTest extends AbstractCamunda7Integrat
                 .deploy("test_support/testVisitPlanningV1.bpmn")
                 .startByKey("visitPlanning");
 
-        String instanceId = sampleDataManager.getStartedInstances("visitPlanning").getFirst();
+        String instanceId = sampleDataManager.getStartedInstances("visitPlanning").get(0);
 
         //when
         processInstanceService.suspendById(instanceId);
@@ -68,7 +68,7 @@ public class Camunda7ProcessInstanceSuspendTest extends AbstractCamunda7Integrat
                 .deploy("test_support/testVisitPlanningV1.bpmn")
                 .startByKey("visitPlanning", 5);
 
-        String processId = sampleDataManager.getDeployedProcessVersions("visitPlanning").getFirst();
+        String processId = sampleDataManager.getDeployedProcessVersions("visitPlanning").get(0);
         List<String> activeInstanceIds = camundaRestTestHelper.getActiveInstancesByProcessId(camunda7, processId);
 
         //when

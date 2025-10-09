@@ -53,7 +53,7 @@ public class Camunda7IncidentServiceTest extends AbstractCamunda7IntegrationTest
                 .startByKey("testMultipleFailedJobIncidents")
                 .waitJobsExecution();
 
-        String instanceId = camundaRestTestHelper.getActiveRuntimeInstancesByKey(camunda7, "testMultipleFailedJobIncidents").getFirst();
+        String instanceId = camundaRestTestHelper.getActiveRuntimeInstancesByKey(camunda7, "testMultipleFailedJobIncidents").get(0);
 
         //when+
         List<ActivityIncidentData> activityIncidents = incidentService.findRuntimeIncidents(instanceId);
@@ -76,9 +76,9 @@ public class Camunda7IncidentServiceTest extends AbstractCamunda7IntegrationTest
                 .startByKey("testFailedJobIncident")
                 .waitJobsExecution();
 
-        String instanceId = camundaRestTestHelper.getActiveRuntimeInstancesByKey(camunda7, "testFailedJobIncident").getFirst();
+        String instanceId = camundaRestTestHelper.getActiveRuntimeInstancesByKey(camunda7, "testFailedJobIncident").get(0);
 
-        RuntimeIncidentDto sourceIncident = camundaRestTestHelper.findRuntimeIncidentsByInstanceId(camunda7, instanceId).getFirst();
+        RuntimeIncidentDto sourceIncident = camundaRestTestHelper.findRuntimeIncidentsByInstanceId(camunda7, instanceId).get(0);
 
         //when
         IncidentData foundIncident = incidentService.findRuntimeIncidentById(sourceIncident.getId());
@@ -111,8 +111,8 @@ public class Camunda7IncidentServiceTest extends AbstractCamunda7IntegrationTest
                 .retryFailedJobs()
                 .waitJobsExecution();
 
-        String instanceId = camundaRestTestHelper.getHistoricInstancesByKey(camunda7, "testResolvedFailedJobIncident").getFirst();
-        HistoricIncidentDto sourceIncident = camundaRestTestHelper.findHistoricIncidentsByInstanceId(camunda7, instanceId).getFirst();
+        String instanceId = camundaRestTestHelper.getHistoricInstancesByKey(camunda7, "testResolvedFailedJobIncident").get(0);
+        HistoricIncidentDto sourceIncident = camundaRestTestHelper.findHistoricIncidentsByInstanceId(camunda7, instanceId).get(0);
 
         //when
         HistoricIncidentData foundIncident = incidentService.findHistoricIncidentById(sourceIncident.getId());
@@ -147,8 +147,8 @@ public class Camunda7IncidentServiceTest extends AbstractCamunda7IntegrationTest
                 .startByKey("testFailedJobIncident")
                 .waitJobsExecution();
 
-        String instanceId = camundaRestTestHelper.getHistoricInstancesByKey(camunda7, "testFailedJobIncident").getFirst();
-        HistoricIncidentDto sourceIncident = camundaRestTestHelper.findHistoricIncidentsByInstanceId(camunda7, instanceId).getFirst();
+        String instanceId = camundaRestTestHelper.getHistoricInstancesByKey(camunda7, "testFailedJobIncident").get(0);
+        HistoricIncidentDto sourceIncident = camundaRestTestHelper.findHistoricIncidentsByInstanceId(camunda7, instanceId).get(0);
 
         //when
         HistoricIncidentData foundIncident = incidentService.findHistoricIncidentById(sourceIncident.getId());

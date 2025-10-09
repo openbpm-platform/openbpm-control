@@ -48,7 +48,7 @@ public class Camunda7ProcessDefinitionActivateTest extends AbstractCamunda7Integ
         CamundaSampleDataManager sampleDataManager = applicationContext.getBean(CamundaSampleDataManager.class, camunda7)
                 .deploy("test_support/vacationApproval.bpmn");
 
-        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").getFirst();
+        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").get(0);
         camundaRestTestHelper.suspendProcessById(camunda7, "vacation_approval", processVersionId, true);
         ProcessDefinitionDto suspendedProcess = camundaRestTestHelper.getProcessById(camunda7, processVersionId);
 
@@ -71,11 +71,11 @@ public class Camunda7ProcessDefinitionActivateTest extends AbstractCamunda7Integ
                 .deploy("test_support/vacationApproval.bpmn")
                 .startByKey("vacation_approval");
 
-        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").getFirst();
+        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").get(0);
         camundaRestTestHelper.suspendProcessById(camunda7, "vacation_approval", processVersionId, true);
 
         ProcessDefinitionDto suspendedProcess = camundaRestTestHelper.getProcessById(camunda7, processVersionId);
-        RuntimeProcessInstanceDto suspendedInstance = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processVersionId).getFirst();
+        RuntimeProcessInstanceDto suspendedInstance = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processVersionId).get(0);
 
         //when
         processDefinitionService.activateById(processVersionId, true);
@@ -106,11 +106,11 @@ public class Camunda7ProcessDefinitionActivateTest extends AbstractCamunda7Integ
                 .deploy("test_support/vacationApproval.bpmn")
                 .startByKey("vacation_approval");
 
-        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").getFirst();
+        String processVersionId = sampleDataManager.getDeployedProcessVersions("vacation_approval").get(0);
         camundaRestTestHelper.suspendProcessById(camunda7, "vacation_approval", processVersionId, true);
 
         ProcessDefinitionDto suspendedProcess = camundaRestTestHelper.getProcessById(camunda7, processVersionId);
-        RuntimeProcessInstanceDto suspendedInstance = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processVersionId).getFirst();
+        RuntimeProcessInstanceDto suspendedInstance = camundaRestTestHelper.getRuntimeInstancesById(camunda7, processVersionId).get(0);
 
         //when
         processDefinitionService.activateById(processVersionId, false);
