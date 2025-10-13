@@ -22,14 +22,13 @@ import io.openbpm.control.entity.processinstance.ProcessInstanceState;
 import io.openbpm.control.view.processinstance.filter.ProcessInstanceStateHeaderFilter;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.IntStream;
 
 public class ProcessInstanceListParamBinder extends AbstractUrlQueryParametersBinder {
 
     private static final String MODE_URL_PARAM = "mode";
+    private static final String FIRST_RESULT_PARAM = "firstResult";
 
     private final InstanceContainer<ProcessInstanceFilter> filterDc;
     private final CollectionLoader<ProcessInstanceData> processInstanceDl;
@@ -80,6 +79,12 @@ public class ProcessInstanceListParamBinder extends AbstractUrlQueryParametersBi
         updateButtons(activeButtonIdx);
 
         ProcessInstanceViewMode mode = ProcessInstanceViewMode.values()[activeButtonIdx];
+
+        processInstanceDl.setFirstResult(0);
+
+        Map<String, List<String>> params = new HashMap<>();
+        params.put(MODE_URL_PARAM, Collections.singletonList(mode.getId()));
+        params.put(FIRST_RESULT_PARAM, Collections.singletonList("0"));
 
         loadInstances(mode);
 
