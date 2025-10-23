@@ -109,7 +109,11 @@ dependencies {
     annotationProcessor "org.mapstruct:mapstruct-processor"
 
     // Database drivers
+    runtimeOnly 'org.hsqldb:hsqldb'
     runtimeOnly 'org.postgresql:postgresql'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
+    runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 
     // test: Spring
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
