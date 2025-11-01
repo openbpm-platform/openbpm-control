@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://bpmEngineListView.title"
+      focusComponent="bpmEnginesDataGrid">
+    <data>
+        <collection id="bpmEnginesDc"
+                    class="io.flowset.control.entity.engine.BpmEngine">
+            <fetchPlan extends="_base"/>
+            <loader id="bpmEnginesDl" readOnly="true">
+                <query>
+                    <![CDATA[select e from BpmEngine e]]>
+                </query>
+            </loader>
+        </collection>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+        <urlQueryParameters>
+            <pagination component="pagination"/>
+        </urlQueryParameters>
+    </facets>
+    <actions>
+        <action id="selectAction" type="lookup_select"/>
+        <action id="discardAction" type="lookup_discard"/>
+    </actions>
+    <layout>
+        <hbox id="buttonsPanel" classNames="buttons-panel">
+            <button id="refreshButton" action="bpmEnginesDataGrid.refresh" themeNames="success primary"/>
+            <button id="createButton" action="bpmEnginesDataGrid.create"/>
+            <button id="removeButton" action="bpmEnginesDataGrid.remove"/>
+            <simplePagination id="pagination" dataLoader="bpmEnginesDl"/>
+        </hbox>
+        <dataGrid id="bpmEnginesDataGrid"
+                  width="100%"
+                  minHeight="20em" selectionMode="MULTI"
+                  dataContainer="bpmEnginesDc"
+                  columnReorderingAllowed="true">
+            <actions>
+                <action id="refresh" type="list_refresh"/>
+                <action id="create" type="list_create"/>
+                <action id="remove" type="list_remove"/>
+                <action id="edit" type="list_edit" visible="false"/>
+            </actions>
+            <columns resizable="true">
+                <column property="name">
+                    <fragmentRenderer class="io.flowset.control.view.bpmengine.BpmEngineNameColumnFragment"/>
+                </column>
+                <column property="baseUrl" autoWidth="true"/>
+                <column property="type" autoWidth="true"/>
+               <column key="actions" sortable="false" autoWidth="true" flexGrow="0"/>
+            </columns>
+        </dataGrid>
+        <hbox id="lookupActions" visible="false">
+            <button id="selectButton" action="selectAction"/>
+            <button id="discardButton" action="discardAction"/>
+        </hbox>
+    </layout>
+</view>

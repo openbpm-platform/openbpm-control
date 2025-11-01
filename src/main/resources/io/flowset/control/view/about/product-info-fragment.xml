@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fragment xmlns="http://jmix.io/schema/flowui/fragment">
+    <content>
+        <vbox id="root" padding="false" themeNames="spacing-s">
+            <span id="nameLabel" classNames="font-bold"/>
+            <span id="descriptionLabel" classNames="text-secondary"/>
+            <fragment id="learnMoreLink" class="io.flowset.control.view.about.ExternalLinkFragment"/>
+        </vbox>
+    </content>
+</fragment>

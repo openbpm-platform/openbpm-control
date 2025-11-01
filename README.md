@@ -1,4 +1,4 @@
-**OpenBPM Control** is a web application that provides administrative functionality for external BPM engines.
+**Flowset Control** is a web application that provides administrative functionality for external BPM engines.
 
 **Key Features**
 - **Connection Management:** Easily set up connections to various BPM engines and switch between them as needed.
@@ -10,7 +10,7 @@
 > [!NOTE]
 > Currently, only Camunda 7 is supported. 
 
-OpenBPM Control is built using the open-source [Jmix](https://www.jmix.io) framework.
+Flowset Control is built using the open-source [Jmix](https://www.jmix.io) framework.
 
 ## Table of Contents
 
@@ -32,10 +32,10 @@ OpenBPM Control is built using the open-source [Jmix](https://www.jmix.io) frame
 
 ## Running the Application <a name="running-the-application"></a>
 
-You can run OpenBPM Control using either a Docker image or from source code.
+You can run Flowset Control using either a Docker image or from source code.
 
 ### Docker Image <a name="docker-image"></a>
-This method allows running OpenBPM Control with a pre-built Docker image.
+This method allows running Flowset Control with a pre-built Docker image.
 
 **Prerequisites:**
 
@@ -46,7 +46,7 @@ You must have the following installed:
 Instructions can be found [here](docker-compose/README.md).
 
 ### Using Sources <a name="using-sources"></a>
-This method allows building and running OpenBPM Control locally with Gradle.
+This method allows building and running Flowset Control locally with Gradle.
 
 **Prerequisites:**
 
@@ -59,12 +59,12 @@ You must have the following installed:
 
 1. Clone the repository:
     ```shell
-     git clone https://github.com/openbpm-platform/openbpm-control
+     git clone https://github.com/flowset-platform/flowset-control
     ```
 2. Configure a PostgreSQL database.
-   OpenBPM Control stores data such as connections to BPM engines in the database. 
-   OpenBPM Control requires a PostgreSQL database by default:
-   - Name: `openbpm-control`
+   Flowset Control stores data such as connections to BPM engines in the database. 
+   Flowset Control requires a PostgreSQL database by default:
+   - Name: `flowset-control`
    - Connection username: `root`
    - Connection password: `root`
 3. Navigate to the cloned project directory and open a terminal.
@@ -75,7 +75,7 @@ You must have the following installed:
 The application is now running at http://localhost:8081 in the browser.
 
 ## Usage <a name="usage"></a>
-OpenBPM Control requires authenticated access. An administrative user with the credentials `admin/admin` is provided 
+Flowset Control requires authenticated access. An administrative user with the credentials `admin/admin` is provided 
 from the start. To add more users, see the [Configuring Users](#configuring-users) section.
 
 ### Connecting to BPM Engines <a name="connecting-to-bpm-engines"></a>
@@ -94,7 +94,7 @@ To add a connection to a running BPM engine, follow these steps:
 
 You can configure as many connections as needed.
 
-In the upper right corner, you can see which engine OpenBPM Control is currently connected to.
+In the upper right corner, you can see which engine Flowset Control is currently connected to.
 
 ![engine-state.png](img/engine-state.png)
 
@@ -174,12 +174,12 @@ In addition to viewing, you can also increase the number of retries for incident
 ![incident-list-view.png](img/incident-list-view.png)
 
 ### Configuring Users <a name="configuring-users"></a>
-OpenBPM Control stores users in the `USER_` table in the configured database.
+Flowset Control stores users in the `USER_` table in the configured database.
 
 #### Adding Users <a name="add-a-user"></a>
 
 To add a new user, follow these steps:
-1. Log in to OpenBPM Control with administrator credentials (by default, `admin/admin`).
+1. Log in to Flowset Control with administrator credentials (by default, `admin/admin`).
 2. In the menu, go to **Security** -> **Users** and then click the **Create** button.
 
 ![user-list-view.png](img/user-list-view.png)
@@ -205,7 +205,7 @@ To grant permissions to a user, follow these steps:
 
 ![role-assignments-view_2.png](img/role-assignments-view_2.png)
 
-The user can now log in to OpenBPM Control and use all the functionality.
+The user can now log in to Flowset Control and use all the functionality.
 
 ## Running the Tests <a name="running-the-tests"></a>
 
@@ -215,10 +215,10 @@ You must have the following installed:
 
 1. Docker
 
-OpenBPM Control tests use [Testcontainers](https://testcontainers.com/) to run database and BPM engine containers.
+Flowset Control tests use [Testcontainers](https://testcontainers.com/) to run database and BPM engine containers.
 and do not require a pre-prepared running instances for them.
 
-To run all tests in OpenBPM Control, use the following command:
+To run all tests in Flowset Control, use the following command:
 
 ```shell
 .\gradlew test
@@ -231,12 +231,12 @@ profile.
 
 When the `test-engine` profile is enabled as the active profile, the following application properties become available:
 
-1. `openbpm.control.testing.engine.type` - a type of BPM engine. Supported values: `camunda_7`. Default value:
+1. `flowset.control.testing.engine.type` - a type of BPM engine. Supported values: `camunda_7`. Default value:
    `camunda_7`.
-2. `openbpm.control.testing.engine.docker-image` - the full docker image of the BPM engine. Supported
+2. `flowset.control.testing.engine.docker-image` - the full docker image of the BPM engine. Supported
    values: [Camunda Run docker images](https://hub.docker.com/r/camunda/camunda-bpm-platform/tags?name=run).
    Default value: `camunda/camunda-bpm-platform:run-7.22.0`
-3. `openbpm.control.testing.engine.auth-type` - an authentication type for the BPM engine used in the tests. Supported values:
+3. `flowset.control.testing.engine.auth-type` - an authentication type for the BPM engine used in the tests. Supported values:
    `Basic`. Default value: null.
 
 You can pass the values of these properties as environment variables or by using the `-P` prefix in the Gradle task command.
@@ -246,7 +246,7 @@ You can pass the values of these properties as environment variables or by using
 Using environment variable:
 
 ```shell
-  SPRING_PROFILES_INCLUDE=test-engine;OPENBPM_CONTROL_TESTING_ENGINE_DOCKER_IMAGE=camunda/camunda-bpm-platform:run-7.21.0 .\gradlew test
+  SPRING_PROFILES_INCLUDE=test-engine;FLOWSET_CONTROL_TESTING_ENGINE_DOCKER_IMAGE=camunda/camunda-bpm-platform:run-7.21.0 .\gradlew test
 ```
 
 Using Gradle command properties:
@@ -260,7 +260,7 @@ Using Gradle command properties:
 Using environment variable:
 
 ```shell
-  SPRING_PROFILES_INCLUDE=test-engine;OPENBPM_CONTROL_TESTING_ENGINE_AUTH_TYPE=Basic .\gradlew test
+  SPRING_PROFILES_INCLUDE=test-engine;FLOWSET_CONTROL_TESTING_ENGINE_AUTH_TYPE=Basic .\gradlew test
 ```
 
 Using Gradle command properties:
@@ -270,4 +270,4 @@ Using Gradle command properties:
 ```
 
 ## License <a name="license"></a>
-OpenBPM Control is an open-source project distributed under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license. 
+Flowset Control is an open-source project distributed under the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license. 

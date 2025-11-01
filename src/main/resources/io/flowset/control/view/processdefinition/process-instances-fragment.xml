@@ -1,0 +1,42 @@
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<fragment xmlns="http://jmix.io/schema/flowui/fragment">
+    <data>
+        <instance id="processDefinitionDataDc" class="io.flowset.control.entity.processdefinition.ProcessDefinitionData" provided="true"/>
+        <collection id="processInstanceDataDc"
+                    class="io.flowset.control.entity.processinstance.RuntimeProcessInstanceData" provided="true"/>
+        <instance id="processInstanceFilterDc" class="io.flowset.control.entity.filter.ProcessInstanceFilter" provided="true"/>
+    </data>
+    <content>
+        <vbox id="processInstanceVBox" width="100%" height="100%" themeNames="spacing-xs" padding="false">
+            <hbox id="processInstancesButtons" classNames="buttons-panel" alignItems="BASELINE">
+                <button id="refreshProcessInstanceBtn" action="processInstancesGrid.refresh"
+                        themeNames="small success primary"/>
+                <div id="selectedActivityContainer"/>
+                <simplePagination id="processInstancesPagination" />
+            </hbox>
+            <dataGrid id="processInstancesGrid" dataContainer="processInstanceDataDc" themeNames="compact"
+                      width="100%" height="100%">
+                <actions>
+                    <action id="edit" type="list_edit"
+                            text="msg://viewProcessInstance" icon="EYE"/>
+                    <action id="refresh" type="list_refresh"/>
+                </actions>
+                <columns resizable="true">
+                    <column property="id" autoWidth="true" flexGrow="1">
+                        <fragmentRenderer class="io.flowset.control.view.processinstance.column.instanceid.InstanceIdColumnFragment"/>
+                    </column>
+                    <column property="businessKey" autoWidth="true" flexGrow="2"/>
+                    <column key="state" header="msg://processInstance.state" autoWidth="true" flexGrow="1"
+                            sortable="false">
+                        <fragmentRenderer class="io.flowset.control.view.processinstance.column.state.ProcessInstanceStateColumnFragment"/>
+                    </column>
+                    <column key="actions" sortable="false" flexGrow="0" autoWidth="true"/>
+                </columns>
+            </dataGrid>
+        </vbox>
+    </content>
+</fragment>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<mainView xmlns="http://jmix.io/schema/flowui/main-view"
+          title="msg://MainView.title">
+    <data>
+        <instance id="engineConnectionStatusDc" class="io.flowset.control.entity.EngineConnectionCheckResult"/>
+        <instance id="selectedEngineDc" class="io.flowset.control.entity.engine.BpmEngine"/>
+    </data>
+    <facets>
+        <timer id="connectionCheckTimer" delay="10000" repeating="true" autostart="false"/>
+    </facets>
+    <appLayout>
+        <navigationBar>
+            <header id="header" classNames="jmix-main-view-header">
+                <drawerToggle id="drawerToggle"
+                              classNames="jmix-main-view-drawer-toggle"
+                              themeNames="contrast"
+                              ariaLabel="msg://drawerToggle.ariaLabel"/>
+                <h1 id="viewTitle" classNames="jmix-main-view-title"/>
+                <div id="viewTitleDiv">
+
+                </div>
+            </header>
+        </navigationBar>
+        <drawerLayout>
+            <section id="section" classNames="jmix-main-view-section">
+                <hbox padding="false" themeNames="spacing-s" width="100%" alignItems="CENTER" classNames="pr-s border-b border-contrast-10">
+                    <h2 id="applicationTitle"
+                        classNames="jmix-main-view-application-title">
+                        <anchor id="baseLink"
+                                href="."
+                                text="msg://applicationTitle.text"
+                                classNames="jmix-main-view-application-title-base-link flex gap-xs items-center"/>
+                    </h2>
+                </hbox>
+                <nav id="navigation"
+                     classNames="jmix-main-view-navigation"
+                     ariaLabel="msg://navigation.ariaLabel">
+                    <listMenu id="menu" themeNames="toggle-reverse"/>
+                </nav>
+                <footer id="footer" classNames="jmix-main-view-footer">
+                    <fragment id="userIndicator" class="io.flowset.control.view.main.UserIndicatorFragment"/>
+                </footer>
+            </section>
+        </drawerLayout>
+        <initialLayout id="initialLayout" width="100%" height="auto" minHeight="100%"
+                       classNames="dashboard-root-container pb-m">
+
+        </initialLayout>
+    </appLayout>
+</mainView>

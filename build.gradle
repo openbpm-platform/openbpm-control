@@ -21,7 +21,7 @@ jmix {
     bomVersion = '2.6.1'
 }
 
-group = 'io.openbpm'
+group = 'io.flowset'
 version = '1.1.999-SNAPSHOT'
 
 java {
@@ -39,27 +39,27 @@ repositories {
         url 'https://maven.vaadin.com/vaadin-addons'
     }
 
-    if (project.hasProperty('openbpmRepoUrl')) {
+    if (project.hasProperty('flowsetRepoUrl')) {
         maven {
-            url = rootProject['openbpmRepoUrl']
+            url = rootProject['flowsetRepoUrl']
             credentials {
-                username rootProject['openbpmRepoUser']
-                password rootProject['openbpmRepoPassword']
+                username rootProject['flowsetRepoUser']
+                password rootProject['flowsetRepoPassword']
             }
             allowInsecureProtocol = true
         }
     } else {
-        maven {
-            url 'https://nexus.openbpm.io/repository/public'
+         maven {
+            url 'https://nexus.flowset.io/repository/public'
         }
     }
 }
 
 dependencies {
-    // OpenBPM
-    implementation(platform("io.openbpm.bom:openbpm-bom:$bomVersion"))
-    implementation 'io.openbpm.ui:openbpm-theme'
-    implementation 'io.openbpm.ui:openbpm-ui-kit-starter'
+    // Flowset
+    implementation(platform("io.flowset.bom:flowset-bom:$bomVersion"))
+    implementation 'io.flowset.ui:flowset-theme'
+    implementation 'io.flowset.ui:flowset-ui-kit-starter'
 
     // Jmix
     implementation 'io.jmix.core:jmix-core-starter'
@@ -104,7 +104,7 @@ dependencies {
     implementation "org.mapstruct:mapstruct:"
     implementation "org.projectlombok:lombok"
 
-    annotationProcessor platform("io.openbpm.bom:openbpm-bom:$bomVersion")
+    annotationProcessor platform("io.flowset.bom:flowset-bom:$bomVersion")
     annotationProcessor "org.projectlombok:lombok"
     annotationProcessor "org.mapstruct:mapstruct-processor"
 
@@ -125,7 +125,7 @@ dependencies {
 
     // test: processors
     testCompileOnly "org.projectlombok:lombok"
-    testAnnotationProcessor platform("io.openbpm.bom:openbpm-bom:$bomVersion")
+    testAnnotationProcessor platform("io.flowset.bom:flowset-bom:$bomVersion")
     testAnnotationProcessor "org.projectlombok:lombok"
 
     testImplementation 'org.testcontainers:junit-jupiter'

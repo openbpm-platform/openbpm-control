@@ -3,4 +3,4 @@
  * Use is subject to license terms.
  */
 
-rootProject.name = 'openbpm-control'
+rootProject.name = 'flowset-control'

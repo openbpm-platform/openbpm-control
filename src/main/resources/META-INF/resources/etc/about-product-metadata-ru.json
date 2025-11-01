@@ -1,50 +1,40 @@
 {
   "products": [
     {
-      "name": "OpenBPM Studio",
-      "url": "https://openbpm.ru",
+      "name": "Flowset Studio",
+      "url": "https://flowset.io",
       "description": "Плагин для визуального моделирования BPMN-процессов в IntelliJ IDEA",
       "released": true
     },
     {
-      "name": "OpenBPM Workspace (скоро появится)",
-      "url": "https://openbpm.ru",
+      "name": "Flowset Workspace (скоро появится)",
+      "url": "https://flowset.io",
       "description": "Инструмент для визуального создания прототипов систем с бизнес процессами",
       "released": false
     },
     {
-      "name": "OpenBPM TaskList (скоро появится)",
-      "url": "https://openbpm.ru",
+      "name": "Flowset Tasklist (скоро появится)",
+      "url": "https://flowset.io",
       "description": "Open-source веб-приложение для отображения и работы с задачами пользователей",
-      "released": false
-    },
-    {
-      "name": "OpenBPM Engine (скоро появится)",
-      "url": "https://openbpm.ru",
-      "description": "BPM-движок, совместимый по API с Camunda 7",
       "released": false
     }
   ],
   "externalLinks": [
     {
-      "url": "https://openbpm.ru/",
+      "url": "https://flowset.io",
       "label": "Вебсайт"
     },
     {
-      "url": "https://github.com/openbpm-platform/openbpm-control?tab=readme-ov-file#table-of-contents",
-      "label": "Документация OpenBPM Control"
+      "url": "https://github.com/flowset-platform/flowset-control?tab=readme-ov-file#table-of-contents",
+      "label": "Документация Flowset Control"
     },
     {
-      "url": "https://github.com/openbpm-platform/openbpm-control",
-      "label": "Исходный код OpenBPM Control"
+      "url": "https://github.com/flowset-platform/flowset-control",
+      "label": "Исходный код Flowset Control"
     },
     {
-      "url": "https://t.me/openbpm_chat",
+      "url": "https://join.slack.com/t/flowset/shared_invite/zt-31ghauwhi-eaF8kkgtcM091pt4P4HXyA",
       "label": "Поддержка"
-    },
-    {
-      "url": "https://t.me/openbpm",
-      "label": "Телеграм канал"
     }
   ]
 }

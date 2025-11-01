@@ -1,0 +1,189 @@
+/*
+ * Copyright (c) Haulmont 2024. All Rights Reserved.
+ * Use is subject to license terms.
+ */
+
+package io.flowset.control.service.job.impl;
+
+import com.google.common.base.Strings;
+import feign.FeignException;
+import io.jmix.core.Sort;
+import io.flowset.control.entity.filter.JobFilter;
+import io.flowset.control.entity.job.JobData;
+import io.flowset.control.entity.job.JobDefinitionData;
+import io.flowset.control.mapper.JobMapper;
+import io.flowset.control.service.client.EngineRestClient;
+import io.flowset.control.service.job.JobLoadContext;
+import io.flowset.control.service.job.JobService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.camunda.community.rest.client.api.HistoryApiClient;
+import org.camunda.community.rest.client.api.JobApiClient;
+import org.camunda.community.rest.client.api.JobDefinitionApiClient;
+import org.camunda.community.rest.client.model.*;
+import org.springframework.http.ResponseEntity;
+import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static io.flowset.control.util.EngineRestUtils.getCountResult;
+
+@Service("control_JobService")
+@Slf4j
+public class JobServiceImpl implements JobService {
+    protected final JobMapper jobMapper;
+    protected final JobApiClient jobApiClient;
+    protected final JobDefinitionApiClient jobDefinitionApiClient;
+    protected final HistoryApiClient historyApiClient;
+    protected final EngineRestClient engineRestClient;
+
+    public JobServiceImpl(JobMapper jobMapper,
+                          JobApiClient jobApiClient,
+                          JobDefinitionApiClient jobDefinitionApiClient,
+                          HistoryApiClient historyApiClient,
+                          EngineRestClient engineRestClient) {
+        this.jobMapper = jobMapper;
+        this.jobApiClient = jobApiClient;
+        this.jobDefinitionApiClient = jobDefinitionApiClient;
+        this.historyApiClient = historyApiClient;
+        this.engineRestClient = engineRestClient;
+    }
+
+    @Override
+    public List<JobData> findAll(JobLoadContext loadContext) {
+        JobQueryDto jobQueryDto = createJobQueryDto(loadContext.getFilter());
+        jobQueryDto.setSorting(createSortOptions(loadContext.getSort()));
+
+        ResponseEntity<List<JobDto>> jobsResponse = jobApiClient.queryJobs(loadContext.getFirstResult(), loadContext.getMaxResults(),
+                jobQueryDto);
+        if (jobsResponse.getStatusCode().is2xxSuccessful()) {
+            List<JobDto> jobDtoList = jobsResponse.getBody();
+            return CollectionUtils.emptyIfNull(jobDtoList)
+                    .stream()
+                    .map(jobMapper::fromJobDto)
+                    .toList();
+        }
+        log.error("Error on loading runtime jobs: query {}, status code {}", jobQueryDto, jobsResponse.getStatusCode());
+        return List.of();
+    }
+
+    @Override
+    public long getCount(@Nullable JobFilter jobFilter) {
+        JobQueryDto jobQueryDto = createJobQueryDto(jobFilter);
+
+        ResponseEntity<CountResultDto> jobsResponse = jobApiClient.queryJobsCount(jobQueryDto);
+        if (jobsResponse.getStatusCode().is2xxSuccessful()) {
+            return getCountResult(jobsResponse.getBody());
+        }
+        log.error("Error on loading runtime jobs count: query {}, status code {}", jobQueryDto, jobsResponse.getStatusCode());
+        return 0;
+    }
+
+    @Override
+    @Nullable
+    public JobDefinitionData findJobDefinition(String jobDefinitionId) {
+        ResponseEntity<JobDefinitionDto> response = jobDefinitionApiClient.getJobDefinition(jobDefinitionId);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            JobDefinitionDto jobDefinitionDto = response.getBody();
+            return jobDefinitionDto != null ? jobMapper.fromJobDefinitionDto(jobDefinitionDto) : null;
+        }
+        log.error("Error on loading stacktrace for job definition id {}, status code {}", jobDefinitionId, response.getStatusCode());
+        return null;
+    }
+
+    @Override
+    public void setJobRetries(String jobId, int retries) {
+        ResponseEntity<Void> response = jobApiClient.setJobRetries(jobId, new JobRetriesDto().retries(retries));
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            log.error("Error on loading update retries to {} for job with id {}, status code {}", retries,
+                    jobId, response.getStatusCode());
+        } else {
+            log.debug("Update retries count for job {}. New value: {}", jobId, retries);
+        }
+    }
+
+    @Override
+    public void setJobRetriesAsync(List<String> jobIds, int retries) {
+        ResponseEntity<BatchDto> response = jobApiClient.setJobRetriesAsyncOperation(new SetJobRetriesDto()
+                .jobIds(jobIds)
+                .retries(retries));
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            log.error("Error on loading update retries to {} for job with ids {}, status code {}", retries,
+                    jobIds, response.getStatusCode());
+        } else {
+            log.debug("Async update retries count for jobs {}. New value: {}", jobIds, retries);
+        }
+    }
+
+    @Override
+    public String getErrorDetails(String jobId) {
+        ResponseEntity<String> response = engineRestClient.getStacktrace(jobId);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return Strings.nullToEmpty(response.getBody());
+        }
+        return "";
+    }
+
+    @Override
+    public String getHistoryErrorDetails(String jobId) {
+        ResponseEntity<String> response = engineRestClient.getStacktraceHistoricJobLog(jobId);
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return Strings.nullToEmpty(response.getBody());
+        }
+        return "";
+    }
+
+    @Override
+    public boolean isHistoryJobLogPresent(String jobId) {
+        try {
+            ResponseEntity<HistoricJobLogDto> jobLogResponse = historyApiClient.getHistoricJobLog(jobId);
+            return jobLogResponse.getStatusCode().is2xxSuccessful() && jobLogResponse.getBody() != null;
+        } catch (FeignException e) {
+            log.error("Error checking job log presence for jobId: {}, error: ", jobId, e);
+            return false;
+        }
+    }
+
+    protected JobQueryDto createJobQueryDto(JobFilter filter) {
+        JobQueryDto jobQueryDto = new JobQueryDto();
+        if (filter != null) {
+            jobQueryDto.processInstanceId(filter.getProcessInstanceId());
+        }
+
+        return jobQueryDto;
+    }
+
+    @Nullable
+    protected List<JobQueryDtoSortingInner> createSortOptions(Sort sort) {
+        if (sort == null) {
+            return null;
+        }
+        List<JobQueryDtoSortingInner> jobQueryDtoSortingInners = new ArrayList<>();
+        for (Sort.Order order : sort.getOrders()) {
+            JobQueryDtoSortingInner sortOption = new JobQueryDtoSortingInner();
+
+            switch (order.getProperty()) {
+                case "id" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOB_ID);
+                case "retries" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOB_RETRIES);
+                case "dueDate" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOB_DUE_DATE);
+                case "priority" -> sortOption.setSortBy(JobQueryDtoSortingInner.SortByEnum.JOB_PRIORITY);
+                default -> {
+                }
+            }
+
+            if (order.getDirection() == Sort.Direction.ASC) {
+                sortOption.setSortOrder(JobQueryDtoSortingInner.SortOrderEnum.ASC);
+            } else if (order.getDirection() == Sort.Direction.DESC) {
+                sortOption.setSortOrder(JobQueryDtoSortingInner.SortOrderEnum.DESC);
+            }
+            if (sortOption.getSortBy() != null && sortOption.getSortOrder() != null) {
+                jobQueryDtoSortingInners.add(sortOption);
+            }
+        }
+
+        return jobQueryDtoSortingInners;
+    }
+}

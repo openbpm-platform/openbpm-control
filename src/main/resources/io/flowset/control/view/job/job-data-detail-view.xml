@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://jobData.detail.title">
+    <data>
+        <instance id="jobDataDc" class="io.flowset.control.entity.job.JobData"/>
+    </data>
+    <actions>
+        <action id="closeAction" type="detail_discard"/>
+    </actions>
+    <layout>
+        <vbox width="100%" padding="false" spacing="false" height="100%">
+            <formLayout id="form" dataContainer="jobDataDc" width="100%">
+                <textField id="idField" property="jobId" label="msg://jobId" readOnly="true"/>
+                <textField id="activityField" property="jobDefinitionId" label="msg://activity"
+                           readOnly="true"/>
+                <dateTimePicker id="createTimeField" property="createTime" width="AUTO" readOnly="true"/>
+                <dateTimePicker id="dueDateField" property="dueDate" width="AUTO" readOnly="true"/>
+                <textField id="retriesField" property="retries" readOnly="true"/>
+                <textField id="priorityField" property="priority" readOnly="true"/>
+                <textField id="failedActivityIdField" property="failedActivityId" readOnly="true"/>
+                <textField id="jobTypeField" readOnly="true" label="msg://jobType"/>
+            </formLayout>
+            <textArea id="exceptionMessageField" dataContainer="jobDataDc" property="exceptionMessage" minHeight="3.5em"
+                      readOnly="true" width="100%"
+                      label="msg://exceptionMessage"/>
+            <codeEditor id="stackTraceField" label="msg://fullStacktrace" readOnly="true" width="100%" height="100%"
+                        showGutter="false"/>
+        </vbox>
+        <hbox id="editActions" width="100%">
+            <button id="retryBtn" text="msg:///actions.Retry" icon="ROTATE_LEFT" visible="false" themeNames="primary"/>
+            <button action="closeAction" classNames="ml-auto"/>
+        </hbox>
+    </layout>
+</view>

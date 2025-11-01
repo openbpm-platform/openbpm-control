@@ -1,20 +1,20 @@
 {
   "products": [
     {
-      "name": "OpenBPM Studio",
-      "url": "https://plugins.jetbrains.com/plugin/25655-openbpm/",
+      "name": "Flowset Studio",
+      "url": "https://plugins.jetbrains.com/plugin/25655-flowset/",
       "description": "Plugin for visual modeling of BPMN processes in IntelliJ IDEA",
       "released": true
     },
     {
-      "name": "OpenBPM Workspace (coming soon)",
-      "url": "https://openbpm.io",
+      "name": "Flowset Workspace (coming soon)",
+      "url": "https://flowset.io",
       "description": "A visual tool to create a ready-made prototype of a business application",
       "released": false
     },
     {
-      "name": "OpenBPM TaskList (coming soon)",
-      "url": "https://openbpm.io",
+      "name": "Flowset Tasklist (coming soon)",
+      "url": "https://flowset.io",
       "description": "Open-source web application for displaying end-user tasks",
       "released": false
     }
@@ -22,19 +22,19 @@
   "externalLinks": [
     {
       "label": "Website",
-      "url": "https://openbpm.io/"
+      "url": "https://flowset.io/"
     },
     {
-      "label": "OpenBPM Control Documentation",
-      "url": "https://github.com/openbpm-platform/openbpm-control?tab=readme-ov-file#table-of-contents"
+      "label": "Flowset Control Documentation",
+      "url": "https://github.com/flowset-platform/flowset-control?tab=readme-ov-file#table-of-contents"
     },
     {
-      "label": "OpenBPM Control Source code",
-      "url": "https://github.com/openbpm-platform/openbpm-control"
+      "label": "Flowset Control Source code",
+      "url": "https://github.com/flowset-platform/flowset-control"
     },
     {
       "label": "Support",
-      "url": "https://join.slack.com/t/openbpm/shared_invite/zt-31ghauwhi-eaF8kkgtcM091pt4P4HXyA"
+      "url": "https://join.slack.com/t/flowset/shared_invite/zt-31ghauwhi-eaF8kkgtcM091pt4P4HXyA"
     }
   ]
 }
