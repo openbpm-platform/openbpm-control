@@ -141,6 +141,7 @@ public class VariableInstanceDataDetail extends StandardDetailView<VariableInsta
     protected void initVisibleComponents() {
         if (!newVariable) {
             activityInstanceIdField.setVisible(true);
+            nameField.setReadOnly(true);
         }
     }
 
