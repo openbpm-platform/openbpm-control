@@ -2,20 +2,20 @@
   "products": [
     {
       "name": "Flowset Studio",
-      "url": "https://flowset.io",
+      "url": "https://flowset.io/studio",
       "description": "Плагин для визуального моделирования BPMN-процессов в IntelliJ IDEA",
       "released": true
     },
     {
-      "name": "Flowset Workspace (скоро появится)",
-      "url": "https://flowset.io",
-      "description": "Инструмент для визуального создания прототипов систем с бизнес процессами",
-      "released": false
+      "name": "Flowset Tasklist",
+      "url": "https://flowset.io/tasklist",
+      "description": "Open-source веб-приложение для отображения и работы с задачами пользователей",
+      "released": true
     },
     {
-      "name": "Flowset Tasklist (скоро появится)",
-      "url": "https://flowset.io",
-      "description": "Open-source веб-приложение для отображения и работы с задачами пользователей",
+      "name": "Flowset Workspace (скоро появится)",
+      "url": "https://flowset.io/workspace",
+      "description": "Инструмент для визуального создания прототипов систем с бизнес процессами",
       "released": false
     }
   ],
@@ -25,16 +25,20 @@
       "label": "Вебсайт"
     },
     {
-      "url": "https://github.com/flowset-platform/flowset-control?tab=readme-ov-file#table-of-contents",
+      "url": "https://github.com/flowset/flowset-control?tab=readme-ov-file#table-of-contents",
       "label": "Документация Flowset Control"
     },
     {
-      "url": "https://github.com/flowset-platform/flowset-control",
+      "url": "https://github.com/flowset/flowset-control",
       "label": "Исходный код Flowset Control"
     },
     {
-      "url": "https://join.slack.com/t/flowset/shared_invite/zt-31ghauwhi-eaF8kkgtcM091pt4P4HXyA",
+      "url": "https://flowset.slack.com/",
       "label": "Поддержка"
+    },
+    {
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/company/flowset-platform/"
     }
   ]
 }
