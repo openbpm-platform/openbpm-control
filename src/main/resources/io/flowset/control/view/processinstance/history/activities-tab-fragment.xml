@@ -1,0 +1,42 @@
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<fragment xmlns="http://jmix.io/schema/flowui/fragment">
+    <data>
+        <instance id="processInstanceDataDc"
+                  class="io.flowset.control.entity.processinstance.ProcessInstanceData" provided="true"/>
+
+        <collection id="historicActivityInstancesDc"
+                    class="io.flowset.control.entity.activity.HistoricActivityInstanceData">
+            <loader id="historicActivityInstancesDl" readOnly="true"/>
+        </collection>
+
+    </data>
+    <content>
+        <vbox height="100%" width="100%" themeNames="spacing-xs" minHeight="20em" padding="false">
+            <hbox classNames="buttons-panel" padding="false">
+                <button action="historicActivityInstancesGrid.view" themeNames="small primary"/>
+                <simplePagination id="historicActivityInstancesPagination" dataLoader="historicActivityInstancesDl"/>
+            </hbox>
+            <dataGrid id="historicActivityInstancesGrid" width="100%" height="100%" themeNames="compact"
+                      dataContainer="historicActivityInstancesDc">
+                <actions>
+                    <action id="view"
+                            text="msg:///actions.View"
+                            icon="EYE"
+                            type="list_itemTracking"/>
+                </actions>
+                <columns resizable="true">
+                    <column property="activityId"/>
+                    <column property="activityType"/>
+                    <column property="activityName"/>
+                    <column property="startTime"/>
+                    <column property="endTime"/>
+                    <column property="assignee" sortable="false"/>
+                </columns>
+            </dataGrid>
+        </vbox>
+    </content>
+</fragment>

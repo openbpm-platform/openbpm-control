@@ -1,16 +1,16 @@
-This repository contains links to OpenBPM Control resources and supporting configuration files for running Docker Compose as a local development option.
+This repository contains links to Flowset Control resources and supporting configuration files for running Docker Compose as a local development option.
 
 ## Using Docker Compose
 
 The following Docker Compose files are provided:
 1. [docker-compose-core.yaml](docker-compose-core.yaml) which contains these components:
-    - **OpenBPM Control**
-    - PostgresQL which is used by **OpenBPM Control**
+    - **Flowset Control**
+    - PostgresQL which is used by **Flowset Control**
 
    **Note:** This Docker Compose is suitable for cases when you need to connect to already running external Camunda 7 engines.
 2. [docker-compose-full.yaml](docker-compose-core.yaml) which contains these components:
-    - **OpenBPM Control**
-    - PostgresQL which is used by **OpenBPM Control**
+    - **Flowset Control**
+    - PostgresQL which is used by **Flowset Control**
     - Camunda 7 as the external BPM engine - an engine that runs on the `8082` port by default.
     - PostgresQL which is used by Camunda 7
 
@@ -42,23 +42,23 @@ The following Docker Compose files are provided:
    cd docker-compose
    ```
 5. Execute the following commands:
-     - **OpenBPM Control only:** If you want to run OpenBPM Control without the Camunda 7 engine, use:
+     - **Flowset Control only:** If you want to run Flowset Control without the Camunda 7 engine, use:
         ```shell
         docker compose -f docker-compose-core.yaml up -d
         ```
         To check container statuses:
         ```shell
-        docker container ls -f "name=openbpm-control-app" -f "name=openbpm-control-database"
+        docker container ls -f "name=flowset-control-app" -f "name=flowset-control-database"
         ```
-    - **OpenBPM Control + external Camunda 7:** If you want to run not only OpenBPM Control, but also the Camunda 7 engine, use
+    - **Flowset Control + external Camunda 7:** If you want to run not only Flowset Control, but also the Camunda 7 engine, use
       ```shell
       docker compose -f docker-compose-full.yaml up -d
       ```
       To check container statuses:
       ```shell
-      docker container ls -f "name=openbpm-control-app" -f "name=openbpm-control-database" -f "name=camunda7-bpm-platform" -f "name=camunda7-bpm-platform-database"
+      docker container ls -f "name=flowset-control-app" -f "name=flowset-control-database" -f "name=camunda7-bpm-platform" -f "name=camunda7-bpm-platform-database"
       ```
-6. Open OpenBPM Control in your browser using the link [http://localhost:8081](http://localhost:8081) and login as `admin/admin`.
+6. Open Flowset Control in your browser using the link [http://localhost:8081](http://localhost:8081) and login as `admin/admin`.
 7. Configure your first connection to the Camunda 7 engine. 
    
    If you are running Camunda 7 using `docker-compose-full.yaml`, enter the following data:

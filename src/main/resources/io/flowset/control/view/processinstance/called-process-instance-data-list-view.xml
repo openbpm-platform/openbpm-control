@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2025. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://calledProcessInstanceDataListView.title"
+      focusComponent="processInstancesDataGrid">
+    <data>
+        <collection id="processInstancesDc"
+                    class="io.flowset.control.entity.processinstance.ProcessInstanceData">
+            <loader id="processInstancesDl" readOnly="true"/>
+        </collection>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+        <urlQueryParameters>
+            <pagination component="pagination"/>
+        </urlQueryParameters>
+    </facets>
+    <actions>
+        <action id="closeAction" type="view_close" text="msg:///actions.Close"/>
+    </actions>
+    <layout>
+        <hbox id="buttonsPanel" classNames="buttons-panel">
+            <simplePagination id="pagination" dataLoader="processInstancesDl"/>
+        </hbox>
+        <dataGrid id="processInstancesDataGrid"
+                  width="100%"
+                  minHeight="20em"
+                  dataContainer="processInstancesDc"
+                  columnReorderingAllowed="true">
+            <actions>
+            </actions>
+            <columns resizable="true">
+                <column property="id">
+                    <fragmentRenderer class="io.flowset.control.view.processinstance.column.instanceid.InstanceIdColumnFragment"/>
+                </column>
+                <column property="processDefinitionId" resizable="true" header="msg://processKey" flexGrow="2"
+                        autoWidth="true"/>
+                <column property="businessKey"/>
+                <column property="startTime"/>
+                <column property="endTime"/>
+                <column property="state">
+                    <fragmentRenderer class="io.flowset.control.view.processinstance.column.state.ProcessInstanceStateColumnFragment"/>
+                </column>
+                <column key="actions" sortable="false" autoWidth="true" flexGrow="0"/>
+            </columns>
+        </dataGrid>
+        <hbox id="lookupActions">
+            <button id="closeButton" action="closeAction"/>
+        </hbox>
+    </layout>
+</view>

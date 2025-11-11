@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://startProcessWithVariablesView.title">
+    <data>
+        <instance id="processDefinitionDc" class="io.flowset.control.entity.processdefinition.ProcessDefinitionData"/>
+        <collection id="variableDc" class="io.flowset.control.entity.variable.VariableInstanceData"/>
+    </data>
+    <actions>
+        <action id="cancelAction" type="detail_discard"/>
+        <action id="startProcessAction" icon="PLAY" text="msg://startProcess" actionVariant="PRIMARY"/>
+    </actions>
+    <layout>
+        <formLayout id="processDefinitionFormLayout" dataContainer="processDefinitionDc">
+            <textField property="name" readOnly="true"/>
+            <textField property="version" readOnly="true"/>
+            <textField property="processDefinitionId" readOnly="true"
+                       colspan="2"
+                       width="auto"
+                       label="msg://processDefinitionIdLabel"/>
+        </formLayout>
+        <vbox id="variablesVBox" width="100%" padding="false" themeNames="spacing-s">
+            <h4 text="msg://variableGrid.title"/>
+            <hbox id="variableGridPanel" classNames="buttons-panel">
+                <button id="createVariableBtn" action="variableGrid.add" themeNames="primary small"/>
+                <button id="editVariableBtn" action="variableGrid.edit" themeNames="small"/>
+                <button id="removeVariableBtn" action="variableGrid.remove" themeNames="small"/>
+            </hbox>
+            <dataGrid id="variableGrid" dataContainer="variableDc" maxHeight="15em">
+                <columns>
+                    <column property="name"/>
+                    <column key="value" header="msg://variableValue.title" sortable="false"/>
+                    <column property="type"/>
+                </columns>
+                <actions>
+                    <action id="add" type="list_add"/>
+                    <action id="edit" type="list_edit"/>
+                    <action id="remove" type="list_remove"/>
+                </actions>
+            </dataGrid>
+        </vbox>
+
+        <hbox id="lookupActions" classNames="buttons-panel" justifyContent="END" >
+            <button id="startProcessBtn" action="startProcessAction" />
+            <button id="cancelBtn" action="cancelAction"/>
+        </hbox>
+    </layout>
+</view>

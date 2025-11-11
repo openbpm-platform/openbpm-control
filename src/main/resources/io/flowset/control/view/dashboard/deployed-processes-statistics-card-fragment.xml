@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fragment xmlns="http://jmix.io/schema/flowui/fragment">
+    <data>
+        <instance id="selectedEngineDc" provided="true" class="io.flowset.control.entity.engine.BpmEngine"/>
+    </data>
+    <content>
+        <div classNames="bordered-card p-m bg-base count-statistics-card">
+            <hbox width="100%" height="100%"
+                  classNames="sm:small-gap md:small-gap lg:small-gap xl:small-gap xxl:small-gap">
+                <vbox padding="false" themeNames="spacing-s" width="fit-content" alignItems="BASELINE">
+                    <span text="msg://deployedProcesses" classNames="text-secondary "/>
+                    <hbox width="100%" alignItems="CENTER" height="100%" themeNames="spacing-s">
+                        <icon icon="ROCKET"/>
+                        <h3 id="deployProcessesCount" text="0" alignSelf="CENTER"/>
+                    </hbox>
+                </vbox>
+                <button id="viewDefinitionsBtn" icon="CHEVRON_CIRCLE_RIGHT_O"
+                        themeNames="tertiary-inline large" classNames="ml-auto" height="min-content"/>
+            </hbox>
+        </div>
+    </content>
+</fragment>

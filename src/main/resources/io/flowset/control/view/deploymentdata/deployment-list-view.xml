@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://deploymentListView.title"
+      focusComponent="deploymentsDataGrid">
+    <data>
+        <collection id="deploymentDatasDc" class="io.flowset.control.entity.deployment.DeploymentData">
+            <loader id="deploymentDatasDl" readOnly="true"/>
+        </collection>
+        <instance id="deploymentFilterDc" class="io.flowset.control.entity.filter.DeploymentFilter"/>
+    </data>
+    <facets>
+        <urlQueryParameters>
+            <pagination component="pagination"/>
+        </urlQueryParameters>
+    </facets>
+    <actions>
+        <action id="applyFilter" text="msg:///actions.Apply" icon="SEARCH"/>
+    </actions>
+    <layout>
+        <hbox id="filterPanel" width="100%" padding="true" spacing="false">
+            <details id="filterDetails" opened="true" width="100%" summaryText="msg://filter">
+                <formLayout id="filterFormLayout" dataContainer="deploymentFilterDc">
+                    <responsiveSteps>
+                        <responsiveStep minWidth="0" columns="1"/>
+                        <responsiveStep minWidth="28em" columns="2"/>
+                        <responsiveStep minWidth="42em" columns="3"/>
+                        <responsiveStep minWidth="60em" columns="4"/>
+                    </responsiveSteps>
+
+                    <textField id="nameField"
+                               property="nameLike"
+                               label="msg://filter.name.label"
+                               placeholder="msg://filter.name.placeholder"
+                               clearButtonVisible="true"/>
+                    <dateTimePicker id="deploymentAfterField"
+                                    property="deploymentAfter"
+                                    label="msg://filter.deploymentAfter.label"/>
+                    <dateTimePicker id="deploymentBeforeField"
+                                    property="deploymentBefore"
+                                    label="msg://filter.deploymentBefore.label"/>
+
+                    <hbox alignSelf="END">
+                        <button id="applyFilterBtn"
+                                action="applyFilter"
+                                themeNames="primary"
+                                icon="SEARCH"/>
+                        <button id="clearBtn"
+                                text="msg:///actions.Clear"
+                                icon="CLOSE_SMALL"/>
+                    </hbox>
+                </formLayout>
+            </details>
+        </hbox>
+        <hbox id="buttonsPanel" classNames="buttons-panel">
+            <button id="refreshBtn" action="deploymentsDataGrid.refresh" themeNames="primary success"/>
+            <button id="bulkRemoveBtn" action="deploymentsDataGrid.bulkRemove"/>
+            <simplePagination id="pagination" dataLoader="deploymentDatasDl"/>
+        </hbox>
+        <dataGrid id="deploymentsDataGrid"
+                  width="100%"
+                  minHeight="20em"
+                  dataContainer="deploymentDatasDc"
+                  columnReorderingAllowed="true"
+                  selectionMode="MULTI">
+            <actions>
+                <action id="refresh" type="list_refresh"/>
+                <action id="bulkRemove" type="list_itemTracking" icon="TRASH"
+                        text="msg://deploymentDataList.remove" actionVariant="DANGER"/>
+                <action id="view" type="list_edit" visible="false"/>
+            </actions>
+            <columns resizable="true">
+                <column property="deploymentId" flexGrow="1"/>
+                <column property="name" autoWidth="true" flexGrow="1"/>
+                <column property="deploymentTime"/>
+                <column property="source"/>
+                <column property="tenantId"/>
+                <column key="actions" sortable="false" editable="false" autoWidth="true" flexGrow="0"/>
+            </columns>
+        </dataGrid>
+    </layout>
+</view>

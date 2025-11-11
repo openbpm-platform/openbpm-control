@@ -1,0 +1,76 @@
+/*
+ * Copyright (c) Haulmont 2024. All Rights Reserved.
+ * Use is subject to license terms.
+ */
+
+:host {
+    pointer-events: none;
+}
+
+html {
+    --bpmn-history-activity-color: rgba(162, 224, 172, 0.45);
+    --dashboard-background-color: hsla(214, 61%, 25%, 0.02);
+    --toggle-button-border-color: rgba(48, 114, 132, 0.8);
+
+    --menu-item-hover-bg-color: #7EB3C2;
+    --menu-item-hover-color:rgb(16, 70, 86);
+    --user-avatar-bg-color: #7EB3C2;
+    --menu-group-item-color: #69CE87;
+    --side-menu-bg-color: rgb(16, 70, 86);
+}
+
+[part="toggle"] {
+    pointer-events: auto;
+}
+
+[part='footer'] {
+    background-color: var(--lumo-base-color);
+}
+
+.suspended-state-small-icon {
+    padding: calc(var(--lumo-space-xs) + 0.15rem);
+}
+
+.bordered-container {
+    padding: 0;
+    border: 1px var(--lumo-utility-border-style, solid) var(--lumo-utility-border-color, var(--lumo-contrast-20pct));
+    border-radius: var(--lumo-border-radius-l);
+}
+
+.sticky-buttons-bottom-panel {
+    position: sticky;
+    bottom: 0;
+    background-color: var(--lumo-base-color);
+}
+
+.no-click-tree-grid vaadin-grid-cell-content {
+    display: flex;
+    align-items: center;
+}
+
+.no-click-tree-item-name {
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+vaadin-grid::part(multiline-text-cell) {
+    white-space: pre-wrap;
+}
+
+[theme~='badge'][theme~='warning'] {
+    color: var(--lumo-warning-text-color);
+    background-color: var(--lumo-warning-color-10pct);
+}
+
+vaadin-grid::part(error-cell) {
+    background-color: var(--lumo-error-color-10pct);
+}
+
+vaadin-button[theme~='badge'][theme~='has-icon'] {
+    padding-block: 0.2em;
+}
+
+vaadin-button[theme~='badge'][theme~='has-icon'] vaadin-icon {
+    margin-left: 0;
+    margin-block: 0;
+}

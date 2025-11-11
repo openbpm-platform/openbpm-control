@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view" focusComponent="processInstancesGrid"
+      title="msg://processInstanceList.title">
+    <data>
+        <collection id="processInstancesDc" class="io.flowset.control.entity.processinstance.ProcessInstanceData">
+            <loader id="processInstancesDl"/>
+        </collection>
+        <instance id="processInstanceFilterDc" class="io.flowset.control.entity.filter.ProcessInstanceFilter"/>
+    </data>
+    <facets>
+        <dataLoadCoordinator auto="true"/>
+        <urlQueryParameters id="urlQueryParameters">
+            <pagination component="processInstancePagination"/>
+        </urlQueryParameters>
+    </facets>
+    <layout expand="processInstancesGrid">
+        <hbox id="modeButtonsGroup" spacing="false" padding="false" classNames="toggle-button-group">
+            <button text="msg://io.flowset.control.view.processinstance/ProcessInstanceViewMode.ALL" themeNames="tertiary" classNames="border-b border-t border-l"/>
+            <button text="msg://io.flowset.control.view.processinstance/ProcessInstanceViewMode.ACTIVE" themeNames="tertiary primary" classNames="border rounded-none"/>
+            <button text="msg://io.flowset.control.view.processinstance/ProcessInstanceViewMode.COMPLETED" themeNames="tertiary" classNames="border-b border-t border-r"/>
+        </hbox>
+        <hbox id="buttonsPanel" classNames="buttons-panel" alignItems="BASELINE">
+            <button id="refreshBtn" action="processInstancesGrid.refresh" themeNames="success primary"
+                    text="msg:///actions.Refresh"/>
+            <button id="bulkTerminateBtn" action="processInstancesGrid.bulkTerminate" enabled="false"/>
+            <button id="bulkSuspendBtn" action="processInstancesGrid.bulkSuspend" enabled="false"/>
+            <button id="bulkActivateBtn" action="processInstancesGrid.bulkActivate" enabled="false"/>
+            <simplePagination id="processInstancePagination" dataLoader="processInstancesDl"/>
+        </hbox>
+        <dataGrid id="processInstancesGrid"
+                  dataContainer="processInstancesDc"
+                  width="100%" selectionMode="MULTI"
+                  minHeight="20em">
+            <actions>
+                <action id="refresh" type="list_refresh"/>
+                <action id="bulkTerminate" type="list_itemTracking" text="msg:///actions.Terminate" icon="DOT_CIRCLE"/>
+                <action id="bulkActivate" type="list_itemTracking" text="msg:///actions.Activate" icon="PLAY"/>
+                <action id="bulkSuspend" type="list_itemTracking" text="msg:///actions.Suspend" icon="PAUSE"/>
+                <action id="view" type="list_edit" visible="false"/>
+            </actions>
+            <columns resizable="true">
+                <column property="id" flexGrow="1"/>
+                <column property="processDefinitionId" resizable="true" header="msg://processKey" flexGrow="2"
+                        autoWidth="true"/>
+                <column property="businessKey" flexGrow="1" autoWidth="true"/>
+                <column property="state" sortable="false" autoWidth="true" flexGrow="1">
+                    <fragmentRenderer
+                            class="io.flowset.control.view.processinstance.column.state.ProcessInstanceStateColumnFragment"/>
+                </column>
+                <column property="startTime" autoWidth="true"/>
+                <column property="endTime" flexGrow="1" autoWidth="true"/>
+                <column key="actions" sortable="false" autoWidth="true" flexGrow="0"/>
+            </columns>
+        </dataGrid>
+    </layout>
+</view>

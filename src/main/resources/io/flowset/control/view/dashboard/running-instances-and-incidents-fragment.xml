@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<fragment xmlns="http://jmix.io/schema/flowui/fragment"
+          xmlns:charts="http://jmix.io/schema/charts/ui">
+    <data>
+        <instance id="selectedEngineDc" provided="true" class="io.flowset.control.entity.engine.BpmEngine"/>
+        <collection id="processDefinitionStatisticsDc"
+                    class="io.flowset.control.entity.dashboard.ProcessDefinitionStatistics">
+            <loader id="processDefinitionStatisticsDl"/>
+        </collection>
+        <keyValueCollection id="groupedProcessInstancesDc">
+            <properties>
+                <property name="process" datatype="string"/>
+                <property name="instanceCount" datatype="int"/>
+            </properties>
+        </keyValueCollection>
+        <keyValueCollection id="groupedIncidentsDc">
+            <properties>
+                <property name="process" datatype="string"/>
+                <property name="incidentCount" datatype="int"/>
+            </properties>
+        </keyValueCollection>
+    </data>
+    <content>
+        <div classNames="grid grid-flow-row grid-rows-2 grid-cols-1 gap-m">
+            <div id="runningInstancesCard" classNames="bordered-card p-m bg-base col-span-2">
+                <hbox padding="false" themeNames="spacing-s" width="100%" alignItems="BASELINE">
+                    <h3 text="msg://runningInstances"/>
+                    <button id="viewRunningInstancesStatBtn" icon="ELLIPSIS_DOTS_H" classNames="ml-auto"
+                            themeNames="tertiary-inline"/>
+                </hbox>
+                <span text="msg://runningProcesses.helpText" classNames="text-secondary text-s"/>
+                <vbox id="runningInstanceLoadingBox" visible="false" width="100%" themeNames="spacing-xl"
+                      height="100%">
+                    <span classNames="skeleton-background" width="100%" height="1.5em"/>
+                    <span classNames="skeleton-background" width="100%" height="1.5em"/>
+                    <span classNames="skeleton-background" width="100%" height="1.5em"/>
+                </vbox>
+                <flexLayout id="runningInstancesChartContainer" height="100%" minHeight="10em" maxHeight="15em"
+                            alignSelf="CENTER" width="100%">
+                    <charts:chart id="runningInstancesChart" height="100%" width="100%" renderer="SVG">
+                        <charts:tooltip trigger="ITEM" position="LEFT"/>
+                        <charts:dataSet>
+                            <charts:source dataContainer="groupedProcessInstancesDc"
+                                           categoryField="process"
+                                           valueFields="instanceCount"/>
+                        </charts:dataSet>
+                        <charts:series>
+                            <charts:pie radius="50% 80%" name="msg://processCount">
+                                <charts:label show="false"/>
+                                <charts:labelLine show="false"/>
+                            </charts:pie>
+                        </charts:series>
+                    </charts:chart>
+                </flexLayout>
+            </div>
+            <div id="incidentsCard" classNames="bordered-card p-m bg-base col-span-2">
+                <hbox padding="false" themeNames="spacing-s" width="100%" alignItems="BASELINE">
+                    <h3 text="msg://incidents"/>
+                    <button id="viewIncidentsStatBtn" icon="ELLIPSIS_DOTS_H" classNames="ml-auto"
+                            themeNames="tertiary-inline"/>
+                </hbox>
+                <span text="msg://incidents.helpText" classNames="text-secondary text-s"/>
+                <vbox id="incidentLoadingBox" height="100%" minHeight="10em" maxHeight="15em" alignSelf="CENTER"
+                      themeNames="spacing-xl">
+                    <span classNames="skeleton-background" width="100%" height="1.5em"/>
+                    <span classNames="skeleton-background" width="100%" height="1.5em"/>
+                    <span classNames="skeleton-background" width="100%" height="1.5em"/>
+                </vbox>
+                <flexLayout id="incidentsChartContainer" height="100%" minHeight="10em" maxHeight="15em"
+                            alignSelf="CENTER">
+                    <charts:chart id="incidentsChart" height="100%" width="100%" renderer="SVG">
+                        <charts:tooltip trigger="ITEM" position="LEFT"/>
+                        <charts:dataSet>
+                            <charts:source dataContainer="groupedIncidentsDc"
+                                           categoryField="process"
+                                           valueFields="incidentCount"/>
+                        </charts:dataSet>
+                        <charts:series>
+                            <charts:pie radius="50% 80%" name="msg://processCount">
+                                <charts:label show="false"/>
+                                <charts:labelLine show="false"/>
+                            </charts:pie>
+                        </charts:series>
+                    </charts:chart>
+                </flexLayout>
+            </div>
+        </div>
+    </content>
+</fragment>

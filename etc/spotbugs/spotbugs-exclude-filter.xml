@@ -41,33 +41,33 @@
 
     <Match>
         <Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
-        <Package name="io.openbpm.control.entity"/>
+        <Package name="io.flowset.control.entity"/>
     </Match>
 
     <Match>
         <Bug pattern="NP_BOOLEAN_RETURN_NULL"/>
-        <Package name="io.openbpm.control.entity.filter"/>
+        <Package name="io.flowset.control.entity.filter"/>
     </Match>
 
     <Match>
         <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
-        <Class name="io.openbpm.control.test_support.camunda7.CamundaRunContainer"/>
+        <Class name="io.flowset.control.test_support.camunda7.CamundaRunContainer"/>
     </Match>
 
     <Match>
         <Bug pattern="EQ_DOESNT_OVERRIDE_EQUALS"/>
-        <Class name="io.openbpm.control.test_support.camunda7.OperatonContainer"/>
+        <Class name="io.flowset.control.test_support.camunda7.OperatonContainer"/>
     </Match>
 
     <Match>
         <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
-        <Class name="io.openbpm.control.view.processinstance.runtime.RuntimeTabFragment" />
+        <Class name="io.flowset.control.view.processinstance.runtime.RuntimeTabFragment" />
         <Method name="onRuntimeActivityInstancesDcItemChange" />
     </Match>
 
     <Match>
         <Bug pattern="NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE" />
-        <Class name="io.openbpm.control.view.processinstance.history.HistoryTabFragment" />
+        <Class name="io.flowset.control.view.processinstance.history.HistoryTabFragment" />
         <Method name="onHistoryTabsheetSelectedChange" />
     </Match>
 

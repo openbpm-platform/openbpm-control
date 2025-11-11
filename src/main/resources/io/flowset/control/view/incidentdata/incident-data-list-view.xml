@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      title="msg://incidentDataListView.title"
+      focusComponent="incidentsDataGrid">
+    <data>
+        <collection id="incidentsDc"
+                    class="io.flowset.control.entity.incident.IncidentData">
+            <loader id="incidentsDl" readOnly="true"/>
+        </collection>
+        <instance id="filterDc" class="io.flowset.control.entity.filter.IncidentFilter"/>
+    </data>
+    <facets>
+        <urlQueryParameters id="urlQueryParameters">
+            <pagination component="pagination"/>
+        </urlQueryParameters>
+    </facets>
+    <actions>
+        <action id="selectAction" type="lookup_select"/>
+        <action id="discardAction" type="lookup_discard"/>
+    </actions>
+    <layout>
+        <hbox id="buttonsPanel" classNames="buttons-panel" alignItems="BASELINE">
+            <button action="incidentsDataGrid.refresh" themeNames="success primary"/>
+            <button action="incidentsDataGrid.bulkRetry"/>
+            <simplePagination id="pagination" dataLoader="incidentsDl"/>
+        </hbox>
+        <dataGrid id="incidentsDataGrid" classNames="incidents-data-grid"
+                  width="100%"
+                  minHeight="20em" selectionMode="MULTI"
+                  dataContainer="incidentsDc">
+            <actions>
+                <action id="refresh" type="list_refresh"/>
+                <action id="bulkRetry" type="list_itemTracking" icon="ROTATE_LEFT" text="msg:///actions.Retry"/>
+                <action id="view" type="list_edit" visible="false"/>
+            </actions>
+            <columns resizable="true">
+                <column property="activityId"/>
+                <column property="timestamp" flexGrow="1"/>
+                <column property="message"/>
+                <column property="processInstanceId"/>
+                <column property="processDefinitionId" flexGrow="2"/>
+                <column property="type" autoWidth="true" flexGrow="0"/>
+                <column key="actions" sortable="false" autoWidth="true" flexGrow="0"/>
+            </columns>
+        </dataGrid>
+        <hbox id="lookupActions" visible="false">
+            <button id="selectBtn" action="selectAction"/>
+            <button id="discardBtn" action="discardAction"/>
+        </hbox>
+    </layout>
+</view>

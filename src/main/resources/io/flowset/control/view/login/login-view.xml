@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+  ~ Copyright (c) Haulmont 2024. All Rights Reserved.
+  ~ Use is subject to license terms.
+  -->
+
+<view xmlns="http://jmix.io/schema/flowui/view"
+      focusComponent="login"
+      title="msg://LoginView.title">
+    <layout justifyContent="CENTER" alignItems="CENTER" classNames="jmix-login-main-layout">
+        <loginForm id="login" classNames="flowset-control-login-form"
+                   rememberMeVisible="true"
+                   forgotPasswordButtonVisible="false">
+            <form title="msg://loginForm.headerTitle"
+                  username="msg://loginForm.username"
+                  password="msg://loginForm.password"
+                  rememberMe="msg://loginForm.rememberMe"
+                  submit="msg://loginForm.submit"
+                  forgotPassword="msg://loginForm.forgotPassword"/>
+            <errorMessage title="msg://loginForm.errorTitle"
+                          message="msg://loginForm.badCredentials"
+                          username="msg://loginForm.errorUsername"
+                          password="msg://loginForm.errorPassword"/>
+        </loginForm>
+    </layout>
+</view>

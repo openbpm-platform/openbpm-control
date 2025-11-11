@@ -1,50 +1,44 @@
 {
   "products": [
     {
-      "name": "OpenBPM Studio",
-      "url": "https://openbpm.ru",
+      "name": "Flowset Studio",
+      "url": "https://flowset.io/studio",
       "description": "Плагин для визуального моделирования BPMN-процессов в IntelliJ IDEA",
       "released": true
     },
     {
-      "name": "OpenBPM Workspace (скоро появится)",
-      "url": "https://openbpm.ru",
-      "description": "Инструмент для визуального создания прототипов систем с бизнес процессами",
-      "released": false
-    },
-    {
-      "name": "OpenBPM TaskList (скоро появится)",
-      "url": "https://openbpm.ru",
+      "name": "Flowset Tasklist",
+      "url": "https://flowset.io/tasklist",
       "description": "Open-source веб-приложение для отображения и работы с задачами пользователей",
-      "released": false
+      "released": true
     },
     {
-      "name": "OpenBPM Engine (скоро появится)",
-      "url": "https://openbpm.ru",
-      "description": "BPM-движок, совместимый по API с Camunda 7",
+      "name": "Flowset Workspace (скоро появится)",
+      "url": "https://flowset.io/workspace",
+      "description": "Инструмент для визуального создания прототипов систем с бизнес процессами",
       "released": false
     }
   ],
   "externalLinks": [
     {
-      "url": "https://openbpm.ru/",
+      "url": "https://flowset.io",
       "label": "Вебсайт"
     },
     {
-      "url": "https://github.com/openbpm-platform/openbpm-control?tab=readme-ov-file#table-of-contents",
-      "label": "Документация OpenBPM Control"
+      "url": "https://github.com/flowset/flowset-control?tab=readme-ov-file#table-of-contents",
+      "label": "Документация Flowset Control"
     },
     {
-      "url": "https://github.com/openbpm-platform/openbpm-control",
-      "label": "Исходный код OpenBPM Control"
+      "url": "https://github.com/flowset/flowset-control",
+      "label": "Исходный код Flowset Control"
     },
     {
-      "url": "https://t.me/openbpm_chat",
+      "url": "https://flowset.slack.com/",
       "label": "Поддержка"
     },
     {
-      "url": "https://t.me/openbpm",
-      "label": "Телеграм канал"
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/company/flowset-platform/"
     }
   ]
 }
