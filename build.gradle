@@ -22,7 +22,7 @@ jmix {
 }
 
 group = 'io.flowset'
-version = '1.1.999-SNAPSHOT'
+version = '2025.0.999-SNAPSHOT'
 
 java {
     toolchain {
